@@ -1,4 +1,4 @@
-package com.romanvonklein.headmagic;
+package com.romanvonklein.skullmagic;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +11,8 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.util.Identifier;
 
-public class HeadMagic implements ModInitializer {
-	public static String MODID = "headmagic";
+public class SkullMagic implements ModInitializer {
+	public static String MODID = "skullmagic";
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.

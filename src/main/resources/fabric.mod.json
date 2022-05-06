@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "headmagic",
+  "id": "skullmagic",
   "version": "${version}",
 
-  "name": "Head Magic",
-  "description": "Head Magic is a mod allowing the player to harness the arcane power withing seperated heads!",
+  "name": "Skull Magic",
+  "description": "Skull Magic is a mod allowing the player to harness the arcane power within Skulls!",
   "authors": [
     "RomanvonKlein"
   ],
@@ -19,11 +19,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.romanvonklein.headmagic.HeadMagic"
+      "com.romanvonklein.skullmagic.SkullMagic"
     ]
   },
   "mixins": [
-    "headmagic.mixins.json"
+    "skullmagic.mixins.json"
   ],
 
   "depends": {

@@ -1,12 +1,12 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.romanvonklein.headmagic.mixin",
+  "package": "com.romanvonklein.skullmagic.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
   "client": [
-    "HeadMagicMixin",
+    "SkullMagicMixin",
     "EntityMixin"
   ],
   "injectors": {
