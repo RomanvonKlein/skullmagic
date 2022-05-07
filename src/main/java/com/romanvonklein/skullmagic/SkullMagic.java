@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic;
 
+import com.romanvonklein.skullmagic.config.Config;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ public class SkullMagic implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		// No magic constants!
+
 		final Identifier COAL_ORE_LOOT_TABLE_ID = Blocks.COAL_ORE.getLootTableId();
 		LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, table, setter) -> {
 			if (COAL_ORE_LOOT_TABLE_ID.equals(id)) {
@@ -34,6 +37,10 @@ public class SkullMagic implements ModInitializer {
 				table.pool(poolBuilder);
 			}
 		});
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info(Config.configToString());
+		LOGGER.info("Trying to load the config:");
+		Config.getConfig();
+		LOGGER.info(Config.configToString());
+
 	}
 }
