@@ -23,8 +23,11 @@ public class Config {
     public static class ConfigData {
         public HashMap<String, Map<String, Float>> drops;
 
+        public HashMap<String, Integer> skulls;
+
         public ConfigData() {
             this.drops = new HashMap<String, Map<String, Float>>();
+            this.skulls = new HashMap<String, Integer>();
         }
     }
 
@@ -66,10 +69,21 @@ public class Config {
 
     private static ConfigData getDefaultConfigData() {
         ConfigData defaultData = new ConfigData();
+
         HashMap<String, Float> zombieDrops = new HashMap<>();
         zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1.0f);
-
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
+        HashMap<String, Float> skeletonDrops = new HashMap<>();
+        zombieDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1.0f);
+        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
+        HashMap<String, Float> creeperDrops = new HashMap<>();
+        zombieDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 1.0f);
+        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
+
+        defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
+        defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
+        defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);
+
         return defaultData;
     }
 

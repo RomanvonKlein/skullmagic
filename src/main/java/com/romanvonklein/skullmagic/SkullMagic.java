@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -39,6 +42,7 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_altar"), SkullAltar);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
 				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		/*
 		 * final Identifier COAL_ORE_LOOT_TABLE_ID = Blocks.COAL_ORE.getLootTableId();
 		 * LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id,

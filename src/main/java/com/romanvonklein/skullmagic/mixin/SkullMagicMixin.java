@@ -3,7 +3,6 @@ package com.romanvonklein.skullmagic.mixin;
 import java.util.Map;
 import java.util.Random;
 
-import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
 
 import org.spongepowered.asm.mixin.Mixin;
