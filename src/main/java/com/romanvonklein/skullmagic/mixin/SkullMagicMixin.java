@@ -31,6 +31,8 @@ public abstract class SkullMagicMixin extends EntityMixin {
 				Float roll = rand.nextFloat();
 				Float chance = itemDrops.get(itemIdentifyer);
 				if (roll <= chance) {
+					// TODO: what happens if the itemIdentifier cannot be parsed to a valid
+					// Identifier?
 					other.dropStack(new ItemStack(Registry.ITEM.get(Identifier.tryParse(itemIdentifyer))));
 				}
 			}

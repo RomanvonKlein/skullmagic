@@ -1,17 +1,19 @@
 package com.romanvonklein.skullmagic;
 
-import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.loot.v1.FabricLootPoolBuilder;
-import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
-import net.minecraft.block.Blocks;
-import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class SkullMagic implements ModInitializer {
 	public static String MODID = "skullmagic";
@@ -19,6 +21,8 @@ public class SkullMagic implements ModInitializer {
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+	public static final Block SkullPedestal = new SkullPedestal(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
 
 	@Override
 	public void onInitialize() {
@@ -26,21 +30,27 @@ public class SkullMagic implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		// No magic constants!
-
-		final Identifier COAL_ORE_LOOT_TABLE_ID = Blocks.COAL_ORE.getLootTableId();
-		LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, table, setter) -> {
-			if (COAL_ORE_LOOT_TABLE_ID.equals(id)) {
-				FabricLootPoolBuilder poolBuilder = FabricLootPoolBuilder.builder()
-						.rolls(ConstantLootNumberProvider.create(1)) // Same as "rolls": 1 in the loot table json
-						.with(ItemEntry.builder(Blocks.ZOMBIE_HEAD));
-
-				table.pool(poolBuilder);
-			}
-		});
-		LOGGER.info(Config.configToString());
-		LOGGER.info("Trying to load the config:");
-		Config.getConfig();
-		LOGGER.info(Config.configToString());
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_pedestal"),
+				new BlockItem(SkullPedestal, new FabricItemSettings().group(ItemGroup.MISC)));
+		/*
+		 * final Identifier COAL_ORE_LOOT_TABLE_ID = Blocks.COAL_ORE.getLootTableId();
+		 * LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id,
+		 * table, setter) -> {
+		 * if (COAL_ORE_LOOT_TABLE_ID.equals(id)) {
+		 * FabricLootPoolBuilder poolBuilder = FabricLootPoolBuilder.builder()
+		 * .rolls(ConstantLootNumberProvider.create(1)) // Same as "rolls": 1 in the
+		 * loot table json
+		 * .with(ItemEntry.builder(Blocks.ZOMBIE_HEAD));
+		 * 
+		 * table.pool(poolBuilder);
+		 * }
+		 * });
+		 * LOGGER.info(Config.configToString());
+		 * LOGGER.info("Trying to load the config:");
+		 * Config.getConfig();
+		 * LOGGER.info(Config.configToString());
+		 */
 
 	}
 }
