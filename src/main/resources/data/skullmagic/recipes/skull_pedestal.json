@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " W ",
+        " W ",
+        "   "
+    ],
+    "key": {
+        "W": {
+            "item": "minecraft:iron_block"
+        }
+    },
+    "result": {
+        "item": "skullmagic:skull_pedestal",
+        "count": 1
+    }
+}

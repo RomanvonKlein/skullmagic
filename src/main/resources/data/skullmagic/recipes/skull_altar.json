@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XGX",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:diamond_block"
+    },
+    "G": {
+      "item": "minecraft:light_weighted_pressure_plate"
+    },
+    "X": {
+      "item": "minecraft:deepslate_bricks"
+    }
+  },
+  "result": {
+    "item": "skullmagic:skull_altar",
+    "count": 1
+  }
+}
