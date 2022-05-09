@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic;
 
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
+import com.romanvonklein.skullmagic.blocks.SkullAltar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ public class SkullMagic implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
+	public static final Block SkullAltar = new SkullAltar(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
 
 	@Override
 	public void onInitialize() {
@@ -33,6 +36,9 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_pedestal"),
 				new BlockItem(SkullPedestal, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_altar"), SkullAltar);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
+				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
 		/*
 		 * final Identifier COAL_ORE_LOOT_TABLE_ID = Blocks.COAL_ORE.getLootTableId();
 		 * LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id,
