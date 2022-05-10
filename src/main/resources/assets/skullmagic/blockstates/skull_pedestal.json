@@ -1,6 +1,9 @@
 {
     "variants": {
-        "": {
+        "connected=true": {
+            "model": "skullmagic:block/skull_pedestal"
+        },
+        "connected=false": {
             "model": "skullmagic:block/skull_pedestal"
         }
     }

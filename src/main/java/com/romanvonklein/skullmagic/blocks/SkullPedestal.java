@@ -53,6 +53,7 @@ public class SkullPedestal extends Block {
 
             // update pedestal charge rate
             world.setBlockState(pos, world.getBlockState(pos).with(CONNECTED, true));
+            world.getBlockEntity(altarPos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).get().addChargeRate(essenceChargeRate);
         }
     }
 

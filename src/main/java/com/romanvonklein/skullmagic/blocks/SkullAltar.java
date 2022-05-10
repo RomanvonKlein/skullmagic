@@ -12,6 +12,11 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -49,5 +54,17 @@ public class SkullAltar extends BlockWithEntity {
             BlockEntityType<T> type) {
         return checkType(type, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY,
                 (world1, pos, state1, be) -> SkullAltarBlockEntity.tick(world1, pos, state1, be));
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+            BlockHitResult hit) {
+        SkullAltarBlockEntity altarEntity = world.getBlockEntity(pos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).get();
+        if (altarEntity != null) {
+            altarEntity.trySetLinkedPlayer(player);
+        } else {
+            SkullMagic.LOGGER.warn("unabled to find the SkullAltarBlockEntity on the position: " + pos);
+        }
+        return ActionResult.SUCCESS;
     }
 }
