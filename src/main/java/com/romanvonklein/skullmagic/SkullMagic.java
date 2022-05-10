@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic;
 
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 
@@ -33,6 +34,7 @@ public class SkullMagic implements ModInitializer {
 	public static Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
+	public static BlockEntityType<SkullPedestalBlockEntity> SKULL_PEDESTAL_BLOCK_ENTITY;
 	private static KeyBinding keyBinding;
 
 	@Override
@@ -43,6 +45,9 @@ public class SkullMagic implements ModInitializer {
 
 		SKULL_ALTAR_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":skull_altar_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullAltarBlockEntity::new, SkullAltar).build(null));
+		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+				MODID + ":skull_pedestal_block_entity",
+				FabricBlockEntityTypeBuilder.create(SkullPedestalBlockEntity::new, SkullPedestal).build(null));
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_altar"),
 				SkullAltar);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),

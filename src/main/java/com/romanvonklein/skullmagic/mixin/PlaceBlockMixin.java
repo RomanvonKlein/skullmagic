@@ -1,6 +1,9 @@
 package com.romanvonklein.skullmagic.mixin;
 
+import java.util.Optional;
+
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.config.Config;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,19 +32,23 @@ public class PlaceBlockMixin {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 BlockPos below = pos.down();
-                BlockState pedestalCandidateBlockState = world.getBlockState(below);
-                String pedestalCandidateIdentifier = Registry.BLOCK.getId(pedestalCandidateBlockState.getBlock())
-                        .toString();
-                SkullMagic.LOGGER.info("Placed a skull: " + blockIdentifier + " onto: " + pedestalCandidateIdentifier);
+                Optional<SkullPedestalBlockEntity> optional = world.getBlockEntity(below,
+                        SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
+
+                if (optional.isPresent()) {
+                    String pedestalCandidateIdentifier = Registry.BLOCK
+                            .getId(world.getBlockState(optional.get().getPos()).getBlock())
+                            .toString();
+                    if (pedestalCandidateIdentifier.equals("skullmagic:skull_pedestal")) {
+                        SkullMagic.LOGGER.info("Skull Placed on pedestal!");
+                        optional.get().addSkull(world, pos.down(),
+                                blockIdentifier,
+                                (PlayerEntity) placer);
+                    }
+                }
 
                 // TODO: smart better pedestal detection.
 
-                if (pedestalCandidateIdentifier.equals("skullmagic:skull_pedestal")) {
-                    SkullMagic.LOGGER.info("Skull Placed on pedestal!");
-                    ((SkullPedestal) pedestalCandidateBlockState.getBlock()).addSkull(world, pos.down(),
-                            blockIdentifier,
-                            (PlayerEntity) placer);
-                }
             }
         }
     }
