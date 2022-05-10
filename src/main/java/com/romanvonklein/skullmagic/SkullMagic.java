@@ -1,15 +1,12 @@
 package com.romanvonklein.skullmagic;
 
-import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
+import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -42,25 +39,6 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_altar"), SkullAltar);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
 				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		/*
-		 * final Identifier COAL_ORE_LOOT_TABLE_ID = Blocks.COAL_ORE.getLootTableId();
-		 * LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id,
-		 * table, setter) -> {
-		 * if (COAL_ORE_LOOT_TABLE_ID.equals(id)) {
-		 * FabricLootPoolBuilder poolBuilder = FabricLootPoolBuilder.builder()
-		 * .rolls(ConstantLootNumberProvider.create(1)) // Same as "rolls": 1 in the
-		 * loot table json
-		 * .with(ItemEntry.builder(Blocks.ZOMBIE_HEAD));
-		 * 
-		 * table.pool(poolBuilder);
-		 * }
-		 * });
-		 * LOGGER.info(Config.configToString());
-		 * LOGGER.info("Trying to load the config:");
-		 * Config.getConfig();
-		 * LOGGER.info(Config.configToString());
-		 */
 
 	}
 }

@@ -11,10 +11,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+
+import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 
 @Mixin(Block.class)
 public class PlaceBlockMixin {
@@ -26,7 +29,8 @@ public class PlaceBlockMixin {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 BlockPos below = pos.down();
-                String pedestalCandidateIdentifier = Registry.BLOCK.getId(world.getBlockState(below).getBlock())
+                BlockState pedestalCandidateBlockState = world.getBlockState(below);
+                String pedestalCandidateIdentifier = Registry.BLOCK.getId(pedestalCandidateBlockState.getBlock())
                         .toString();
                 SkullMagic.LOGGER.info("Placed a skull: " + blockIdentifier + " onto: " + pedestalCandidateIdentifier);
 
@@ -34,9 +38,11 @@ public class PlaceBlockMixin {
 
                 if (pedestalCandidateIdentifier.equals("skullmagic:skull_pedestal")) {
                     SkullMagic.LOGGER.info("Skull Placed on pedestal!");
+                    ((SkullPedestal) pedestalCandidateBlockState.getBlock()).addSkull(world, pos.down(),
+                            blockIdentifier,
+                            (PlayerEntity) placer);
                 }
             }
-
         }
     }
 }
