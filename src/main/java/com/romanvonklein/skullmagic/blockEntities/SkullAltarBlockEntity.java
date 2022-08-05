@@ -1,11 +1,16 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,12 +18,11 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
-import java.util.ArrayList;
 
 public class SkullAltarBlockEntity extends BlockEntity {
     private int essence = 0;
@@ -73,16 +77,22 @@ public class SkullAltarBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, SkullAltarBlockEntity be) {
+
         if (world.isClient) {
 
         } else {
+
             int prevEssence = be.getEssence();
             be.chargeEssence();
-            if (prevEssence != be.getEssence()) {
-                // TODO: send update to client??
+            if (prevEssence != be.getEssence()
+                    && ((ServerWorld) world).getPlayerByUuid(UUID.fromString(be.linkedPlayerID)) != null) {
+                ServerPlayNetworking.send(
+                        (ServerPlayerEntity) (world.getPlayerByUuid(UUID.fromString(be.linkedPlayerID))),
+                        NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, PacketByteBufs.empty());
             }
             // SkullMagic.LOGGER.info(prevEssence + "->" + be.getEssence() + "(" +
             // be.essenceChargeRate + ")");
+
         }
     }
 
