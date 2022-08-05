@@ -31,14 +31,27 @@ public class SkullPedestalBlockEntity extends BlockEntity {
 
     @Override
     public void writeNbt(NbtCompound tag) {
-        tag.putIntArray("linkedAltarPosition", this.linkedAltarCoords);
+        if (this.linkedAltarCoords != null) {
+            tag.putIntArray("linkedAltarPosition", this.linkedAltarCoords);
+        }
         super.writeNbt(tag);
     }
 
     @Override
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
-        linkedAltarCoords = tag.getIntArray("linkedAltarPosition");
+        if (tag.contains("linkedAltarPosition")) {
+            try {
+                linkedAltarCoords = tag.getIntArray("linkedAltarPosition");
+                if (linkedAltarCoords != null) {
+                    SkullMagic.LOGGER
+                            .info(String.format("Successfully loaded linkedAltarCoords from nbt: %d %d %d",
+                                    linkedAltarCoords[0], linkedAltarCoords[1], linkedAltarCoords[2]));
+                }
+            } catch (Exception e) {
+                SkullMagic.LOGGER.error("Failed loading linked altar position from NBT data!");
+            }
+        }
     }
 
     @Nullable

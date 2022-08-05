@@ -42,15 +42,19 @@ public class testPersistantState extends PersistentState {
         System.out.println("Reading nbt for testPersistentState");
         testPersistantState tps = new testPersistantState();
         tps.linkedAltars.clear();
-
-        NbtCompound altarLinks = tag.getCompound("altarLinks");
-
-        altarLinks.getKeys().forEach(uuid -> {
-            System.out.println("Loaded link for '" + uuid + "' and '" + altarLinks.getString(uuid) + "'");
-            tps.linkedAltars.put(UUID.fromString(uuid),
-                    new BlockPos(parseBlockPosFromNBTString(altarLinks.getString(uuid))));
-        });
-
+        if (tag.contains("altarLinks")) {
+            try {
+                NbtCompound altarLinks = tag.getCompound("altarLinks");
+                SkullMagic.LOGGER.info("Successfully loaded altarLinks from NBT data: ");
+                altarLinks.getKeys().forEach(uuid -> {
+                    System.out.println("Loaded link for '" + uuid + "' and '" + altarLinks.getString(uuid) + "'");
+                    tps.linkedAltars.put(UUID.fromString(uuid),
+                            new BlockPos(parseBlockPosFromNBTString(altarLinks.getString(uuid))));
+                });
+            } catch (Exception e) {
+                SkullMagic.LOGGER.error("Failed loading persistentstate from NBT data!");
+            }
+        }
         return tps;
     }
 

@@ -43,8 +43,22 @@ public class SkullAltarBlockEntity extends BlockEntity {
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
 
-        essence = tag.getInt("essence");
-        essenceChargeRate = tag.getInt("essenceChargeRate");
+        if (tag.contains("essence")) {
+            try {
+                essence = tag.getInt("essence");
+                SkullMagic.LOGGER.info("Successfully loaded essence from nbt: " + essence);
+            } catch (Exception e) {
+                SkullMagic.LOGGER.error("Failed loading essence for altar from NBT data!");
+            }
+        }
+        if (tag.contains("essenceChargeRate")) {
+            try {
+                essenceChargeRate = tag.getInt("essenceChargeRate");
+                SkullMagic.LOGGER.info("Successfully loaded essencechargeRate from nbt: " + essenceChargeRate);
+            } catch (Exception e) {
+                SkullMagic.LOGGER.error("Failed loading essenceChargeRate from NBT data!");
+            }
+        }
     }
 
     @Nullable
@@ -74,7 +88,7 @@ public class SkullAltarBlockEntity extends BlockEntity {
 
     private int getEssence() {
         return this.essence;
-    
+
     }
 
     public void addChargeRate(int amount) {
