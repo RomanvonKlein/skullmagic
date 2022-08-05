@@ -22,22 +22,23 @@ import net.minecraft.world.World;
 public class SkullPedestalBlockEntity extends BlockEntity {
     public static final int scanRange = 5;
     public static final int scanHeight = 1;
-    private int[] linkedAltar;
+    private int[] linkedAltarCoords;
 
     public SkullPedestalBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY, pos, state);
+        SkullMagic.LOGGER.info("Creating SkullpedestalBlockEntity");
     }
 
     @Override
     public void writeNbt(NbtCompound tag) {
-        tag.putIntArray("linkedAltarPosition", this.linkedAltar);
+        tag.putIntArray("linkedAltarPosition", this.linkedAltarCoords);
         super.writeNbt(tag);
     }
 
     @Override
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
-        linkedAltar = tag.getIntArray("linkedAltarPosition");
+        linkedAltarCoords = tag.getIntArray("linkedAltarPosition");
     }
 
     @Nullable
@@ -64,7 +65,6 @@ public class SkullPedestalBlockEntity extends BlockEntity {
     }
 
     public void addSkull(World world, BlockPos pos, String skullIdentifier, PlayerEntity player) {
-        // SkullAltar altar = getSkullAltarNearby(world, pos);
         BlockPos altarPos = getSkullAltarNearby(world, pos);
 
         if (altarPos == null) {

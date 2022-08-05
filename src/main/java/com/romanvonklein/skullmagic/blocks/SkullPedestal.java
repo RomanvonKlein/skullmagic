@@ -1,25 +1,21 @@
 package com.romanvonklein.skullmagic.blocks;
 
-import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 
-import net.minecraft.util.registry.Registry;
-
-public class SkullPedestal extends Block {
+public class SkullPedestal extends BlockWithEntity {
     public static final BooleanProperty CONNECTED = BooleanProperty.of("connected");
     public static final int scanRange = 5;
     public static final int scanHeight = 1;
@@ -27,6 +23,13 @@ public class SkullPedestal extends Block {
     public SkullPedestal(Settings settings) {
         super(settings);
         setDefaultState(getStateManager().getDefaultState().with(CONNECTED, false));
+    }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need
+        // to change that!
+        return BlockRenderType.MODEL;
     }
 
     @Override
@@ -39,5 +42,10 @@ public class SkullPedestal extends Block {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(CONNECTED);
+    }
+
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new SkullPedestalBlockEntity(pos, state);
     }
 }

@@ -16,6 +16,7 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 import java.util.ArrayList;
 
@@ -28,6 +29,7 @@ public class SkullAltarBlockEntity extends BlockEntity {
 
     public SkullAltarBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY, pos, state);
+
     }
 
     @Override
@@ -57,15 +59,22 @@ public class SkullAltarBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, SkullAltarBlockEntity be) {
-        if (!world.isClient) {
+        if (world.isClient) {
+
+        } else {
             int prevEssence = be.getEssence();
             be.chargeEssence();
-            SkullMagic.LOGGER.info(prevEssence + "->" + be.getEssence());
+            if (prevEssence != be.getEssence()) {
+                // TODO: send update to client??
+            }
+            // SkullMagic.LOGGER.info(prevEssence + "->" + be.getEssence() + "(" +
+            // be.essenceChargeRate + ")");
         }
     }
 
     private int getEssence() {
         return this.essence;
+    
     }
 
     public void addChargeRate(int amount) {
@@ -88,16 +97,27 @@ public class SkullAltarBlockEntity extends BlockEntity {
     }
 
     public void trySetLinkedPlayer(PlayerEntity player) {
-        String playerID = player.getUuidAsString();
-        if (this.linkedPlayerID.equals("")) {
-            this.linkedPlayerID = playerID;
-            player.sendMessage(Text.of("Linked you to this altar."), true);
-            // ServerWorld.getPersistentStateManager().save
-        } else if (this.linkedPlayerID.equals(playerID)) {
-            this.linkedPlayerID = "";
-            player.sendMessage(Text.of("Unlinked you from this altar."), true);
-        } else {
-            player.sendMessage(Text.of("This altar is already linked to another player."), true);
+
+        if (!world.isClient) {
+            if (SkullMagic.StateManager.playerHasLink(player.getUuid())
+                    && !SkullMagic.StateManager.getLinkedAltarBlockPos(player.getUuid()).equals(this.pos)) {
+                player.sendMessage(Text.of("You already have an altar linked to you at "
+                        + SkullMagic.StateManager.getAltarPosLinkedToPlayer(player.getUuid()) + "."), true);
+            } else {
+
+                String playerID = player.getUuidAsString();
+                if (this.linkedPlayerID.equals("")) {
+                    this.linkedPlayerID = playerID;
+                    SkullMagic.StateManager.addLink(player.getUuid(), this.pos);
+                    player.sendMessage(Text.of("Linked you to this altar."), true);
+                } else if (this.linkedPlayerID.equals(playerID)) {
+                    this.linkedPlayerID = "";
+                    SkullMagic.StateManager.removeLink(player.getUuid(), this.pos);
+                    player.sendMessage(Text.of("Unlinked you from this altar."), true);
+                } else {
+                    player.sendMessage(Text.of("This altar is already linked to another player."), true);
+                }
+            }
         }
     }
 
@@ -130,4 +150,23 @@ public class SkullAltarBlockEntity extends BlockEntity {
             this.connectedPedestals[i + 2] = pos.getZ();
         }
     }
+
+    public String getEssenceSummary() {
+        return String.format("%d/%d(%d)", this.essence, this.maxEssence, this.essenceChargeRate);
+    }
+
+    // TODO: read into this for networking
+    /*
+     * @Nullable
+     * 
+     * @Override
+     * public Packet<ClientPlayPacketListener> toUpdatePacket() {
+     * return BlockEntityUpdateS2CPacket.create(this);
+     * }
+     * 
+     * @Override
+     * public NbtCompound toInitialChunkDataNbt() {
+     * return createNbt();
+     * }
+     */
 }

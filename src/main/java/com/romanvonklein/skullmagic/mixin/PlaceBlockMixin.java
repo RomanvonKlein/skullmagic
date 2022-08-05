@@ -20,8 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
-import com.romanvonklein.skullmagic.blocks.SkullPedestal;
-
 @Mixin(Block.class)
 public class PlaceBlockMixin {
     @Inject(at = @At("HEAD"), method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
@@ -30,8 +28,11 @@ public class PlaceBlockMixin {
         if (!world.isClient()) {
             SkullMagic.LOGGER.info("placement mixin called.");
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
+            SkullMagic.LOGGER.info("BLock Identifier:" + blockIdentifier);
+
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
-                BlockPos below = pos.down();
+                SkullMagic.LOGGER.info(blockIdentifier + " is a valid skull");
+                BlockPos below = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
                 Optional<SkullPedestalBlockEntity> optional = world.getBlockEntity(below,
                         SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
 
@@ -44,11 +45,18 @@ public class PlaceBlockMixin {
                         optional.get().addSkull(world, pos.down(),
                                 blockIdentifier,
                                 (PlayerEntity) placer);
+                    } else {
+                        SkullMagic.LOGGER.info("Skull Placed, but not on pedestal(2st check failed)!");
                     }
+                } else {
+                    SkullMagic.LOGGER.info(
+                            "Skull Placed, but not on pedestal(pos: " + pos + ",down: " + below.toString() + ")!");
                 }
 
                 // TODO: smart better pedestal detection.
 
+            } else {
+                SkullMagic.LOGGER.info(blockIdentifier + " not a valid skull.");
             }
         }
     }

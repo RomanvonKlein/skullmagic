@@ -3,8 +3,6 @@ package com.romanvonklein.skullmagic.blocks;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -13,7 +11,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -59,12 +56,24 @@ public class SkullAltar extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
             BlockHitResult hit) {
-        SkullAltarBlockEntity altarEntity = world.getBlockEntity(pos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).get();
-        if (altarEntity != null) {
-            altarEntity.trySetLinkedPlayer(player);
-        } else {
-            SkullMagic.LOGGER.warn("unabled to find the SkullAltarBlockEntity on the position: " + pos);
+        if (!world.isClient) {
+
+            SkullAltarBlockEntity altarEntity = world.getBlockEntity(pos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).get();
+            if (altarEntity != null) {
+                altarEntity.trySetLinkedPlayer(player);
+            } else {
+                SkullMagic.LOGGER.warn("unabled to find the SkullAltarBlockEntity on the position: " + pos);
+            }
         }
         return ActionResult.SUCCESS;
+    }
+
+    @Override
+    public void afterBreak(net.minecraft.world.World world, net.minecraft.entity.player.PlayerEntity player,
+            net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
+            net.minecraft.block.entity.BlockEntity blockEntity, net.minecraft.item.ItemStack stack) {
+        SkullMagic.StateManager.removeAltar(pos);
+        SkullMagic.LOGGER.info("Removed SkullAltar at " + pos.toString() + " from the linking data.");
+        super.afterBreak(world, player, pos, state, blockEntity, stack);
     }
 }
