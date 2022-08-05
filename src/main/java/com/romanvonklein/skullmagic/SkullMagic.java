@@ -10,11 +10,13 @@ import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
+import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.persistantState.testPersistantState;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -94,13 +96,15 @@ public class SkullMagic implements ModInitializer {
 				connectedEntClient = null;
 			}
 		});
+		
 		// register action for keybind
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (keyBinding.wasPressed()) {
 				client.player.sendMessage(Text.of("currently stored essence for you: "), false);
 			}
 		});
-		// TODO: is this only executed on the the client???
+
+		// clientside hud render stuff
 		HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
 			// collect data to draw for player
 			if (connectedEntClient != null) {
@@ -110,5 +114,12 @@ public class SkullMagic implements ModInitializer {
 			}
 		});
 
+		// Networking
+		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID,
+				(client, handler, buf, responseSender) -> {
+					client.execute(() -> {
+						LOGGER.debug("Received the server's event on the clientside!");
+					});
+				});
 	}
 }
