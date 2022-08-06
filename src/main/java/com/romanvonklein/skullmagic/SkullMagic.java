@@ -20,6 +20,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
@@ -31,8 +33,10 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -96,11 +100,18 @@ public class SkullMagic implements ModInitializer {
 				connectedEntClient = null;
 			}
 		});
-		
+
 		// register action for keybind
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (keyBinding.wasPressed()) {
 				client.player.sendMessage(Text.of("currently stored essence for you: "), false);
+				PacketByteBuf buf = PacketByteBufs.create();
+				buf.writeString("fireball");
+				ClientPlayNetworking.send(NetworkingConstants.SPELL_CAST_ID, buf);
+				// .send(
+				// (ServerPlayerEntity)
+				// (world.getPlayerByUuid(UUID.fromString(be.linkedPlayerID))),
+				// NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
 			}
 		});
 
@@ -117,8 +128,50 @@ public class SkullMagic implements ModInitializer {
 		// Networking
 		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID,
 				(client, handler, buf, responseSender) -> {
-					client.execute(() -> {
-						LOGGER.debug("Received the server's event on the clientside!");
+					int[] arr = buf.readIntArray(3);
+					if (arr.length != 3) {
+						LOGGER.error("message " + NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID
+								+ " had wrong number of int parameters: " + arr.length);
+					} else {
+						LOGGER.debug("Received essence update from server");
+						client.execute(() -> {
+							BlockPos pos = SkullMagic.StateManager.getLinkedAltarBlockPos(client.player.getUuid());
+							Optional<SkullAltarBlockEntity> opt = client.world.getBlockEntity(pos,
+									SKULL_ALTAR_BLOCK_ENTITY);
+							if (opt.isPresent()) {
+								SkullAltarBlockEntity altar = opt.get();
+								altar.setEssence(arr[0]);
+								altar.setMaxEssence(arr[1]);
+								altar.setChargeRate(arr[2]);
+							}
+						});
+					}
+				});
+
+		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.SPELL_CAST_ID,
+				(server, serverPlayerEntity, handler, buf, packetSender) -> {
+					String spellname = buf.readString(100);
+					BlockPos pos = StateManager.getLinkedAltarBlockPos(serverPlayerEntity.getUuid());
+					server.execute(() -> {
+						// TODO: create structure to cast spells from here somewhere
+						// for now just reduce essence
+						if (pos == null) {
+							// this just happens if there is no altar bound to the player
+							LOGGER.error("Tried finding altar linked to player, but found none.");
+						} else {
+							Optional<SkullAltarBlockEntity> opt = serverPlayerEntity.getWorld().getBlockEntity(pos,
+									SKULL_ALTAR_BLOCK_ENTITY);
+							if (opt.isPresent()) {
+								SkullAltarBlockEntity ent = opt.get();
+								if (ent.discharge(100))// TODO: here the spell-specific costs and actions should be
+														// applied.
+								{
+									serverPlayerEntity.sendMessage(
+											Text.of("Successfully cast spell: '" + spellname + "'"),
+											false);
+								}
+							}
+						}
 					});
 				});
 	}

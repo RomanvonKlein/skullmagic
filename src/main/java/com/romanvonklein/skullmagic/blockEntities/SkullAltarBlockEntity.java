@@ -16,6 +16,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -86,9 +87,14 @@ public class SkullAltarBlockEntity extends BlockEntity {
             be.chargeEssence();
             if (prevEssence != be.getEssence()
                     && ((ServerWorld) world).getPlayerByUuid(UUID.fromString(be.linkedPlayerID)) != null) {
+
+                // create package data consisting of current essence, max essence and essence
+                // charge rate
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeIntArray(new int[] { be.essence, be.maxEssence, be.essenceChargeRate });
                 ServerPlayNetworking.send(
                         (ServerPlayerEntity) (world.getPlayerByUuid(UUID.fromString(be.linkedPlayerID))),
-                        NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, PacketByteBufs.empty());
+                        NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
             }
             // SkullMagic.LOGGER.info(prevEssence + "->" + be.getEssence() + "(" +
             // be.essenceChargeRate + ")");
@@ -98,7 +104,6 @@ public class SkullAltarBlockEntity extends BlockEntity {
 
     private int getEssence() {
         return this.essence;
-
     }
 
     public void addChargeRate(int amount) {
@@ -177,6 +182,27 @@ public class SkullAltarBlockEntity extends BlockEntity {
 
     public String getEssenceSummary() {
         return String.format("%d/%d(%d)", this.essence, this.maxEssence, this.essenceChargeRate);
+    }
+
+    public void setEssence(int i) {
+        this.essence = i;
+    }
+
+    public void setMaxEssence(int i) {
+        this.maxEssence = i;
+    }
+
+    public void setChargeRate(int i) {
+        this.essenceChargeRate = i;
+    }
+
+    public boolean discharge(int i) {
+        if (this.essence >= i) {
+            this.essence -= i;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // TODO: read into this for networking
