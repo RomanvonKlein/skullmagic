@@ -26,9 +26,7 @@ public class PlaceBlockMixin {
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
         if (!world.isClient()) {
-            SkullMagic.LOGGER.info("placement mixin called.");
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
-            SkullMagic.LOGGER.info("BLock Identifier:" + blockIdentifier);
 
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 SkullMagic.LOGGER.info(blockIdentifier + " is a valid skull");

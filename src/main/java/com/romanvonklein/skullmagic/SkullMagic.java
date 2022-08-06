@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -125,6 +126,17 @@ public class SkullMagic implements ModInitializer {
 			}
 		});
 
+		// TODO: this only applies when the altar is broken by a player - other events
+		// (explosions, ...) might cause trouble
+		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
+			if (entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
+				StateManager.removeAltar(pos);
+			} else {
+				LOGGER.info(entity.toString());
+				LOGGER.info(entity.getType().toString());
+			}
+		}));
+
 		// Networking
 		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID,
 				(client, handler, buf, responseSender) -> {
@@ -133,7 +145,7 @@ public class SkullMagic implements ModInitializer {
 						LOGGER.error("message " + NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID
 								+ " had wrong number of int parameters: " + arr.length);
 					} else {
-						LOGGER.debug("Received essence update from server");
+						LOGGER.info("Received essence update from server");
 						client.execute(() -> {
 							BlockPos pos = SkullMagic.StateManager.getLinkedAltarBlockPos(client.player.getUuid());
 							Optional<SkullAltarBlockEntity> opt = client.world.getBlockEntity(pos,

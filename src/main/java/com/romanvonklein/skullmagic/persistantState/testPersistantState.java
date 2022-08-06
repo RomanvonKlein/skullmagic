@@ -1,7 +1,8 @@
 package com.romanvonklein.skullmagic.persistantState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Map.Entry;
 
@@ -99,18 +100,30 @@ public class testPersistantState extends PersistentState {
     }
 
     public void removeAltar(BlockPos pos) {
-        UUID toRemove = null;
+        ArrayList<UUID> toRemove = new ArrayList<>();
         for (Entry<UUID, BlockPos> entry : this.linkedAltars.entrySet()) {
             if (pos.equals(entry.getValue())) {
-                toRemove = entry.getKey();
+                toRemove.add(entry.getKey());
             }
         }
-        if (toRemove != null) {
-            this.linkedAltars.remove(toRemove);
+        if (toRemove.size() != 0) {
+            toRemove.forEach((uuid) -> {
+                this.linkedAltars.remove(uuid);
+            });
+            // TODO: send update to player whose altar has been unlinked
         } else {
             SkullMagic.LOGGER.warn(
                     "Could not remove the altar from linking nbt, as it was not found (pos: " + pos.toString() + ")");
         }
         this.dirty = true;
+    }
+
+    public String getPlayerLinkedToAltar(BlockPos pos) {
+        for (Entry<UUID, BlockPos> set : this.linkedAltars.entrySet()) {
+            if (set.getValue().equals(pos)) {
+                return set.getKey().toString();
+            }
+        }
+        return "";
     }
 }

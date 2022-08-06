@@ -67,13 +67,4 @@ public class SkullAltar extends BlockWithEntity {
         }
         return ActionResult.SUCCESS;
     }
-
-    @Override
-    public void afterBreak(net.minecraft.world.World world, net.minecraft.entity.player.PlayerEntity player,
-            net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
-            net.minecraft.block.entity.BlockEntity blockEntity, net.minecraft.item.ItemStack stack) {
-        SkullMagic.StateManager.removeAltar(pos);
-        SkullMagic.LOGGER.info("Removed SkullAltar at " + pos.toString() + " from the linking data.");
-        super.afterBreak(world, player, pos, state, blockEntity, stack);
-    }
 }

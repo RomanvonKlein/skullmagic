@@ -133,13 +133,12 @@ public class SkullAltarBlockEntity extends BlockEntity {
                 player.sendMessage(Text.of("You already have an altar linked to you at "
                         + SkullMagic.StateManager.getAltarPosLinkedToPlayer(player.getUuid()) + "."), true);
             } else {
-
-                String playerID = player.getUuidAsString();
-                if (this.linkedPlayerID.equals("")) {
-                    this.linkedPlayerID = playerID;
+                String linkedUUID = SkullMagic.StateManager.getPlayerLinkedToAltar(this.pos);
+                if (linkedUUID.equals("")) {
+                    this.linkedPlayerID = player.getUuidAsString();
                     SkullMagic.StateManager.addLink(player.getUuid(), this.pos);
                     player.sendMessage(Text.of("Linked you to this altar."), true);
-                } else if (this.linkedPlayerID.equals(playerID)) {
+                } else if (linkedUUID.equals(player.getUuidAsString())) {
                     this.linkedPlayerID = "";
                     SkullMagic.StateManager.removeLink(player.getUuid(), this.pos);
                     player.sendMessage(Text.of("Unlinked you from this altar."), true);
@@ -204,19 +203,4 @@ public class SkullAltarBlockEntity extends BlockEntity {
             return false;
         }
     }
-
-    // TODO: read into this for networking
-    /*
-     * @Nullable
-     * 
-     * @Override
-     * public Packet<ClientPlayPacketListener> toUpdatePacket() {
-     * return BlockEntityUpdateS2CPacket.create(this);
-     * }
-     * 
-     * @Override
-     * public NbtCompound toInitialChunkDataNbt() {
-     * return createNbt();
-     * }
-     */
 }
