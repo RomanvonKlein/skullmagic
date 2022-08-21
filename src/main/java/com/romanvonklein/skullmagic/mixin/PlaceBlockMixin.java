@@ -74,18 +74,15 @@ public class PlaceBlockMixin {
 
     private void tryLinkToNearbyAltar(World world, BlockPos pedestalpos) {
         if (isValidSkullPedestalCombo(world, pedestalpos)) {
-            SkullMagic.LOGGER.info("skull placed on pedestal");
             int height = Config.getConfig().scanHeight;
             int width = Config.getConfig().scanWidth;
             for (int x = pedestalpos.getX() - width; x <= pedestalpos.getX() + width; x++) {
                 for (int y = pedestalpos.getY() - height; y <= pedestalpos.getY() + height; y++) {
                     for (int z = pedestalpos.getZ() - width; z <= pedestalpos.getZ() + width; z++) {
                         BlockPos pos = new BlockPos(x, y, z);
-                        SkullMagic.LOGGER.info("Checking " + x + ", " + y + ", " + z);
                         Optional<SkullAltarBlockEntity> opt = world.getBlockEntity(pos,
                                 SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
                         if (opt.isPresent()) {
-                            SkullMagic.LOGGER.info("found altar closeby!");
                             opt.get().tryAddPedestal(pedestalpos);
                         }
                     }

@@ -88,6 +88,7 @@ public class SkullAltarBlockEntity extends BlockEntity {
 
         if (Config.getConfig().skulls.containsKey(skullIdentifier)) {
             this.essenceChargeRate += Config.getConfig().skulls.get(skullIdentifier);
+            SkullMagic.StateManager.addPedestalLink(pedestalPos, this.pos);
         }
     }
 
@@ -95,7 +96,6 @@ public class SkullAltarBlockEntity extends BlockEntity {
         String skullIdentifier = getPedestalSkullIdentifier(pedestalPos.up());
         if (!skullIdentifier.equals("") && Config.getConfig().skulls.containsKey(skullIdentifier)) {
             this.essenceChargeRate -= Config.getConfig().skulls.get(skullIdentifier);
-            SkullMagic.StateManager.removePedestalLink(pedestalPos, this.pos);
         }
     }
 

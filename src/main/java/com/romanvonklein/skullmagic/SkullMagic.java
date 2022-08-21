@@ -105,7 +105,6 @@ public class SkullMagic implements ModInitializer {
 		// register action for keybind
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (keyBinding.wasPressed()) {
-				client.player.sendMessage(Text.of("currently stored essence for you: "), false);
 				PacketByteBuf buf = PacketByteBufs.create();
 				buf.writeString("fireball");
 				ClientPlayNetworking.send(NetworkingConstants.SPELL_CAST_ID, buf);
@@ -130,10 +129,14 @@ public class SkullMagic implements ModInitializer {
 		// (explosions, ...) might cause trouble
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
 			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
+				// broke a skullAltar
 				StateManager.removeAltar(pos);
-			} else {
-				LOGGER.info(entity.toString());
-				LOGGER.info(entity.getType().toString());
+			} else if (entity != null && entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
+				// broke a skullpedestal
+				StateManager.tryRemovePedestalLink(pos, world);
+				// TODO: also check when skulls are destroyed on top of pedestals...
+				// LOGGER.info(entity.toString());
+				// LOGGER.info(entity.getType().toString());
 			}
 		}));
 
@@ -145,7 +148,6 @@ public class SkullMagic implements ModInitializer {
 						LOGGER.error("message " + NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID
 								+ " had wrong number of int parameters: " + arr.length);
 					} else {
-						LOGGER.info("Received essence update from server");
 						client.execute(() -> {
 							BlockPos pos = SkullMagic.StateManager.getLinkedAltarBlockPos(client.player.getUuid());
 							Optional<SkullAltarBlockEntity> opt = client.world.getBlockEntity(pos,

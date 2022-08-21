@@ -2,14 +2,17 @@ package com.romanvonklein.skullmagic.persistantState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.Map.Entry;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.World;
 
 public class PersistentLinksState extends PersistentState {
 
@@ -118,7 +121,11 @@ public class PersistentLinksState extends PersistentState {
         this.dirty = true;
     }
 
-    public void removePedestalLink(BlockPos pedestalPos, BlockPos altarPos) {
+    public void removePedestalLink(BlockPos pedestalPos, BlockPos altarPos, World world) {
+        Optional<SkullAltarBlockEntity> opt = world.getBlockEntity(altarPos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
+        if (opt.isPresent()) {
+            opt.get().removePedestal(pedestalPos);
+        }
         this.linkedSkullPedestals.remove(pedestalPos, altarPos);
         this.dirty = true;
     }
@@ -196,5 +203,12 @@ public class PersistentLinksState extends PersistentState {
             }
         }
         return "";
+    }
+
+    public void tryRemovePedestalLink(BlockPos pos, World world) {
+        if (this.linkedSkullPedestals.containsKey(pos)) {
+            SkullMagic.LOGGER.info("link to remove found for pedestal(" + pos + ") link");
+            removePedestalLink(pos, this.linkedSkullPedestals.get(pos), world);
+        }
     }
 }
