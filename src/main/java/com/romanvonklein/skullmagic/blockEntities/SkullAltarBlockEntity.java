@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -23,6 +24,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class SkullAltarBlockEntity extends BlockEntity {
@@ -77,17 +79,44 @@ public class SkullAltarBlockEntity extends BlockEntity {
         return createNbt();
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, SkullAltarBlockEntity be) {
+    public void tryAddPedestal(BlockPos pedestalPos) {
+        // TODO: maybe pass the ids down the line instead of passing blockpos and
+        // getting the ids in every function...
+        // String pedestalIdentifier =
+        // Registry.BLOCK.getId(this.world.getBlockState(pedestalPos).getBlock()).toString();
+        String skullIdentifier = Registry.BLOCK.getId(this.world.getBlockState(pedestalPos.up()).getBlock()).toString();
 
+        if (Config.getConfig().skulls.containsKey(skullIdentifier)) {
+            this.essenceChargeRate += Config.getConfig().skulls.get(skullIdentifier);
+        }
+    }
+
+    public void removePedestal(BlockPos pedestalPos) {
+        String skullIdentifier = getPedestalSkullIdentifier(pedestalPos.up());
+        if (!skullIdentifier.equals("") && Config.getConfig().skulls.containsKey(skullIdentifier)) {
+            this.essenceChargeRate -= Config.getConfig().skulls.get(skullIdentifier);
+            SkullMagic.StateManager.removePedestalLink(pedestalPos, this.pos);
+        }
+    }
+
+    private String getPedestalSkullIdentifier(BlockPos pedestalPos) {
+        return Registry.BLOCK.getId(world.getBlockState(pedestalPos).getBlock()).toString();
+    }
+
+    public static void tick(World world, BlockPos pos, BlockState state, SkullAltarBlockEntity be) {
         if (world.isClient) {
 
         } else {
 
             int prevEssence = be.getEssence();
             be.chargeEssence();
-            if (prevEssence != be.getEssence()
-                    && ((ServerWorld) world).getPlayerByUuid(UUID.fromString(be.linkedPlayerID)) != null) {
-
+            UUID linkedPlayerUUID = null;
+            try {
+                linkedPlayerUUID = UUID.fromString(be.linkedPlayerID);
+            } catch (Exception e) {
+            }
+            if (prevEssence != be.getEssence() && linkedPlayerUUID != null
+                    && ((ServerWorld) world).getPlayerByUuid(linkedPlayerUUID) != null) {
                 // create package data consisting of current essence, max essence and essence
                 // charge rate
                 PacketByteBuf buf = PacketByteBufs.create();
@@ -96,9 +125,6 @@ public class SkullAltarBlockEntity extends BlockEntity {
                         (ServerPlayerEntity) (world.getPlayerByUuid(UUID.fromString(be.linkedPlayerID))),
                         NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
             }
-            // SkullMagic.LOGGER.info(prevEssence + "->" + be.getEssence() + "(" +
-            // be.essenceChargeRate + ")");
-
         }
     }
 
@@ -136,11 +162,11 @@ public class SkullAltarBlockEntity extends BlockEntity {
                 String linkedUUID = SkullMagic.StateManager.getPlayerLinkedToAltar(this.pos);
                 if (linkedUUID.equals("")) {
                     this.linkedPlayerID = player.getUuidAsString();
-                    SkullMagic.StateManager.addLink(player.getUuid(), this.pos);
+                    SkullMagic.StateManager.addAltarLink(player.getUuid(), this.pos);
                     player.sendMessage(Text.of("Linked you to this altar."), true);
                 } else if (linkedUUID.equals(player.getUuidAsString())) {
                     this.linkedPlayerID = "";
-                    SkullMagic.StateManager.removeLink(player.getUuid(), this.pos);
+                    SkullMagic.StateManager.removeAltarLink(player.getUuid(), this.pos);
                     player.sendMessage(Text.of("Unlinked you from this altar."), true);
                 } else {
                     player.sendMessage(Text.of("This altar is already linked to another player."), true);

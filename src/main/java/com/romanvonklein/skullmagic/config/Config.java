@@ -24,6 +24,8 @@ public class Config {
         public HashMap<String, Map<String, Float>> drops;
 
         public HashMap<String, Integer> skulls;
+        public int scanWidth;
+        public int scanHeight;
 
         public ConfigData() {
             this.drops = new HashMap<String, Map<String, Float>>();
@@ -83,7 +85,8 @@ public class Config {
         defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);
-
+        defaultData.scanHeight = 2;
+        defaultData.scanWidth = 5;
         return defaultData;
     }
 

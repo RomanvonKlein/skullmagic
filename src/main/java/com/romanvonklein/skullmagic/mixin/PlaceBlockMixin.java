@@ -1,20 +1,22 @@
 package com.romanvonklein.skullmagic.mixin;
 
+import java.util.ArrayList;
 import java.util.Optional;
-
-import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
-import com.romanvonklein.skullmagic.config.Config;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
+import com.romanvonklein.skullmagic.config.Config;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -27,35 +29,79 @@ public class PlaceBlockMixin {
             CallbackInfo info) {
         if (!world.isClient()) {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
-
+            // cases:
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
-                SkullMagic.LOGGER.info(blockIdentifier + " is a valid skull");
-                BlockPos below = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-                Optional<SkullPedestalBlockEntity> optional = world.getBlockEntity(below,
-                        SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
-
-                if (optional.isPresent()) {
-                    String pedestalCandidateIdentifier = Registry.BLOCK
-                            .getId(world.getBlockState(optional.get().getPos()).getBlock())
-                            .toString();
-                    if (pedestalCandidateIdentifier.equals("skullmagic:skull_pedestal")) {
-                        SkullMagic.LOGGER.info("Skull Placed on pedestal!");
-                        optional.get().addSkull(world, pos.down(),
-                                blockIdentifier,
-                                (PlayerEntity) placer);
-                    } else {
-                        SkullMagic.LOGGER.info("Skull Placed, but not on pedestal(2st check failed)!");
-                    }
-                } else {
-                    SkullMagic.LOGGER.info(
-                            "Skull Placed, but not on pedestal(pos: " + pos + ",down: " + below.toString() + ")!");
-                }
-
-                // TODO: smart better pedestal detection.
-
-            } else {
-                SkullMagic.LOGGER.info(blockIdentifier + " not a valid skull.");
+                // skull placed on pedestal?
+                SkullMagic.LOGGER.info("placed a skull");
+                tryLinkToNearbyAltar(world, pos.down());
+            } else if (blockIdentifier
+                    .equals(BlockEntityType.getId(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY).toString())) {
+                // pedestal placed under skull?
+                tryLinkToNearbyAltar(world, pos);
+                SkullMagic.LOGGER.info("placed a skull pedestal");
+            } else if (blockIdentifier.equals(BlockEntityType.getId(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).toString())) {
+                SkullMagic.LOGGER.info("placed a skull altar");
+                // altar places around valid pedestal - skull combination?
+                tryLinkNearbyUnlinkedPedestals(world, pos);
             }
         }
+    }
+
+    private void tryLinkNearbyUnlinkedPedestals(World world, BlockPos altarPos) {
+        Optional<SkullAltarBlockEntity> altarOpt = world.getBlockEntity(altarPos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
+        if (altarOpt.isPresent()) {
+            int height = Config.getConfig().scanHeight;
+            int width = Config.getConfig().scanWidth;
+            ArrayList<BlockPos> foundPedestals = new ArrayList<>();
+            for (int x = altarPos.getX() - width; x < altarPos.getX() + width; x++) {
+                for (int y = altarPos.getY() - height; y < altarPos.getY() + height; y++) {
+                    for (int z = altarPos.getZ() - width; z < altarPos.getZ() + width; z++) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        if (isValidSkullPedestalCombo(world, pos)) {
+                            foundPedestals.add(pos);
+                        }
+                    }
+                }
+            }
+            SkullAltarBlockEntity altar = altarOpt.get();
+            for (BlockPos foundPedestalPos : foundPedestals) {
+                if (!SkullMagic.StateManager.isPedestalLinked(foundPedestalPos)) {
+                    altar.tryAddPedestal(foundPedestalPos);
+                }
+            }
+        }
+    }
+
+    private void tryLinkToNearbyAltar(World world, BlockPos pedestalpos) {
+        if (isValidSkullPedestalCombo(world, pedestalpos)) {
+            SkullMagic.LOGGER.info("skull placed on pedestal");
+            int height = Config.getConfig().scanHeight;
+            int width = Config.getConfig().scanWidth;
+            for (int x = pedestalpos.getX() - width; x <= pedestalpos.getX() + width; x++) {
+                for (int y = pedestalpos.getY() - height; y <= pedestalpos.getY() + height; y++) {
+                    for (int z = pedestalpos.getZ() - width; z <= pedestalpos.getZ() + width; z++) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        SkullMagic.LOGGER.info("Checking " + x + ", " + y + ", " + z);
+                        Optional<SkullAltarBlockEntity> opt = world.getBlockEntity(pos,
+                                SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
+                        if (opt.isPresent()) {
+                            SkullMagic.LOGGER.info("found altar closeby!");
+                            opt.get().tryAddPedestal(pedestalpos);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean isValidSkullPedestalCombo(World world, BlockPos pedestalPos) {
+        Optional<SkullPedestalBlockEntity> pedestalCandidate = world.getBlockEntity(pedestalPos,
+                SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
+        if (pedestalCandidate.isPresent()) {
+            BlockState skullCandidate = world.getBlockState(pedestalPos.up());
+            String blockIdentifier = Registry.BLOCK.getId(skullCandidate.getBlock()).toString();
+            return Config.getConfig().skulls.containsKey(blockIdentifier);
+        }
+        return false;
     }
 }

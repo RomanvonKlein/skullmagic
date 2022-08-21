@@ -11,7 +11,7 @@ import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
-import com.romanvonklein.skullmagic.persistantState.testPersistantState;
+import com.romanvonklein.skullmagic.persistantState.PersistentLinksState;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -51,7 +51,7 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
 	public static BlockEntityType<SkullPedestalBlockEntity> SKULL_PEDESTAL_BLOCK_ENTITY;
 	private static KeyBinding keyBinding;
-	public static testPersistantState StateManager;
+	public static PersistentLinksState StateManager;
 
 	public SkullAltarBlockEntity connectedEntClient;
 
@@ -79,8 +79,8 @@ public class SkullMagic implements ModInitializer {
 		));
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			StateManager = (testPersistantState) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(testPersistantState::fromNbt, testPersistantState::new, MODID);
+			StateManager = (PersistentLinksState) server.getWorld(World.OVERWORLD).getPersistentStateManager()
+					.getOrCreate(PersistentLinksState::fromNbt, PersistentLinksState::new, MODID);
 			// Migrator.Migrate(server.getSavePath(WorldSavePath.ROOT).toFile(), CMAN);
 		});
 		// update mana status from nbt(which is hopefully synced automatically???)
@@ -129,7 +129,7 @@ public class SkullMagic implements ModInitializer {
 		// TODO: this only applies when the altar is broken by a player - other events
 		// (explosions, ...) might cause trouble
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
-			if (entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
+			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
 				StateManager.removeAltar(pos);
 			} else {
 				LOGGER.info(entity.toString());
