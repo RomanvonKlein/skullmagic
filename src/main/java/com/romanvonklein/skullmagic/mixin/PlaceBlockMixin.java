@@ -17,10 +17,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 @Mixin(Block.class)
 public class PlaceBlockMixin {
@@ -47,6 +49,28 @@ public class PlaceBlockMixin {
         }
     }
 
+    /*
+     * public void onDestroyedByExplosion(net.minecraft.world.World world,
+     * net.minecraft.util.math.BlockPos pos, net.minecraft.world.explosion.Explosion
+     * explosion)
+     */
+    @Inject(at = @At("HEAD"), method = "onDestroyedByExplosion(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/explosion/Explosion;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
+    public void onBreak(World world, BlockPos pos, Explosion explosion, CallbackInfo info) {
+        SkullMagic.LOGGER.info(world.getBlockState(pos).getBlock() + " destroyed by explosion!");
+    }
+
+    /*
+     * public void onBreak(net.minecraft.world.World world,
+     * net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
+     * net.minecraft.entity.player.PlayerEntity player)
+     */
+    // @Inject(at = @At("HEAD"), method =
+    // "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+    // cancellable = true)
+    // public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity
+    // player, CallbackInfo info) {
+    // SkullMagic.LOGGER.info("BLock Broken!");
+    // }
 
     private void tryLinkNearbyUnlinkedPedestals(World world, BlockPos altarPos) {
         Optional<SkullAltarBlockEntity> altarOpt = world.getBlockEntity(altarPos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
