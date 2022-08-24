@@ -122,7 +122,8 @@ public class SkullMagic implements ModInitializer {
 			if (connectedEntClient != null) {
 				TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
 				renderer.draw(matrixStack, connectedEntClient.getEssenceSummary(), 10, 10, 0xffffff);
-				renderer.draw(matrixStack, "This is red", 0, 100, 0xff0000);
+				//renderer.draw(matrixStack, "This is red", 0, 100, 0xff0000);
+				net.minecraft.client.gui.hud.BossBarHud
 			}
 		});
 
