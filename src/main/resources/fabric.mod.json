@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "skullmagic",
-  "version": "${version}",
+  "version": "0.0.1",
 
   "name": "Skull Magic",
   "description": "Skull Magic is a mod allowing the player to harness the arcane power within Skulls!",

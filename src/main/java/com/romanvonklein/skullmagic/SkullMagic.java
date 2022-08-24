@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
@@ -29,14 +30,18 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -120,10 +125,22 @@ public class SkullMagic implements ModInitializer {
 		HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
 			// collect data to draw for player
 			if (connectedEntClient != null) {
-				TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-				renderer.draw(matrixStack, connectedEntClient.getEssenceSummary(), 10, 10, 0xffffff);
-				//renderer.draw(matrixStack, "This is red", 0, 100, 0xff0000);
-				net.minecraft.client.gui.hud.BossBarHud
+				int borderwidth = 5;
+				int barwidth = 100;
+				int barheight = 25;
+				int pxPerEssence = Math
+						.toIntExact(Math.round(100.0 / Double.valueOf(connectedEntClient.getMaxEssence())));
+				int x = 10;
+				int y = 10;
+				// border
+				drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
+						barheight + 2 * borderwidth, 0xc2c2c2);
+				// essence
+				drawRect(matrixStack, x, y, connectedEntClient.getEssence() * pxPerEssence, barheight, 0x114c9e);
+				// empty
+				// TODO: rounding when multiplying int and double here?
+				drawRect(matrixStack, x + connectedEntClient.getEssence() * pxPerEssence, y,
+						barwidth - connectedEntClient.getEssence() * pxPerEssence, barheight, 0x787f8a);
 			}
 		});
 
@@ -185,4 +202,48 @@ public class SkullMagic implements ModInitializer {
 					});
 				});
 	}
+
+	/**
+	 * Draws a rectangle on the screen
+	 * 
+	 * @param posX
+	 *               the x positon on the screen
+	 * @param posY
+	 *               the y positon on the screen
+	 * @param width
+	 *               the width of the rectangle
+	 * @param height
+	 *               the height of the rectangle
+	 * @param color
+	 *               the color of the rectangle
+	 */
+	private static void drawRect(MatrixStack ms, int posX, int posY, int width, int height, int color) {
+		if (color == -1)
+			return;
+		float f3;
+		if (color <= 0xFFFFFF && color >= 0)
+			f3 = 1.0F;
+		else
+			f3 = (color >> 24 & 255) / 255.0F;
+		float f = (color >> 16 & 255) / 255.0F;
+		float f1 = (color >> 8 & 255) / 255.0F;
+		float f2 = (color & 255) / 255.0F;
+		RenderSystem.enableBlend();
+		RenderSystem.disableTexture();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.disableDepthTest();
+		BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
+		vertexbuffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+		vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY + height, 0).color(f, f1, f2, f3).next();
+		vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY + height, 0).color(f, f1, f2, f3).next();
+		vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).color(f, f1, f2, f3).next();
+		vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).color(f, f1, f2, f3).next();
+		vertexbuffer.end();
+		BufferRenderer.draw(vertexbuffer);
+		RenderSystem.enableTexture();
+		RenderSystem.disableBlend();
+		RenderSystem.enableDepthTest();
+	}
+
 }

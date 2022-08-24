@@ -137,6 +137,10 @@ public class SkullAltarBlockEntity extends BlockEntity {
         return this.essence;
     }
 
+    public int getMaxEssence() {
+        return this.maxEssence;
+    }
+
     public void addChargeRate(int amount) {
         this.essenceChargeRate += amount;
     }

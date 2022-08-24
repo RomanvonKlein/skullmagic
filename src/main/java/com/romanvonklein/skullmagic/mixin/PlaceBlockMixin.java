@@ -17,7 +17,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -26,6 +25,7 @@ import net.minecraft.world.explosion.Explosion;
 
 @Mixin(Block.class)
 public class PlaceBlockMixin {
+
     @Inject(at = @At("HEAD"), method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
@@ -55,8 +55,11 @@ public class PlaceBlockMixin {
      * explosion)
      */
     @Inject(at = @At("HEAD"), method = "onDestroyedByExplosion(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/explosion/Explosion;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
-    public void onBreak(World world, BlockPos pos, Explosion explosion, CallbackInfo info) {
-        SkullMagic.LOGGER.info(world.getBlockState(pos).getBlock() + " destroyed by explosion!");
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion, CallbackInfo info) {
+        /* TODO: make use of this
+         * SkullMagic.LOGGER.info(((BlockInvoker) this).toString() +
+         * " destroyed by explosion!");
+         */
     }
 
     /*
