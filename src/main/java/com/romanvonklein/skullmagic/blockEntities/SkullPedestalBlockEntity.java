@@ -77,45 +77,8 @@ public class SkullPedestalBlockEntity extends BlockEntity {
         return result;
     }
 
-    public void addSkull(World world, BlockPos pos, String skullIdentifier, PlayerEntity player) {
-        BlockPos altarPos = getSkullAltarNearby(world, pos);
-
-        if (altarPos == null) {
-            if (!world.isClient) {
-                world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1f, 1f);
-            }
-        } else {
-            SkullMagic.LOGGER.info("altar found at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
-            if (!world.isClient) {
-                world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1f, 1f);
-            }
-            // update pedestal charge rate
-            world.setBlockState(pos, world.getBlockState(pos).with(SkullPedestal.CONNECTED, true));
-            addSkullEssenceChargeRateToAltar(world.getBlockEntity(altarPos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).get(),
-                    skullIdentifier);
-        }
-    }
-
     private void addSkullEssenceChargeRateToAltar(SkullAltarBlockEntity altar, String skullIdentifier) {
         int essenceChargeRate = Config.getConfig().skulls.get(skullIdentifier);
         altar.addChargeRate(essenceChargeRate);
     }
-
-    private static BlockPos getSkullAltarNearby(World world, BlockPos pos) {
-        BlockPos altarFound = null;
-        outer: for (int x = -scanRange; x < scanRange; x++) {
-            for (int y = -scanHeight; y < scanHeight; y++) {
-                for (int z = -scanRange; z < scanRange; z++) {
-                    // TODO: better way of checking for the right blocktype
-                    if (Registry.BLOCK.getId(world.getBlockState(pos.add(x, y, z)).getBlock()).toString()
-                            .equals("skullmagic:skull_altar")) {
-                        altarFound = pos.add(x, y, z);
-                        break outer;
-                    }
-                }
-            }
-        }
-        return altarFound;
-    }
-
 }

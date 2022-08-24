@@ -47,6 +47,7 @@ public class PlaceBlockMixin {
         }
     }
 
+
     private void tryLinkNearbyUnlinkedPedestals(World world, BlockPos altarPos) {
         Optional<SkullAltarBlockEntity> altarOpt = world.getBlockEntity(altarPos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
         if (altarOpt.isPresent()) {

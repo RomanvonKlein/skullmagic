@@ -22,6 +22,8 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -87,6 +89,9 @@ public class SkullAltarBlockEntity extends BlockEntity {
         String skullIdentifier = Registry.BLOCK.getId(this.world.getBlockState(pedestalPos.up()).getBlock()).toString();
 
         if (Config.getConfig().skulls.containsKey(skullIdentifier)) {
+            if (!world.isClient) {
+                world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1f, 1f);
+            }
             this.essenceChargeRate += Config.getConfig().skulls.get(skullIdentifier);
             SkullMagic.StateManager.addPedestalLink(pedestalPos, this.pos);
         }
@@ -128,7 +133,7 @@ public class SkullAltarBlockEntity extends BlockEntity {
         }
     }
 
-    private int getEssence() {
+    public int getEssence() {
         return this.essence;
     }
 

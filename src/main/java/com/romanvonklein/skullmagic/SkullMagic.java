@@ -12,6 +12,7 @@ import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.persistantState.PersistentLinksState;
+import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -176,14 +177,8 @@ public class SkullMagic implements ModInitializer {
 							Optional<SkullAltarBlockEntity> opt = serverPlayerEntity.getWorld().getBlockEntity(pos,
 									SKULL_ALTAR_BLOCK_ENTITY);
 							if (opt.isPresent()) {
-								SkullAltarBlockEntity ent = opt.get();
-								if (ent.discharge(100))// TODO: here the spell-specific costs and actions should be
-														// applied.
-								{
-									serverPlayerEntity.sendMessage(
-											Text.of("Successfully cast spell: '" + spellname + "'"),
-											false);
-								}
+								SkullAltarBlockEntity altar = opt.get();
+								SpellManager.castSpell(spellname, altar, serverPlayerEntity, serverPlayerEntity.world);
 							}
 						}
 					});
