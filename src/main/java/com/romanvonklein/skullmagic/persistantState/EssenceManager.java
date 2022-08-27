@@ -228,7 +228,9 @@ public class EssenceManager extends PersistentState {
     }
 
     public boolean pedestalIsLinked(RegistryKey<World> key, BlockPos foundPedestalPos) {
-        return this.pedestalsToEssencePools.get(key).containsKey(foundPedestalPos);
+
+        return this.pedestalsToEssencePools.containsKey(key)
+                && this.pedestalsToEssencePools.get(key).containsKey(foundPedestalPos);
     }
 
     public void linkPedestalToEssencePool(RegistryKey<World> key, BlockPos pedestalPos, BlockPos altarPos,

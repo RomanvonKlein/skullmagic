@@ -9,6 +9,7 @@ import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
+import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.persistantState.ClientEssenceManager;
 import com.romanvonklein.skullmagic.persistantState.EssenceManager;
@@ -65,6 +66,7 @@ public class SkullMagic implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		Commands.registerCommands();
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_pedestal"),
 				new BlockItem(SkullPedestal, new FabricItemSettings().group(ItemGroup.MISC)));
@@ -90,6 +92,7 @@ public class SkullMagic implements ModInitializer {
 			LOGGER.info("Initializing Essence Manager");
 			essenceManager = (EssenceManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
 					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID);
+
 		});
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			essenceManager.tick(server);
@@ -101,10 +104,6 @@ public class SkullMagic implements ModInitializer {
 				PacketByteBuf buf = PacketByteBufs.create();
 				buf.writeString("fireball");
 				ClientPlayNetworking.send(NetworkingConstants.SPELL_CAST_ID, buf);
-				// .send(
-				// (ServerPlayerEntity)
-				// (world.getPlayerByUuid(UUID.fromString(be.linkedPlayerID))),
-				// NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
 			}
 		});
 
@@ -115,8 +114,15 @@ public class SkullMagic implements ModInitializer {
 				int borderwidth = 5;
 				int barwidth = 100;
 				int barheight = 25;
-				int pxPerEssence = Math
-						.toIntExact(Math.round(100.0 / Double.valueOf(clientEssenceManager.maxEssence)));
+				int pxPerEssence = 1;
+				try {
+					pxPerEssence = Math
+							.toIntExact(Math.round(100.0 / Double.valueOf(clientEssenceManager.maxEssence)));
+
+				} catch (Exception e) {
+					LOGGER.error(
+							"weird error calculating pxPerEssence with maxEssence: " + clientEssenceManager.maxEssence);
+				}
 				int x = 10;
 				int y = 10;
 				// border
@@ -154,6 +160,8 @@ public class SkullMagic implements ModInitializer {
 								+ " had wrong number of int parameters: " + arr.length);
 					} else {
 						client.execute(() -> {
+							LOGGER.info("received essece='" + arr[0] + "', maxEssence = '" + arr[1]
+									+ ", and essenceChargeRate= '" + arr[2] + "'");
 							if (clientEssenceManager == null) {
 								clientEssenceManager = new ClientEssenceManager();
 							}

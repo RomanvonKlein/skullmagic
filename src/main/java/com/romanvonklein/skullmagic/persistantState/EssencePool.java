@@ -40,6 +40,9 @@ public class EssencePool extends PersistentState {
     }
 
     public EssencePool() {
+        this.essence = 0;
+        this.essenceChargeRate = 0;
+        this.maxEssence = 100;
     }
 
     public EssencePool(BlockPos pos) {
@@ -58,19 +61,21 @@ public class EssencePool extends PersistentState {
 
     public void tick(World world) {
         if (!world.isClient) {
-
-            this.chargeCooldownLeft--;
-            if (this.chargeCooldownLeft <= 0) {
-                chargeCooldownLeft = chargeCooldown;
-                this.essence += this.essenceChargeRate;
-                if (this.essence > this.maxEssence) {
-                    this.essence = this.maxEssence;
+            if (this.linkedPlayerID != null) {
+                this.chargeCooldownLeft--;
+                if (this.chargeCooldownLeft <= 0) {
+                    chargeCooldownLeft = chargeCooldown;
+                    this.essence += this.essenceChargeRate;
+                    if (this.essence > this.maxEssence) {
+                        this.essence = this.maxEssence;
+                    }
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeIntArray(new int[] { this.essence, this.maxEssence, this.essenceChargeRate });
+                    // TODO: this seems to fail. was the playerid set correctly when linking?
+                    ServerPlayNetworking.send(
+                            (ServerPlayerEntity) (world.getPlayerByUuid(this.linkedPlayerID)),
+                            NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
                 }
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeIntArray(new int[] { this.essence, this.maxEssence, this.essenceChargeRate });
-                ServerPlayNetworking.send(
-                        (ServerPlayerEntity) (world.getPlayerByUuid(this.linkedPlayerID)),
-                        NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
             }
         }
     }
