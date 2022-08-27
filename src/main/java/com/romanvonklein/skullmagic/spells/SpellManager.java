@@ -4,7 +4,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.function.TriFunction;
 
-import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
+import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.persistantState.EssencePool;
 
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -14,9 +15,9 @@ import net.minecraft.world.World;
 public class SpellManager {
 
     static Map<String, ? extends Spell> SpellDict = Map.of("fireball",
-            new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, SkullAltarBlockEntity, Boolean>() {
+            new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
-                public Boolean apply(ServerPlayerEntity player, World world, SkullAltarBlockEntity altar) {
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     // TODO: future upgrades for speed and explosion power?
                     Vec3d angle = player.getRotationVector();
                     Vec3d pos = player.getPos();
@@ -27,16 +28,16 @@ public class SpellManager {
                 }
             }));
 
-    // TODO: replace the alter with a essencemanager!
-    public static boolean castSpell(String spellName, SkullAltarBlockEntity altar, ServerPlayerEntity player,
+    public static boolean castSpell(String spellName, ServerPlayerEntity player,
             World world) {
         boolean success = false;
         if (SpellDict.containsKey(spellName)) {
+            EssencePool pool = SkullMagic.essenceManager.getEssencePoolForPlayer(player.getUuid());
             Spell spell = SpellDict.get(spellName);
-            if (altar.getEssence() >= spell.essenceCost) {
-                success = spell.action.apply(player, world, altar);
+            if (pool.getEssence() >= spell.essenceCost) {
+                success = spell.action.apply(player, world, pool);
                 if (success) {
-                    altar.discharge(spell.essenceCost);
+                    pool.discharge(spell.essenceCost);
                 }
             }
         }

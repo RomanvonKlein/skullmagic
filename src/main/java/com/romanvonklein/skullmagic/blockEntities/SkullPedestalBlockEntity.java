@@ -3,7 +3,6 @@ package com.romanvonklein.skullmagic.blockEntities;
 import javax.annotation.Nullable;
 
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.config.Config;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,8 +11,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 
 public class SkullPedestalBlockEntity extends BlockEntity {
     public static final int scanRange = 5;
@@ -59,22 +56,5 @@ public class SkullPedestalBlockEntity extends BlockEntity {
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         return createNbt();
-    }
-
-    public boolean checkSkullPedestal(World world, BlockPos pos, SkullAltarBlockEntity skullAltarBlockEntity) {
-        boolean result = false;
-        // check if skull on top
-        String skullCandidateIdentifier = Registry.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString();
-
-        if (Config.getConfig().skulls.containsKey(skullCandidateIdentifier)) {
-            addSkullEssenceChargeRateToAltar(skullAltarBlockEntity, skullCandidateIdentifier);
-            result = true;
-        }
-        return result;
-    }
-
-    private void addSkullEssenceChargeRateToAltar(SkullAltarBlockEntity altar, String skullIdentifier) {
-        int essenceChargeRate = Config.getConfig().skulls.get(skullIdentifier);
-        altar.addChargeRate(essenceChargeRate);
     }
 }

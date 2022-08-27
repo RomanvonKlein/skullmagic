@@ -2,7 +2,6 @@ package com.romanvonklein.skullmagic.blocks;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
-
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -20,6 +19,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
+//TODO: does this even need to still be a blockentity
 public class SkullAltar extends BlockWithEntity {
 
     public SkullAltar(Settings settings) {
@@ -57,13 +57,8 @@ public class SkullAltar extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
             BlockHitResult hit) {
         if (!world.isClient) {
-
-            SkullAltarBlockEntity altarEntity = world.getBlockEntity(pos, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).get();
-            if (altarEntity != null) {
-                altarEntity.trySetLinkedPlayer(player);
-            } else {
-                SkullMagic.LOGGER.warn("unabled to find the SkullAltarBlockEntity on the position: " + pos);
-            }
+            SkullMagic.LOGGER.info("Current Essence manager: " + SkullMagic.essenceManager);
+            SkullMagic.essenceManager.trySetLinkedPlayer(player, pos);
         }
         return ActionResult.SUCCESS;
     }

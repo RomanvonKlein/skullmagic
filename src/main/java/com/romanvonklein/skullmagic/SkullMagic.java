@@ -1,7 +1,5 @@
 package com.romanvonklein.skullmagic;
 
-import java.util.Optional;
-
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +10,19 @@ import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
-import com.romanvonklein.skullmagic.persistantState.PersistentLinksState;
+import com.romanvonklein.skullmagic.persistantState.ClientEssenceManager;
+import com.romanvonklein.skullmagic.persistantState.EssenceManager;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -43,7 +45,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
@@ -57,9 +58,10 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
 	public static BlockEntityType<SkullPedestalBlockEntity> SKULL_PEDESTAL_BLOCK_ENTITY;
 	private static KeyBinding keyBinding;
-	public static PersistentLinksState StateManager;
+	public static EssenceManager essenceManager;
 
-	public SkullAltarBlockEntity connectedEntClient;
+	@Environment(EnvType.CLIENT)
+	private static ClientEssenceManager clientEssenceManager;
 
 	@Override
 	public void onInitialize() {
@@ -85,27 +87,12 @@ public class SkullMagic implements ModInitializer {
 		));
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			StateManager = (PersistentLinksState) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(PersistentLinksState::fromNbt, PersistentLinksState::new, MODID);
-			// Migrator.Migrate(server.getSavePath(WorldSavePath.ROOT).toFile(), CMAN);
+			LOGGER.info("Initializing Essence Manager");
+			essenceManager = (EssenceManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
+					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID);
 		});
-		// update mana status from nbt(which is hopefully synced automatically???)
-		ClientTickEvents.START_CLIENT_TICK.register(client -> {
-			if (client.player != null && StateManager.playerHasLink(client.player.getUuid())) {
-				Optional<SkullAltarBlockEntity> opt = client.world.getBlockEntity(
-						// TODO: catch possible exception if bock ent is not found??
-						StateManager.getLinkedAltarBlockPos(client.player.getUuid()), SKULL_ALTAR_BLOCK_ENTITY);
-				if (opt.isPresent()) {
-					connectedEntClient = opt.get();
-				} else {
-					LOGGER.error("FAILED getting SkullAltarBlockEntity linked to player!");
-					connectedEntClient = null;
-					StateManager.removeAltar(StateManager.getLinkedAltarBlockPos(client.player.getUuid()));
-				}
-
-			} else {
-				connectedEntClient = null;
-			}
+		ServerTickEvents.START_SERVER_TICK.register(server -> {
+			essenceManager.tick(server);
 		});
 
 		// register action for keybind
@@ -124,23 +111,22 @@ public class SkullMagic implements ModInitializer {
 		// clientside hud render stuff
 		HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
 			// collect data to draw for player
-			if (connectedEntClient != null) {
+			if (clientEssenceManager != null) {
 				int borderwidth = 5;
 				int barwidth = 100;
 				int barheight = 25;
 				int pxPerEssence = Math
-						.toIntExact(Math.round(100.0 / Double.valueOf(connectedEntClient.getMaxEssence())));
+						.toIntExact(Math.round(100.0 / Double.valueOf(clientEssenceManager.maxEssence)));
 				int x = 10;
 				int y = 10;
 				// border
 				drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
 						barheight + 2 * borderwidth, 0xc2c2c2);
 				// essence
-				drawRect(matrixStack, x, y, connectedEntClient.getEssence() * pxPerEssence, barheight, 0x114c9e);
+				drawRect(matrixStack, x, y, clientEssenceManager.essence * pxPerEssence, barheight, 0x114c9e);
 				// empty
-				// TODO: rounding when multiplying int and double here?
-				drawRect(matrixStack, x + connectedEntClient.getEssence() * pxPerEssence, y,
-						barwidth - connectedEntClient.getEssence() * pxPerEssence, barheight, 0x787f8a);
+				drawRect(matrixStack, x + clientEssenceManager.essence * pxPerEssence, y,
+						barwidth - clientEssenceManager.essence * pxPerEssence, barheight, 0x787f8a);
 			}
 		});
 
@@ -149,10 +135,10 @@ public class SkullMagic implements ModInitializer {
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
 			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
 				// broke a skullAltar
-				StateManager.removeAltar(pos);
+				essenceManager.removeSkullAltar(world.getRegistryKey(), pos);
 			} else if (entity != null && entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
 				// broke a skullpedestal
-				StateManager.tryRemovePedestalLink(pos, world);
+				essenceManager.removePedestal(world.getRegistryKey(), pos);
 				// TODO: also check when skulls are destroyed on top of pedestals...
 				// LOGGER.info(entity.toString());
 				// LOGGER.info(entity.getType().toString());
@@ -168,15 +154,12 @@ public class SkullMagic implements ModInitializer {
 								+ " had wrong number of int parameters: " + arr.length);
 					} else {
 						client.execute(() -> {
-							BlockPos pos = SkullMagic.StateManager.getLinkedAltarBlockPos(client.player.getUuid());
-							Optional<SkullAltarBlockEntity> opt = client.world.getBlockEntity(pos,
-									SKULL_ALTAR_BLOCK_ENTITY);
-							if (opt.isPresent()) {
-								SkullAltarBlockEntity altar = opt.get();
-								altar.setEssence(arr[0]);
-								altar.setMaxEssence(arr[1]);
-								altar.setChargeRate(arr[2]);
+							if (clientEssenceManager == null) {
+								clientEssenceManager = new ClientEssenceManager();
 							}
+							clientEssenceManager.essence = arr[0];
+							clientEssenceManager.maxEssence = arr[1];
+							clientEssenceManager.essenceChargeRate = arr[2];
 						});
 					}
 				});
@@ -184,22 +167,11 @@ public class SkullMagic implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.SPELL_CAST_ID,
 				(server, serverPlayerEntity, handler, buf, packetSender) -> {
 					String spellname = buf.readString(100);
-					BlockPos pos = StateManager.getLinkedAltarBlockPos(serverPlayerEntity.getUuid());
-					server.execute(() -> {
-						// TODO: create structure to cast spells from here somewhere
-						// for now just reduce essence
-						if (pos == null) {
-							// this just happens if there is no altar bound to the player
-							LOGGER.error("Tried finding altar linked to player, but found none.");
-						} else {
-							Optional<SkullAltarBlockEntity> opt = serverPlayerEntity.getWorld().getBlockEntity(pos,
-									SKULL_ALTAR_BLOCK_ENTITY);
-							if (opt.isPresent()) {
-								SkullAltarBlockEntity altar = opt.get();
-								SpellManager.castSpell(spellname, altar, serverPlayerEntity, serverPlayerEntity.world);
-							}
-						}
-					});
+					if (essenceManager.playerHasEssencePool(serverPlayerEntity.getUuid())) {
+						server.execute(() -> {
+							SpellManager.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
+						});
+					}
 				});
 	}
 
