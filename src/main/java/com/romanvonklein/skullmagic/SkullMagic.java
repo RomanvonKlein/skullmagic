@@ -87,6 +87,7 @@ public class SkullMagic implements ModInitializer {
 		// register blocks
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "fire_cannon"), FireCannon);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "fire_cannon"),
+		
 				new BlockItem(FireCannon, new FabricItemSettings().group(ItemGroup.MISC)));
 
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
