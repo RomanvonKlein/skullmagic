@@ -316,4 +316,27 @@ public class EssenceManager extends PersistentState {
     public boolean hasEssencePoolAt(RegistryKey<World> key, BlockPos pos) {
         return this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos);
     }
+
+    public void tryLinkSkullPedestalToNearbyAltar(World world, BlockPos pedestalpos) {
+        if (EssenceManager.isValidSkullPedestalCombo(world, pedestalpos)) {
+            String skullCandidate = Registry.BLOCK
+                    .getId(world.getBlockState(pedestalpos.up()).getBlock())
+                    .toString();
+            int height = Config.getConfig().scanHeight;
+            int width = Config.getConfig().scanWidth;
+            for (int x = pedestalpos.getX() - width; x <= pedestalpos.getX() + width; x++) {
+                for (int y = pedestalpos.getY() - height; y <= pedestalpos.getY() + height; y++) {
+                    for (int z = pedestalpos.getZ() - width; z <= pedestalpos.getZ() + width; z++) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        if (SkullMagic.essenceManager.hasEssencePoolAt(world.getRegistryKey(), pos)) {
+                            SkullMagic.essenceManager.linkPedestalToEssencePool(world.getRegistryKey(), pedestalpos,
+                                    pos,
+                                    skullCandidate);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

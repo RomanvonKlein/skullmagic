@@ -32,11 +32,11 @@ public class PlaceBlockMixin {
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 // skull placed on pedestal?
                 SkullMagic.LOGGER.info("placed a skull");
-                tryLinkToNearbyAltar(world, pos.down());
+                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar(world, pos.down());
             } else if (blockIdentifier
                     .equals(BlockEntityType.getId(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY).toString())) {
                 // pedestal placed under skull?
-                tryLinkToNearbyAltar(world, pos);
+                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar(world, pos);
                 SkullMagic.LOGGER.info("placed a skull pedestal");
             } else if (blockIdentifier.equals(BlockEntityType.getId(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).toString())) {
                 SkullMagic.LOGGER.info("placed a skull altar");
@@ -72,29 +72,4 @@ public class PlaceBlockMixin {
             }
         }
     }
-
-    // TODO: this method should propably be in EssenceManager.
-    private void tryLinkToNearbyAltar(World world, BlockPos pedestalpos) {
-        if (EssenceManager.isValidSkullPedestalCombo(world, pedestalpos)) {
-            String skullCandidate = Registry.BLOCK
-                    .getId(world.getBlockState(pedestalpos.up()).getBlock())
-                    .toString();
-            int height = Config.getConfig().scanHeight;
-            int width = Config.getConfig().scanWidth;
-            for (int x = pedestalpos.getX() - width; x <= pedestalpos.getX() + width; x++) {
-                for (int y = pedestalpos.getY() - height; y <= pedestalpos.getY() + height; y++) {
-                    for (int z = pedestalpos.getZ() - width; z <= pedestalpos.getZ() + width; z++) {
-                        BlockPos pos = new BlockPos(x, y, z);
-                        if (SkullMagic.essenceManager.hasEssencePoolAt(world.getRegistryKey(), pos)) {
-                            SkullMagic.essenceManager.linkPedestalToEssencePool(world.getRegistryKey(), pedestalpos,
-                                    pos,
-                                    skullCandidate);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }
