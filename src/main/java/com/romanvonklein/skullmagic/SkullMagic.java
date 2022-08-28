@@ -4,8 +4,10 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.commands.Commands;
@@ -45,13 +47,24 @@ import net.minecraft.world.World;
 public class SkullMagic implements ModInitializer {
 	public static String MODID = "skullmagic";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+
+	// blocks
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
 	public static Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
+	public static Block FireCannon = new FireCannon(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
+
+	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
 	public static BlockEntityType<SkullPedestalBlockEntity> SKULL_PEDESTAL_BLOCK_ENTITY;
+	public static BlockEntityType<FireCannonBlockEntity> FIRE_CANNON_BLOCK_ENTITY;
+
+	// keybindings
 	private static KeyBinding keyBinding;
+
+	// custom managers
 	public static EssenceManager essenceManager;
 
 	@Environment(EnvType.CLIENT)
@@ -59,27 +72,40 @@ public class SkullMagic implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		// register commands
 		Commands.registerCommands();
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_pedestal"),
-				new BlockItem(SkullPedestal, new FabricItemSettings().group(ItemGroup.MISC)));
 
+		// register blockentities
+		FIRE_CANNON_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":fire_cannon_block_entity",
+				FabricBlockEntityTypeBuilder.create(FireCannonBlockEntity::new, FireCannon).build(null));
 		SKULL_ALTAR_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":skull_altar_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullAltarBlockEntity::new, SkullAltar).build(null));
 		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullPedestalBlockEntity::new, SkullPedestal).build(null));
+
+		// register blocks
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "fire_cannon"), FireCannon);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "fire_cannon"),
+				new BlockItem(FireCannon, new FabricItemSettings().group(ItemGroup.MISC)));
+
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_pedestal"),
+				new BlockItem(SkullPedestal, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_altar"),
 				SkullAltar);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
 				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
-		// keybind for primary spell
+
+		// keybinds
 		keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.skullmagic.primary", // The translation key of the keybinding's name
 				InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
 				GLFW.GLFW_KEY_R, // The keycode of the key
 				"category.skullmagic.spells" // The translation key of the keybinding's category.
 		));
+
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");

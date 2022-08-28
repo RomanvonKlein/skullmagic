@@ -26,6 +26,8 @@ public class Config {
         public HashMap<String, Integer> skulls;
         public int scanWidth;
         public int scanHeight;
+        public int supplyWidth;
+        public int supplyHeight;
 
         public ConfigData() {
             this.drops = new HashMap<String, Map<String, Float>>();
@@ -87,6 +89,9 @@ public class Config {
         defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);
         defaultData.scanHeight = 2;
         defaultData.scanWidth = 5;
+        defaultData.supplyWidth = 32;
+        defaultData.supplyHeight = 16;
+
         return defaultData;
     }
 

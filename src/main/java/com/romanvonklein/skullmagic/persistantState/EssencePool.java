@@ -1,7 +1,7 @@
 package com.romanvonklein.skullmagic.persistantState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -28,16 +28,7 @@ public class EssencePool extends PersistentState {
     BlockPos position;
     UUID linkedPlayerID;
     HashMap<BlockPos, String> linkedPedestals = new HashMap<>();
-
-    public static Map<UUID, EssencePool> playerToEssencePool = new HashMap<>();
-
-    public static EssencePool getEssencePoolForPlayer(UUID playerID) {
-        if (playerToEssencePool.containsKey(playerID)) {
-            return getEssencePoolForPlayer(playerID);
-        } else {
-            return null;
-        }
-    }
+    ArrayList<BlockPos> Consumers = new ArrayList<>();
 
     public EssencePool() {
         this.essence = 0;
@@ -112,11 +103,22 @@ public class EssencePool extends PersistentState {
         tag.putInt("essence", this.essence);
         tag.putInt("maxEssence", this.maxEssence);
         tag.putInt("essenceChargeRate", this.essenceChargeRate);
+        NbtCompound altarPosition = new NbtCompound();
+        altarPosition.putInt("x", this.position.getX());
+        altarPosition.putInt("y", this.position.getY());
+        altarPosition.putInt("z", this.position.getZ());
+        tag.put("altarPosition", altarPosition);
         NbtCompound linkedPedestalsNBT = new NbtCompound();
         for (Entry<BlockPos, String> entry : this.linkedPedestals.entrySet()) {
             linkedPedestalsNBT.putString(entry.getKey().toShortString(), entry.getValue());
         }
         tag.put("linkedPedestals", linkedPedestalsNBT);
+
+        NbtCompound linkedConsumersNBT = new NbtCompound();
+        for (int i = 0; i < this.Consumers.size(); i++) {
+            linkedConsumersNBT.putString(Integer.toString(i), this.Consumers.get(i).toShortString());
+        }
+        tag.put("linkedConsumers", linkedConsumersNBT);
         return tag;
     }
 
@@ -127,46 +129,22 @@ public class EssencePool extends PersistentState {
         pool.essence = tag.getInt("essence");
         pool.maxEssence = tag.getInt("maxEssence");
         pool.essenceChargeRate = tag.getInt("essenceChargeRate");
+        NbtCompound altarPosition = tag.getCompound("altarPosition");
+        int x = altarPosition.getInt("x");
+        int y = altarPosition.getInt("y");
+        int z = altarPosition.getInt("z");
+        pool.position = new BlockPos(x, y, z);
         NbtCompound pedestalList = tag.getCompound("linkedPedestals");
         pedestalList.getKeys().forEach((shortString) -> {
             // TODO: make this an int array for multiple values in skulls
             pool.linkedPedestals.put(Parsing.shortStringToBlockPos(shortString), pedestalList.getString(shortString));
         });
+        NbtCompound linkedConsumersList = tag.getCompound("linkedConsumers");
+        linkedConsumersList.getKeys().forEach((index) -> {
+            pool.Consumers.add(Parsing.shortStringToBlockPos(linkedConsumersList.getString(index)));
+        });
         return pool;
     }
-    /*
-     * public void checkAllPedestals(World world) {
-     * // reset all values directly influenced by pedestals
-     * this.essenceChargeRate = 0;
-     * ArrayList<SkullPedestalBlockEntity> checkedSkullPedestals = new
-     * ArrayList<>();
-     * 
-     * // check if all saved pedestal locations still contain a pedestal with a
-     * skull
-     * // on it
-     * for (int i = 0; i < linkedPedestals.size(); i += 3) {
-     * BlockPos candidatePos =
-     * Parsing.shortStringToBlockPos(linkedPedestals.get(i));
-     * Optional<SkullPedestalBlockEntity> candidate = world.getBlockEntity(
-     * candidatePos,
-     * SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
-     * if (candidate.isPresent()) {
-     * if (candidate.get().checkSkullPedestal(world, new BlockPos(pos), this)) {
-     * checkedSkullPedestals.add(candidate.get());
-     * }
-     * }
-     * }
-     * // readd all valid pedestals back to this.connctedPedestals
-     * this.linkedPedestals = new int[checkedSkullPedestals.size() * 3];
-     * for (int i = 0; i < checkedSkullPedestals.size() * 3; i++) {
-     * SkullPedestalBlockEntity ent = checkedSkullPedestals.get(i);
-     * BlockPos pos = ent.getPos();
-     * this.linkedPedestals[i] = pos.getX();
-     * this.linkedPedestals[i + 1] = pos.getY();
-     * this.linkedPedestals[i + 2] = pos.getZ();
-     * }
-     * }
-     */
 
     public void removePedestal(BlockPos pos) {
         // TODO: add more fields other than essencechargerate here...
@@ -181,5 +159,13 @@ public class EssencePool extends PersistentState {
         int addChargeRate = Config.getConfig().skulls.get(skullIdentifier);
         this.essenceChargeRate += addChargeRate;
         this.linkedPedestals.put(pedestalPos, skullIdentifier);
+    }
+
+    public void addConsumer(BlockPos pos) {
+        this.Consumers.add(pos);
+    }
+
+    public void removeConsumer(BlockPos pos) {
+        this.Consumers.remove(pos);
     }
 }

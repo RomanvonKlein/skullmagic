@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.config.Config.ConfigData;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.util.Parsing;
 
@@ -38,23 +39,23 @@ public class EssenceManager extends PersistentState {
 
     private Map<RegistryKey<World>, Map<BlockPos, EssencePool>> pedestalsToEssencePools = new HashMap<>();
     private Map<UUID, EssencePool> playersToEssencePools = new HashMap<>();
+    private Map<RegistryKey<World>, Map<BlockPos, EssencePool>> consumersToEssencePools = new HashMap<>();
+    private Map<RegistryKey<World>, ArrayList<BlockPos>> allConsumers = new HashMap<>();
 
     public EssencePool getEssencePool(RegistryKey<World> dimension, BlockPos pos) {
         if (!EssencePools.containsKey(dimension)) {
             EssencePools.put(dimension, new HashMap<>());
         }
         if (!EssencePools.get(dimension).containsKey(pos)) {
-            EssencePools.get(dimension).put(pos, new EssencePool());
+            EssencePools.get(dimension).put(pos, new EssencePool(pos));
         }
         return EssencePools.get(dimension).get(pos);
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
-        SkullMagic.LOGGER.info("Saving Mana pools:");
+        // essence pools
         NbtCompound EssencePoolsNBT = new NbtCompound();
-
         EssencePools.keySet().forEach(dimension -> {
-            SkullMagic.LOGGER.info("Dimension: '" + dimension.getValue().toString() + "'");
             NbtCompound dimensionNBT = new NbtCompound();
 
             EssencePools.get(dimension).keySet().forEach((posStr) -> {
@@ -66,8 +67,19 @@ public class EssenceManager extends PersistentState {
 
             EssencePoolsNBT.put(dimension.getValue().toString(), dimensionNBT);
         });
+        tag.put("essencePools", EssencePoolsNBT);
 
-        tag.put("essencePool", EssencePoolsNBT);
+        // consumers
+        NbtCompound consumersNBT = new NbtCompound();
+        allConsumers.keySet().forEach(worldKey -> {
+            NbtCompound consumerListCompound = new NbtCompound();
+            ArrayList<BlockPos> posList = this.allConsumers.get(worldKey);
+            for (int index = 0; index < posList.size(); index++) {
+                consumerListCompound.putString(Integer.toString(index), posList.get(index).toShortString());
+            }
+            consumersNBT.put(worldKey.getValue().toString(), consumerListCompound);
+        });
+        tag.put("consumers", consumersNBT);
         return tag;
     }
 
@@ -93,33 +105,57 @@ public class EssenceManager extends PersistentState {
     }
 
     public static EssenceManager fromNbt(NbtCompound tag) {
-        System.out.println("Reading EssencePools from NBT");
+        System.out.println("Reading EssenceManager from NBT");
         EssenceManager essenceMngr = new EssenceManager();
-        essenceMngr.clear();
-        if (tag.contains("essencePool")) {
-            try {
-                tag.getKeys().forEach((dimensionid) -> {
-                    RegistryKey<World> key = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
-                            Identifier.tryParse(dimensionid));
-                    if (!essenceMngr.EssencePools.containsKey(key)) {
-                        essenceMngr.EssencePools.put(key, new HashMap<>());
+        // read all essencePools
+        if (tag.contains("essencePools")) {
+            NbtCompound essencePoolsCompound = tag.getCompound("essencePools");
+            essencePoolsCompound.getKeys().forEach((worldKey) -> {
+                RegistryKey<World> key = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
+                        Identifier.tryParse(worldKey));
+                essenceMngr.EssencePools.put(key, new HashMap<>());
+                NbtCompound worldList = essencePoolsCompound.getCompound(worldKey);
+                worldList.getKeys().forEach((essencePoolPosString) -> {
+                    EssencePool pool = EssencePool.fromNbt(worldList.getCompound(essencePoolPosString));
+                    essenceMngr.EssencePools.get(key).put(Parsing.shortStringToBlockPos(essencePoolPosString),
+                            pool);
+                    if (pool.linkedPlayerID != null) {
+                        essenceMngr.playersToEssencePools.put(pool.linkedPlayerID, pool);
                     }
-                    tag.getCompound(dimensionid).getKeys().forEach((posString) -> {
-                        EssencePool pool = EssencePool.fromNbt(tag.getCompound(posString));
-                        if (pool.linkedPlayerID != null) {
-                            essenceMngr.playersToEssencePools.put(pool.linkedPlayerID, pool);
+                    for (BlockPos blockPos : pool.linkedPedestals.keySet()) {
+                        essenceMngr.pedestalsToEssencePools.get(key).put(blockPos, pool);
+                    }
+                    essenceMngr.EssencePools.get(key).put(Parsing.shortStringToBlockPos(essencePoolPosString), pool);
+                    for (BlockPos blockPos : pool.Consumers) {
+                        if (!essenceMngr.consumersToEssencePools.containsKey(key)) {
+                            essenceMngr.consumersToEssencePools.put(key, new HashMap<>());
                         }
-                        for (BlockPos blockPos : pool.linkedPedestals.keySet()) {
-                            essenceMngr.pedestalsToEssencePools.get(key).put(blockPos, pool);
-                        }
-                        essenceMngr.EssencePools.get(key).put(Parsing.shortStringToBlockPos(posString), pool);
-                    });
+                        essenceMngr.consumersToEssencePools.get(key).put(blockPos, pool);
+                    }
                 });
-            } catch (Exception e) {
-                SkullMagic.LOGGER.error("Failed loading persistentstate from NBT data!");
-            }
+            });
         }
+        // read all consumers
+        if (tag.contains("consumers")) {
+            NbtCompound consumersCompound = tag.getCompound("consumers");
+            consumersCompound.getKeys().forEach((worldKey) -> {
+                RegistryKey<World> key = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
+                        Identifier.tryParse(worldKey));
+                essenceMngr.allConsumers.put(key, new ArrayList<>());
+                NbtCompound consumerListCompound = consumersCompound.getCompound(worldKey);
+                consumerListCompound.getKeys().forEach((indexStr) -> {
+                    essenceMngr.allConsumers.get(key)
+                            .add(Parsing.shortStringToBlockPos(consumerListCompound.getString(indexStr)));
+                });
+            });
+        }
+
         return essenceMngr;
+    }
+
+    public String toJsonString() {
+        // TODO: jsonfy all this data...
+        return "";
     }
 
     public void trySetLinkedPlayer(PlayerEntity player, BlockPos pos) {
@@ -155,35 +191,6 @@ public class EssenceManager extends PersistentState {
                 player.sendMessage(Text.of("This altar is already linked to another player."), true);
             }
         }
-        /*
-         * if (pool != null) {
-         * pool.linkedPlayerID = null;
-         * }
-         * 
-         * EssencePool prevpool = this.getEssencePoolForPlayer(player.getUuid());
-         * 
-         * if (SkullMagic.StateManager.playerHasLink(player.getUuid())
-         * &&
-         * !SkullMagic.StateManager.getLinkedAltarBlockPos(player.getUuid()).equals(this
-         * .pos)) {
-         * player.sendMessage(Text.of("You already have an altar linked to you at "
-         * + SkullMagic.StateManager.getAltarPosLinkedToPlayer(player.getUuid()) + "."),
-         * true);
-         * } else {
-         * String linkedUUID = SkullMagic.StateManager.getPlayerLinkedToAltar(this.pos);
-         * if (linkedUUID.equals("")) {
-         * this.linkedPlayerID = player.getUuidAsString();
-         * SkullMagic.StateManager.addAltarLink(player.getUuid(), this.pos);
-         * player.sendMessage(Text.of("Linked you to this altar."), true);
-         * } else if (linkedUUID.equals(player.getUuidAsString())) {
-         * this.linkedPlayerID = "";
-         * SkullMagic.StateManager.removeAltarLink(player.getUuid(), this.pos);
-         * player.sendMessage(Text.of("Unlinked you from this altar."), true);
-         * } else {
-         * 
-         * }
-         * }
-         */
     }
 
     public void tick(MinecraftServer server) {
@@ -268,7 +275,7 @@ public class EssenceManager extends PersistentState {
         if (!EssencePools.containsKey(registryKey)) {
             EssencePools.put(registryKey, new HashMap<>());
         }
-        EssencePool pool = new EssencePool();
+        EssencePool pool = new EssencePool(pos);
         EssencePools.get(registryKey).put(pos, pool);
 
         tryLinkNearbyUnlinkedPedestals(world.getServer().getWorld(registryKey), pos);
@@ -337,6 +344,60 @@ public class EssenceManager extends PersistentState {
                     }
                 }
             }
+        }
+    }
+
+    public EssencePool getEssencePoolForConsumer(RegistryKey<World> registryKey, BlockPos pos) {
+        EssencePool pool = null;
+        if (consumersToEssencePools.containsKey(registryKey)
+                && consumersToEssencePools.get(registryKey).containsKey(pos)) {
+            pool = consumersToEssencePools.get(registryKey).get(pos);
+        }
+        return pool;
+    }
+
+    public void addConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID placerID) {
+        SkullMagic.LOGGER.info("Adding new consumer!");
+        if (!this.allConsumers.containsKey(registryKey)) {
+            this.allConsumers.put(registryKey, new ArrayList<>());
+        }
+        this.allConsumers.get(registryKey).add(pos);
+        // see if the placer has an essencepool reaching the newly placed consumer
+        if (this.playersToEssencePools.containsKey(placerID)) {
+            EssencePool pool = this.playersToEssencePools.get(placerID);
+            if (isConsumerInRangeOf(pos, pool.position)) {
+                SkullMagic.LOGGER.info("Essencepool is in rage! adding the consumer to it...");
+                pool.addConsumer(pos);
+                if (!this.consumersToEssencePools.containsKey(registryKey)) {
+                    this.consumersToEssencePools.put(registryKey, new HashMap<>());
+                }
+                this.consumersToEssencePools.get(registryKey).put(pos, pool);
+            }
+        }
+    }
+
+    private static boolean isConsumerInRangeOf(BlockPos consumerPos, BlockPos altarPos) {
+        ConfigData config = Config.getConfig();
+        int px = consumerPos.getX();
+        int py = consumerPos.getY();
+        int pz = consumerPos.getZ();
+        int ax = consumerPos.getX();
+        int ay = consumerPos.getY();
+        int az = consumerPos.getZ();
+        return px <= ax + config.supplyWidth
+                && px >= ax - config.supplyWidth
+                && py <= ay + config.supplyHeight
+                && py >= ay - config.supplyHeight
+                && pz <= az + config.supplyWidth
+                && pz >= az - config.supplyWidth;
+    }
+
+    public void removeConsumer(RegistryKey<World> registryKey, BlockPos pos) {
+        if (this.consumersToEssencePools.containsKey(registryKey)
+                && this.consumersToEssencePools.get(registryKey).containsKey(pos)) {
+            EssencePool pool = this.consumersToEssencePools.get(registryKey).get(pos);
+            pool.removeConsumer(pos);
+            this.consumersToEssencePools.get(registryKey).remove(pos);
         }
     }
 }

@@ -1,0 +1,46 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "skullmagic:block/fire_cannon",
+		"particle": "skullmagic:block/fire_cannon"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 4, 16],
+			"faces": {
+				"north": {"uv": [4, 4, 8, 5], "texture": "#0"},
+				"east": {"uv": [0, 4, 4, 5], "texture": "#0"},
+				"south": {"uv": [12, 4, 16, 5], "texture": "#0"},
+				"west": {"uv": [8, 4, 12, 5], "texture": "#0"},
+				"up": {"uv": [8, 4, 4, 0], "texture": "#0"},
+				"down": {"uv": [12, 0, 8, 4], "texture": "#0"}
+			}
+		},
+		{
+			"from": [2, 4, 2],
+			"to": [14, 12, 14],
+			"faces": {
+				"north": {"uv": [3, 13, 6, 15], "texture": "#0"},
+				"east": {"uv": [0, 13, 3, 15], "texture": "#0"},
+				"south": {"uv": [9, 13, 12, 15], "texture": "#0"},
+				"west": {"uv": [6, 13, 9, 15], "texture": "#0"},
+				"up": {"uv": [6, 13, 3, 10], "texture": "#0"},
+				"down": {"uv": [9, 10, 6, 13], "texture": "#0"}
+			}
+		},
+		{
+			"from": [0, 12, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [4, 9, 8, 10], "texture": "#0"},
+				"east": {"uv": [0, 9, 4, 10], "texture": "#0"},
+				"south": {"uv": [12, 9, 16, 10], "texture": "#0"},
+				"west": {"uv": [8, 9, 12, 10], "texture": "#0"},
+				"up": {"uv": [8, 9, 4, 5], "texture": "#0"},
+				"down": {"uv": [12, 5, 8, 9], "texture": "#0"}
+			}
+		}
+	]
+}

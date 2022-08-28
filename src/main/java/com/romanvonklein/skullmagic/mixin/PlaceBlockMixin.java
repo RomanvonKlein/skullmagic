@@ -18,7 +18,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 
 @Mixin(Block.class)
 public class PlaceBlockMixin {
@@ -26,6 +25,7 @@ public class PlaceBlockMixin {
     @Inject(at = @At("HEAD"), method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
+                //TODO: overwrite onPlaced instead for custom bocks/blockEntities
         if (!world.isClient()) {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
             // cases:

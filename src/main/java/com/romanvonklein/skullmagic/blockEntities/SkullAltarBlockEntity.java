@@ -40,7 +40,5 @@ public class SkullAltarBlockEntity extends BlockEntity {
         return createNbt();
     }
 
-    public static void tick(World world1, BlockPos pos, BlockState state1, SkullAltarBlockEntity be) {
-
-    }
+    public static void tick(World world1, BlockPos pos, BlockState state1, SkullAltarBlockEntity be) {}
 }

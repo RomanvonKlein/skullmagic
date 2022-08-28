@@ -8,20 +8,21 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
-public class DebugCommand {
+public class DebugCommands {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         dispatcher.register(
                 CommandManager.literal("skullmagic").then(CommandManager.literal("debug")
-                        .then(CommandManager.literal("clear").executes(DebugCommand::clear))));
+                        .then(CommandManager.literal("clear").executes(DebugCommands::clear))));
         dispatcher.register(
                 CommandManager.literal("skullmagic")
                         .then(CommandManager.literal("debug")
                                 .then(CommandManager.literal("output")
-                                        .executes(DebugCommand::output))));
+                                        .executes(DebugCommands::output))));
     }
 
     private static int output(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         SkullMagic.LOGGER.info("debugging command executed");
+        SkullMagic.LOGGER.info(SkullMagic.essenceManager.toJsonString());
         return 1;
     }
 

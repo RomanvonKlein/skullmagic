@@ -1,7 +1,5 @@
 package com.romanvonklein.skullmagic.blocks;
 
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 
