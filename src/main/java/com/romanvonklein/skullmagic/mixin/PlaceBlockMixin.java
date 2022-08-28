@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -40,38 +41,37 @@ public class PlaceBlockMixin {
             } else if (blockIdentifier.equals(BlockEntityType.getId(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).toString())) {
                 SkullMagic.LOGGER.info("placed a skull altar");
                 // altar places around valid pedestal - skull combination?
-                SkullMagic.essenceManager.createNewEssencePool(world, pos);   
+                SkullMagic.essenceManager.createNewEssencePool(world, pos);
                 SkullMagic.essenceManager.tryLinkNearbyUnlinkedPedestals(world, pos);
             }
         }
     }
 
-    /*
-     * public void onDestroyedByExplosion(net.minecraft.world.World world,
-     * net.minecraft.util.math.BlockPos pos, net.minecraft.world.explosion.Explosion
-     * explosion)
-     */
-    @Inject(at = @At("HEAD"), method = "onDestroyedByExplosion(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/explosion/Explosion;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
-    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion, CallbackInfo info) {
-        /*
-         * TODO: make use of this
-         * SkullMagic.LOGGER.info(((BlockInvoker) this).toString() +
-         * " destroyed by explosion!");
-         */
-    }
+    // @Inject(at = @At("HEAD"), method =
+    // "onDestroyedByExplosion(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/explosion/Explosion;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
+    // cancellable = true)
+    // public void onDestroyedByExplosion(World world, BlockPos pos, Explosion
+    // explosion, CallbackInfo info) {
+    // /*
+    // * TODO: make use of this
+    // * SkullMagic.LOGGER.info(((BlockInvoker) this).toString() +
+    // * " destroyed by explosion!");
+    // */
+    // }
 
     /*
      * public void onBreak(net.minecraft.world.World world,
      * net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
      * net.minecraft.entity.player.PlayerEntity player)
      */
-    // @Inject(at = @At("HEAD"), method =
-    // "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
-    // cancellable = true)
-    // public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity
-    // player, CallbackInfo info) {
-    // SkullMagic.LOGGER.info("BLock Broken!");
-    // }
+    @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
+        if (!world.isClient) {
+            if (EssenceManager.isValidSkullPedestalCombo(world, pos.down())) {
+                SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos.down());
+            }
+        }
+    }
 
     // TODO: this method should propably be in EssenceManager.
     private void tryLinkToNearbyAltar(World world, BlockPos pedestalpos) {
@@ -85,8 +85,12 @@ public class PlaceBlockMixin {
                 for (int y = pedestalpos.getY() - height; y <= pedestalpos.getY() + height; y++) {
                     for (int z = pedestalpos.getZ() - width; z <= pedestalpos.getZ() + width; z++) {
                         BlockPos pos = new BlockPos(x, y, z);
-                        SkullMagic.essenceManager.linkPedestalToEssencePool(world.getRegistryKey(), pedestalpos, pos,
-                                skullCandidate);
+                        if (SkullMagic.essenceManager.hasEssencePoolAt(world.getRegistryKey(), pos)) {
+                            SkullMagic.essenceManager.linkPedestalToEssencePool(world.getRegistryKey(), pedestalpos,
+                                    pos,
+                                    skullCandidate);
+                            return;
+                        }
                     }
                 }
             }

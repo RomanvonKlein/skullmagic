@@ -1,5 +1,8 @@
 package com.romanvonklein.skullmagic.blocks;
 
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 
 import net.minecraft.block.Block;
@@ -8,12 +11,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 
 public class SkullPedestal extends BlockWithEntity {
     public static final BooleanProperty CONNECTED = BooleanProperty.of("connected");
@@ -47,5 +52,14 @@ public class SkullPedestal extends BlockWithEntity {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new SkullPedestalBlockEntity(pos, state);
+    }
+
+    @Override
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
+        if (!world.isClient) {
+            SkullMagic.LOGGER.info("Broke a Skull Pedestal.");
+            SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos);
+        }
     }
 }

@@ -171,6 +171,7 @@ public class EssencePool extends PersistentState {
     public void removePedestal(BlockPos pos) {
         // TODO: add more fields other than essencechargerate here...
         int lostChargeRate = Config.getConfig().skulls.get(this.linkedPedestals.get(pos));
+        SkullMagic.LOGGER.info("Removing " + lostChargeRate + "from essence pool.");
         this.essenceChargeRate -= lostChargeRate;
         this.linkedPedestals.remove(pos);
     }

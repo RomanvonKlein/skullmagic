@@ -12,6 +12,7 @@ import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.util.Parsing;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -148,7 +149,8 @@ public class EssenceManager extends PersistentState {
                 pool.linkedPlayerID = null;
                 this.playersToEssencePools.remove(playerID);
                 player.sendMessage(Text.of("Unlinked you from this altar."), true);
-                ServerPlayNetworking.send((ServerPlayerEntity)(player), NetworkingConstants.UNLINK_ESSENCEPOOL_ID, null);
+                ServerPlayNetworking.send((ServerPlayerEntity) (player), NetworkingConstants.UNLINK_ESSENCEPOOL_ID,
+                        PacketByteBufs.create());
             } else {
                 player.sendMessage(Text.of("This altar is already linked to another player."), true);
             }
@@ -254,6 +256,9 @@ public class EssenceManager extends PersistentState {
     public void linkPedestalToEssencePool(RegistryKey<World> key, BlockPos pedestalPos, EssencePool pool,
             String skullIdentifier) {
         pool.linkPedestal(pedestalPos, skullIdentifier);
+        if (!this.pedestalsToEssencePools.containsKey(key)) {
+            this.pedestalsToEssencePools.put(key, new HashMap<>());
+        }
         this.pedestalsToEssencePools.get(key).put(pedestalPos, pool);
     }
 
@@ -306,5 +311,9 @@ public class EssenceManager extends PersistentState {
             return Config.getConfig().skulls.containsKey(blockIdentifier);
         }
         return false;
+    }
+
+    public boolean hasEssencePoolAt(RegistryKey<World> key, BlockPos pos) {
+        return this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos);
     }
 }
