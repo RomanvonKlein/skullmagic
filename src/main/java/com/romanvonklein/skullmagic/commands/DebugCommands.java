@@ -1,5 +1,8 @@
 package com.romanvonklein.skullmagic.commands;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -22,7 +25,24 @@ public class DebugCommands {
 
     private static int output(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         SkullMagic.LOGGER.info("debugging command executed");
-        SkullMagic.LOGGER.info(SkullMagic.essenceManager.toJsonString());
+        String jsonString = SkullMagic.essenceManager.toJsonString();
+        String dir = "./debug/";
+        String fileName = "output.json";
+        String path = dir + fileName;
+        File directory = new File(dir);
+        System.out.print(jsonString);
+        try {
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            FileOutputStream outputStream;
+            outputStream = new FileOutputStream(path);
+            byte[] strToBytes = jsonString.getBytes();
+            outputStream.write(strToBytes);
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 1;
     }
 

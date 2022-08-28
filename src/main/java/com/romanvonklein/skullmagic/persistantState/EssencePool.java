@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
@@ -62,10 +64,10 @@ public class EssencePool extends PersistentState {
                     }
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeIntArray(new int[] { this.essence, this.maxEssence, this.essenceChargeRate });
-                    // TODO: this seems to fail. was the playerid set correctly when linking?
-                    ServerPlayNetworking.send(
-                            (ServerPlayerEntity) (world.getPlayerByUuid(this.linkedPlayerID)),
-                            NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
+                    ServerPlayerEntity player = (ServerPlayerEntity) (world.getPlayerByUuid(this.linkedPlayerID));
+                    if (player != null) {
+                        ServerPlayNetworking.send(player, NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID, buf);
+                    }
                 }
             }
         }
@@ -99,7 +101,7 @@ public class EssencePool extends PersistentState {
     public NbtCompound writeNbt(NbtCompound tag) {
         SkullMagic.LOGGER.info("Saving this Mana pool:");
 
-        tag.putString("linkedPlayerID", this.linkedPlayerID.toString());
+        tag.putUuid("linkedPlayerID", this.linkedPlayerID);
         tag.putInt("essence", this.essence);
         tag.putInt("maxEssence", this.maxEssence);
         tag.putInt("essenceChargeRate", this.essenceChargeRate);
@@ -167,5 +169,19 @@ public class EssencePool extends PersistentState {
 
     public void removeConsumer(BlockPos pos) {
         this.Consumers.remove(pos);
+    }
+
+    public JsonObject toJsonElement() {
+        JsonObject elem = new JsonObject();
+        elem.addProperty("essence", this.essence);
+        elem.addProperty("maxEssence", this.maxEssence);
+        elem.addProperty("essenceChargeRate", this.essenceChargeRate);
+        elem.addProperty("position", this.position.toShortString());
+        JsonArray consumerList = new JsonArray();
+        for (BlockPos pos : this.Consumers) {
+            consumerList.add(pos.toShortString());
+        }
+        elem.add("consumers", consumerList);
+        return elem;
     }
 }

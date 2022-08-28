@@ -3,9 +3,11 @@ package com.romanvonklein.skullmagic.persistantState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.config.Config;
@@ -42,6 +44,15 @@ public class EssenceManager extends PersistentState {
     private Map<RegistryKey<World>, Map<BlockPos, EssencePool>> consumersToEssencePools = new HashMap<>();
     private Map<RegistryKey<World>, ArrayList<BlockPos>> allConsumers = new HashMap<>();
 
+    public EssenceManager() {
+        super();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return true;
+    }
+
     public EssencePool getEssencePool(RegistryKey<World> dimension, BlockPos pos) {
         if (!EssencePools.containsKey(dimension)) {
             EssencePools.put(dimension, new HashMap<>());
@@ -53,6 +64,7 @@ public class EssenceManager extends PersistentState {
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
+        SkullMagic.LOGGER.info("Saving nbt for EssenceManager");
         // essence pools
         NbtCompound EssencePoolsNBT = new NbtCompound();
         EssencePools.keySet().forEach(dimension -> {
@@ -123,6 +135,9 @@ public class EssenceManager extends PersistentState {
                         essenceMngr.playersToEssencePools.put(pool.linkedPlayerID, pool);
                     }
                     for (BlockPos blockPos : pool.linkedPedestals.keySet()) {
+                        if (!essenceMngr.pedestalsToEssencePools.containsKey(key)) {
+                            essenceMngr.pedestalsToEssencePools.put(key, new HashMap<>());
+                        }
                         essenceMngr.pedestalsToEssencePools.get(key).put(blockPos, pool);
                     }
                     essenceMngr.EssencePools.get(key).put(Parsing.shortStringToBlockPos(essencePoolPosString), pool);
@@ -154,8 +169,66 @@ public class EssenceManager extends PersistentState {
     }
 
     public String toJsonString() {
-        // TODO: jsonfy all this data...
-        return "";
+        JsonObject jobj = new JsonObject();
+
+        SkullMagic.LOGGER.info("Creating essence Pools list");
+        // essence pools
+        JsonObject essencePools = new JsonObject();
+        for (RegistryKey<World> key : this.EssencePools.keySet()) {
+            JsonArray poolList = new JsonArray();
+            for (BlockPos poolPos : this.EssencePools.get(key).keySet()) {
+                EssencePool pool = this.EssencePools.get(key).get(poolPos);
+                poolList.add(pool.toJsonElement());
+            }
+            essencePools.add(key.getValue().toString(), poolList);
+        }
+        jobj.add("essencePools", essencePools);
+
+        // consumers
+        SkullMagic.LOGGER.info("Creating consumers list");
+        JsonObject consumers = new JsonObject();
+        for (RegistryKey<World> key : this.allConsumers.keySet()) {
+            JsonArray posList = new JsonArray();
+            for (BlockPos pos : this.allConsumers.get(key)) {
+                posList.add(pos.toShortString());
+            }
+            consumers.add(key.getValue().toString(), posList);
+        }
+        jobj.add("consumers", consumers);
+
+        // playerToEssencePool
+        SkullMagic.LOGGER.info("Creating playerToEssencePool");
+        JsonObject playersToEssencePools = new JsonObject();
+        for (Entry<UUID, EssencePool> entry : this.playersToEssencePools.entrySet()) {
+            playersToEssencePools.addProperty(entry.getKey().toString(), entry.getValue().position.toShortString());
+        }
+        jobj.add("playersToEssencePools", playersToEssencePools);
+
+        // pedestalToEssencePool
+        SkullMagic.LOGGER.info("Creating pedestalToEssencePool");
+        JsonObject pedestalToEssencePool = new JsonObject();
+        for (RegistryKey<World> key : this.pedestalsToEssencePools.keySet()) {
+            JsonArray pedestalList = new JsonArray();
+            for (BlockPos poolPos : this.pedestalsToEssencePools.get(key).keySet()) {
+                pedestalList.add(poolPos.toShortString());
+            }
+            pedestalToEssencePool.add(key.getValue().toString(), pedestalList);
+        }
+        jobj.add("pedestalToEssencePool", pedestalToEssencePool);
+
+        // consumerToEssencePool
+        SkullMagic.LOGGER.info("Creating consumerToEssencePool");
+        JsonObject consumerToEssencePool = new JsonObject();
+        for (RegistryKey<World> key : this.consumersToEssencePools.keySet()) {
+            JsonArray consumerList = new JsonArray();
+            for (BlockPos poolPos : this.consumersToEssencePools.get(key).keySet()) {
+                consumerList.add(poolPos.toShortString());
+            }
+            consumerToEssencePool.add(key.getValue().toString(), consumerList);
+        }
+        jobj.add("consumerToEssencePool", consumerToEssencePool);
+
+        return jobj.toString();
     }
 
     public void trySetLinkedPlayer(PlayerEntity player, BlockPos pos) {
