@@ -9,12 +9,15 @@ import java.util.Map.Entry;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.util.Parsing;
 
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -119,28 +122,36 @@ public class EssenceManager extends PersistentState {
     }
 
     public void trySetLinkedPlayer(PlayerEntity player, BlockPos pos) {
-        UUID playerID = player.getUuid();
-        RegistryKey<World> key = player.getWorld().getRegistryKey();
-        if (!(this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos))) {
-            SkullMagic.LOGGER.warn("no valid mana pool was found for skullaltar. Creating one.");
-            createNewEssencePool(player.getWorld(), pos);
-        }
+        if (!player.world.isClient) {
 
-        EssencePool pool = this.EssencePools.get(key).get(pos);
-        if (pool.linkedPlayerID == null) {
-            pool.linkedPlayerID = playerID;
-
-            // unlink from old essence pool if there was one
-            if (this.getEssencePoolForPlayer(playerID) != null) {
-                this.getEssencePoolForPlayer(playerID).linkedPlayerID = null;
+            UUID playerID = player.getUuid();
+            RegistryKey<World> key = player.getWorld().getRegistryKey();
+            if (!(this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos))) {
+                SkullMagic.LOGGER.warn("no valid mana pool was found for skullaltar. Creating one.");
+                createNewEssencePool(player.getWorld(), pos);
             }
 
-            // set links to new essence pool
-            this.playersToEssencePools.remove(playerID);
-            this.playersToEssencePools.put(playerID, pool);
-            player.sendMessage(Text.of("Linked you to this altar."), true);
-        } else {
-            player.sendMessage(Text.of("This altar is already linked to another player."), true);
+            EssencePool pool = this.EssencePools.get(key).get(pos);
+            if (pool.linkedPlayerID == null) {
+                pool.linkedPlayerID = playerID;
+
+                // unlink from old essence pool if there was one
+                if (this.getEssencePoolForPlayer(playerID) != null) {
+                    this.getEssencePoolForPlayer(playerID).linkedPlayerID = null;
+                }
+
+                // set links to new essence pool
+                this.playersToEssencePools.remove(playerID);
+                this.playersToEssencePools.put(playerID, pool);
+                player.sendMessage(Text.of("Linked you to this altar."), true);
+            } else if (pool.linkedPlayerID == playerID) {
+                pool.linkedPlayerID = null;
+                this.playersToEssencePools.remove(playerID);
+                player.sendMessage(Text.of("Unlinked you from this altar."), true);
+                ServerPlayNetworking.send((ServerPlayerEntity)(player), NetworkingConstants.UNLINK_ESSENCEPOOL_ID, null);
+            } else {
+                player.sendMessage(Text.of("This altar is already linked to another player."), true);
+            }
         }
         /*
          * if (pool != null) {
