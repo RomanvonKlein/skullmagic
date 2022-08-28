@@ -78,15 +78,16 @@ public class Config {
         zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1.0f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
         HashMap<String, Float> skeletonDrops = new HashMap<>();
-        zombieDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1.0f);
+        skeletonDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1.0f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
         HashMap<String, Float> creeperDrops = new HashMap<>();
-        zombieDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 1.0f);
+        creeperDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 1.0f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
 
         defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);
+        defaultData.skulls.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 30);
         defaultData.scanHeight = 2;
         defaultData.scanWidth = 5;
         defaultData.supplyWidth = 32;
