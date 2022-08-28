@@ -3,22 +3,38 @@ package com.romanvonklein.skullmagic.blocks;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class FireCannon extends AConsumerBlock {
 
     public FireCannon(Settings settings) {
         super(settings);
+        setDefaultState(this.stateManager.getDefaultState().with(Properties.FACING, Direction.UP));
     }
 
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
+        stateManager.add(Properties.FACING);
+    }
+
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState) this.getDefaultState().with(Properties.FACING,
+                ctx.getPlayerLookDirection());
+    }
     // @Override
     // public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos
     // pos, ShapeContext context) {

@@ -25,8 +25,10 @@ public class SkullPedestal extends BlockWithEntity {
 
     public SkullPedestal(Settings settings) {
         super(settings);
+        //TODO: is this state even used anymore?
         setDefaultState(getStateManager().getDefaultState().with(CONNECTED, false));
     }
+    
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {

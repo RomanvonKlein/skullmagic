@@ -1,7 +1,36 @@
 {
     "variants": {
-        "": {
-            "model": "skullmagic:block/fire_cannon"
+        "facing=north": {
+            "model": "skullmagic:block/fire_cannon",
+            "x": 90,
+            "uvlock": false
+        },
+        "facing=east": {
+            "model": "skullmagic:block/fire_cannon",
+            "x": 90,
+            "y": 90,
+            "uvlock": false
+        },
+        "facing=south": {
+            "model": "skullmagic:block/fire_cannon",
+            "x": 90,
+            "y": 180,
+            "uvlock": false
+        },
+        "facing=west": {
+            "model": "skullmagic:block/fire_cannon",
+            "x": 90,
+            "y": 270,
+            "uvlock": false
+        },
+        "facing=up": {
+            "model": "skullmagic:block/fire_cannon",
+            "uvlock": false
+        },
+        "facing=down": {
+            "model": "skullmagic:block/fire_cannon",
+            "x": 180,
+            "uvlock": false
         }
     }
 }

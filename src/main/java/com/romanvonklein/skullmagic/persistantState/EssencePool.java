@@ -28,7 +28,7 @@ public class EssencePool extends PersistentState {
     int chargeCooldown = 5;
     int chargeCooldownLeft = 0;
     BlockPos position;
-    UUID linkedPlayerID;
+    public UUID linkedPlayerID;
     HashMap<BlockPos, String> linkedPedestals = new HashMap<>();
     ArrayList<BlockPos> Consumers = new ArrayList<>();
 

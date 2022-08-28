@@ -50,11 +50,11 @@ public class SkullMagic implements ModInitializer {
 
 	// blocks
 	public static final Block SkullPedestal = new SkullPedestal(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block SkullAltar = new SkullAltar(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block FireCannon = new FireCannon(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 
 	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
