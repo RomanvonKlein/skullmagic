@@ -74,16 +74,21 @@ public class Config {
     private static ConfigData getDefaultConfigData() {
         ConfigData defaultData = new ConfigData();
 
+        //mobdrops
         HashMap<String, Float> zombieDrops = new HashMap<>();
-        zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1.0f);
+        zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 0.1f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
         HashMap<String, Float> skeletonDrops = new HashMap<>();
-        skeletonDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1.0f);
+        skeletonDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 0.1f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
         HashMap<String, Float> creeperDrops = new HashMap<>();
-        creeperDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 1.0f);
+        creeperDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 0.1f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
+        HashMap<String, Float> enderDragonDrops = new HashMap<>();
+        enderDragonDrops.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 1.0f);
+        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ENDER_DRAGON).toString(), enderDragonDrops);
 
+        //skull values
         defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);

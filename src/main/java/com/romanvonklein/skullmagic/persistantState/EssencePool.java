@@ -99,8 +99,6 @@ public class EssencePool extends PersistentState {
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
-        SkullMagic.LOGGER.info("Saving this Mana pool:");
-
         tag.putUuid("linkedPlayerID", this.linkedPlayerID);
         tag.putInt("essence", this.essence);
         tag.putInt("maxEssence", this.maxEssence);

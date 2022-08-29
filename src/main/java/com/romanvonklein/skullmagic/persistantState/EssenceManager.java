@@ -429,8 +429,8 @@ public class EssenceManager extends PersistentState {
         return pool;
     }
 
-    public void addConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID placerID) {
-        SkullMagic.LOGGER.info("Adding new consumer!");
+    public boolean addConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID placerID) {
+        boolean success = false;
         if (!this.allConsumers.containsKey(registryKey)) {
             this.allConsumers.put(registryKey, new ArrayList<>());
         }
@@ -439,14 +439,15 @@ public class EssenceManager extends PersistentState {
         if (this.playersToEssencePools.containsKey(placerID)) {
             EssencePool pool = this.playersToEssencePools.get(placerID);
             if (isConsumerInRangeOf(pos, pool.position)) {
-                SkullMagic.LOGGER.info("Essencepool is in rage! adding the consumer to it...");
                 pool.addConsumer(pos);
+                success = true;
                 if (!this.consumersToEssencePools.containsKey(registryKey)) {
                     this.consumersToEssencePools.put(registryKey, new HashMap<>());
                 }
                 this.consumersToEssencePools.get(registryKey).put(pos, pool);
             }
         }
+        return success;
     }
 
     private static boolean isConsumerInRangeOf(BlockPos consumerPos, BlockPos altarPos) {
@@ -454,9 +455,9 @@ public class EssenceManager extends PersistentState {
         int px = consumerPos.getX();
         int py = consumerPos.getY();
         int pz = consumerPos.getZ();
-        int ax = consumerPos.getX();
-        int ay = consumerPos.getY();
-        int az = consumerPos.getZ();
+        int ax = altarPos.getX();
+        int ay = altarPos.getY();
+        int az = altarPos.getZ();
         return px <= ax + config.supplyWidth
                 && px >= ax - config.supplyWidth
                 && py <= ay + config.supplyHeight
