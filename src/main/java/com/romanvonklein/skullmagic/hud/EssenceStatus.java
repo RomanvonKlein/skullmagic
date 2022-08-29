@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.client.render.BufferBuilder;
@@ -16,19 +17,19 @@ public class EssenceStatus {
     public static void drawEssenceStatus(MatrixStack matrixStack, float tickDelta) {
 
         // collect data to draw for player
-        if (SkullMagic.clientEssenceManager != null) {
+        if (ClientInitializer.clientEssenceManager != null) {
             int borderwidth = 5;
             int barwidth = 100;
             int barheight = 25;
             int pxPerEssence = 1;
             try {
                 pxPerEssence = Math
-                        .toIntExact(Math.round(100.0 / Double.valueOf(SkullMagic.clientEssenceManager.maxEssence)));
+                        .toIntExact(Math.round(100.0 / Double.valueOf(ClientInitializer.clientEssenceManager.maxEssence)));
 
             } catch (Exception e) {
                 SkullMagic.LOGGER.error(
                         "weird error calculating pxPerEssence with maxEssence: "
-                                + SkullMagic.clientEssenceManager.maxEssence);
+                                + ClientInitializer.clientEssenceManager.maxEssence);
             }
             int x = 10;
             int y = 10;
@@ -36,10 +37,10 @@ public class EssenceStatus {
             drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
                     barheight + 2 * borderwidth, 0xc2c2c2);
             // essence
-            drawRect(matrixStack, x, y, SkullMagic.clientEssenceManager.essence * pxPerEssence, barheight, 0x114c9e);
+            drawRect(matrixStack, x, y, ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight, 0x114c9e);
             // empty
-            drawRect(matrixStack, x + SkullMagic.clientEssenceManager.essence * pxPerEssence, y,
-                    barwidth - SkullMagic.clientEssenceManager.essence * pxPerEssence, barheight, 0x787f8a);
+            drawRect(matrixStack, x + ClientInitializer.clientEssenceManager.essence * pxPerEssence, y,
+                    barwidth - ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight, 0x787f8a);
         }
 
     }
