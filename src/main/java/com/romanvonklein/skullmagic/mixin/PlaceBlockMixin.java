@@ -21,8 +21,8 @@ import net.minecraft.world.World;
 
 @Mixin(Block.class)
 public class PlaceBlockMixin {
-
-    @Inject(at = @At("HEAD"), method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
+//onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack)
+@Inject(method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;)V",at = @At("HEAD") )
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
                 //TODO: overwrite onPlaced instead for custom bocks/blockEntities
@@ -64,7 +64,7 @@ public class PlaceBlockMixin {
      * net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
      * net.minecraft.entity.player.PlayerEntity player)
      */
-    @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable = true)
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
         if (!world.isClient) {
             if (EssenceManager.isValidSkullPedestalCombo(world, pos.down())) {
