@@ -24,7 +24,8 @@ public class EssenceStatus {
             int pxPerEssence = 1;
             try {
                 pxPerEssence = Math
-                        .toIntExact(Math.round(100.0 / Double.valueOf(ClientInitializer.clientEssenceManager.maxEssence)));
+                        .toIntExact(
+                                Math.round(100.0 / Double.valueOf(ClientInitializer.clientEssenceManager.maxEssence)));
 
             } catch (Exception e) {
                 SkullMagic.LOGGER.error(
@@ -37,7 +38,8 @@ public class EssenceStatus {
             drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
                     barheight + 2 * borderwidth, 0xc2c2c2);
             // essence
-            drawRect(matrixStack, x, y, ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight, 0x114c9e);
+            drawRect(matrixStack, x, y, ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight,
+                    0x114c9e);
             // empty
             drawRect(matrixStack, x + ClientInitializer.clientEssenceManager.essence * pxPerEssence, y,
                     barwidth - ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight, 0x787f8a);
@@ -81,8 +83,7 @@ public class EssenceStatus {
         vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY + height, 0).color(f, f1, f2, f3).next();
         vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).color(f, f1, f2, f3).next();
         vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).color(f, f1, f2, f3).next();
-        vertexbuffer.end();
-        BufferRenderer.draw(vertexbuffer);
+        BufferRenderer.drawWithShader(vertexbuffer.end());
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();

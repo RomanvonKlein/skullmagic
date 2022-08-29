@@ -3,12 +3,12 @@
   "minVersion": "0.8",
   "package": "com.romanvonklein.skullmagic.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
-  "client": [
+  "mixins": [
     "SkullMagicMixin",
     "EntityMixin",
     "PlaceBlockMixin"
   ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

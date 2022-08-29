@@ -8,15 +8,18 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.romanvonklein.skullmagic.SkullMagic;
 
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 
 public class DebugCommands {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
-        dispatcher.register(
+    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher, CommandRegistryAccess cra,
+            RegistrationEnvironment re) {
+        commandDispatcher.register(
                 CommandManager.literal("skullmagic").then(CommandManager.literal("debug")
                         .then(CommandManager.literal("clear").executes(DebugCommands::clear))));
-        dispatcher.register(
+        commandDispatcher.register(
                 CommandManager.literal("skullmagic")
                         .then(CommandManager.literal("debug")
                                 .then(CommandManager.literal("output")
