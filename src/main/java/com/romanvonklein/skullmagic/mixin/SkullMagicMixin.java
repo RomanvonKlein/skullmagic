@@ -23,24 +23,26 @@ public abstract class SkullMagicMixin extends EntityMixin {
 	@Inject(at = @At("HEAD"), method = "onKilledOther(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/LivingEntity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V")
 	private void onKilledOther(net.minecraft.server.world.ServerWorld world, net.minecraft.entity.LivingEntity other,
 			CallbackInfo info) {
-		String killedType = EntityType.getId(other.getType()).toString();
-		if (Config.getConfig().drops.containsKey(killedType)) {
-			Map<String, Float> itemDrops = Config.getConfig().drops.get(killedType);
-			Random rand = new Random();
-			for (String itemIdentifyer : itemDrops.keySet()) {
-				Float roll = rand.nextFloat();
-				Float chance = itemDrops.get(itemIdentifyer);
-				if (roll <= chance) {
-					Identifier itemId = Identifier.tryParse(itemIdentifyer);
-					if (itemId != null) {
-						other.dropStack(new ItemStack(Registry.ITEM.get(itemId)));
-					} else {
-						SkullMagic.LOGGER
-								.warn("Failed trying to parse '" + itemIdentifyer + "' as specified in config.");
+		if (!world.isClient()) {
+			String killedType = EntityType.getId(other.getType()).toString();
+			if (Config.getConfig().drops.containsKey(killedType)) {
+				Map<String, Float> itemDrops = Config.getConfig().drops.get(killedType);
+				Random rand = new Random();
+				for (String itemIdentifyer : itemDrops.keySet()) {
+					Float roll = rand.nextFloat();
+					Float chance = itemDrops.get(itemIdentifyer);
+					if (roll <= chance) {
+						Identifier itemId = Identifier.tryParse(itemIdentifyer);
+						if (itemId != null) {
+							other.dropStack(new ItemStack(Registry.ITEM.get(itemId)));
+						} else {
+							SkullMagic.LOGGER
+									.warn("Failed trying to parse '" + itemIdentifyer + "' as specified in config.");
+						}
 					}
 				}
 			}
-		}
 
+		}
 	}
 }

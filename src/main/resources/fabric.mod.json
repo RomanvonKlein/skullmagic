@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "com.romanvonklein.skullmagic.SkullMagic"
+    ],
+    "client":[
+      "com.romanvonklein.skullmagic.ClientInitializer"
     ]
   },
   "mixins": [

@@ -7,13 +7,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
-import com.romanvonklein.skullmagic.persistantState.EssenceManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -25,7 +23,6 @@ public class PlaceBlockMixin {
     @Inject(at = @At("HEAD"), method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
-                //TODO: overwrite onPlaced instead for custom bocks/blockEntities
         if (!world.isClient()) {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
             // cases:
@@ -59,17 +56,4 @@ public class PlaceBlockMixin {
     // */
     // }
 
-    /*
-     * public void onBreak(net.minecraft.world.World world,
-     * net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
-     * net.minecraft.entity.player.PlayerEntity player)
-     */
-    @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V", cancellable = true)
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
-        if (!world.isClient) {
-            if (EssenceManager.isValidSkullPedestalCombo(world, pos.down())) {
-                SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos.down());
-            }
-        }
-    }
 }

@@ -275,7 +275,8 @@ public class EssenceManager extends PersistentState {
         }
     }
 
-    public void removeSkullAltar(RegistryKey<World> worldKey, BlockPos altarPos) {
+    public void removeSkullAltar(World world, BlockPos altarPos) {
+        RegistryKey<World> worldKey = world.getRegistryKey();
         if (this.EssencePools.containsKey(worldKey) && this.EssencePools.get(worldKey).containsKey(altarPos)) {
             EssencePool poolToRemove = this.EssencePools.get(worldKey).get(altarPos);
             this.EssencePools.get(worldKey).remove(altarPos);
@@ -303,6 +304,11 @@ public class EssenceManager extends PersistentState {
             });
             for (UUID playerID : playersToRemove) {
                 playersToEssencePools.remove(playerID);
+                ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(playerID);
+                if (player != null) {
+                    ServerPlayNetworking.send(player, NetworkingConstants.UNLINK_ESSENCEPOOL_ID,
+                            PacketByteBufs.create());
+                }
             }
         }
     }
