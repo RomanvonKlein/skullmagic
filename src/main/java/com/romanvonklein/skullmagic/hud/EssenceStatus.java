@@ -83,7 +83,8 @@ public class EssenceStatus {
         vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY + height, 0).color(f, f1, f2, f3).next();
         vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).color(f, f1, f2, f3).next();
         vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).color(f, f1, f2, f3).next();
-        BufferRenderer.drawWithShader(vertexbuffer.end());
+        vertexbuffer.end();
+        BufferRenderer.draw(vertexbuffer);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
