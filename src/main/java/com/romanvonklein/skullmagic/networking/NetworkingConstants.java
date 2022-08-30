@@ -8,7 +8,7 @@ public class NetworkingConstants {
         public static final Identifier ESSENCE_CHARGE_UPDATE_ID = new Identifier(
                         SkullMagic.MODID + ":essence_charge_update_id");
         public static final Identifier SPELL_CAST_ID = new Identifier(
-                        SkullMagic.MODID + ":essence_charge_update_id");
+                        SkullMagic.MODID + ":spell_cast_id");
         public static final Identifier UNLINK_ESSENCEPOOL_ID = new Identifier(
                         SkullMagic.MODID + ":unlink_essencepool_id");
         public static final Identifier SPELL_CAST_FEEDBACK = new Identifier(SkullMagic.MODID + "spell_cast_feedback");

@@ -40,7 +40,7 @@ public class SpellManager extends PersistentState {
             "selfheal", new Spell(50, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-                    player.heal(1.0f);
+                    player.heal(4.0f);
                     return true;
                 }
             }));

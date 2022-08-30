@@ -99,7 +99,9 @@ public class EssencePool extends PersistentState {
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
-        tag.putUuid("linkedPlayerID", this.linkedPlayerID);
+        if (this.linkedPlayerID != null) {
+            tag.putUuid("linkedPlayerID", this.linkedPlayerID);
+        }
         tag.putInt("essence", this.essence);
         tag.putInt("maxEssence", this.maxEssence);
         tag.putInt("essenceChargeRate", this.essenceChargeRate);
@@ -125,7 +127,9 @@ public class EssencePool extends PersistentState {
     public static EssencePool fromNbt(NbtCompound tag) {
         System.out.println("Reading this EssencePools from NBT");
         EssencePool pool = new EssencePool();
-        pool.linkedPlayerID = tag.getUuid("linkedPlayerID");
+        if (tag.contains("linkedPlayerID")) {
+            pool.linkedPlayerID = tag.getUuid("linkedPlayerID");
+        }
         pool.essence = tag.getInt("essence");
         pool.maxEssence = tag.getInt("maxEssence");
         pool.essenceChargeRate = tag.getInt("essenceChargeRate");

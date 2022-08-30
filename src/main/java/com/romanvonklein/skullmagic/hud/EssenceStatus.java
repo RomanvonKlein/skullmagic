@@ -27,10 +27,9 @@ public class EssenceStatus {
             int barheight = 25;
             int pxPerEssence = 1;
             try {
-                pxPerEssence = Math
-                        .toIntExact(
-                                Math.round(Double.valueOf(barwidth)
-                                        / Double.valueOf(ClientInitializer.getClientEssenceManager().maxEssence)));
+                pxPerEssence = ClientInitializer.getClientEssenceManager().maxEssence == 0 ? 1
+                        : Math.toIntExact(Math.round(Double.valueOf(barwidth)
+                                / Double.valueOf(ClientInitializer.getClientEssenceManager().maxEssence)));
 
             } catch (Exception e) {
                 SkullMagic.LOGGER.error(
@@ -48,11 +47,18 @@ public class EssenceStatus {
             // empty
             drawRect(matrixStack, x + ClientInitializer.getClientEssenceManager().essence * pxPerEssence, y,
                     barwidth - ClientInitializer.getClientEssenceManager().essence * pxPerEssence, barheight, 0x787f8a);
+            // essence in numbers
+            TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
+            renderer.draw(matrixStack,
+                    Double.valueOf(ClientInitializer.getClientEssenceManager().essence) + "/"
+                            + Double.valueOf(ClientInitializer.getClientEssenceManager().maxEssence),
+                    x,
+                    y, 0xc2c2c2);
 
             // spell cooldown bar
             if (ClientInitializer.getClientSpellManager().spellList
                     .containsKey(ClientInitializer.getClientSpellManager().selectedSpellName)) {
-                TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
+
                 int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
                         .get(ClientInitializer.getClientSpellManager().selectedSpellName);
                 int maxCoolDown = SpellManager.SpellDict

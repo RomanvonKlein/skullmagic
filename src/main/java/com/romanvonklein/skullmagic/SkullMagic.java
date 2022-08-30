@@ -85,9 +85,9 @@ public class SkullMagic implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
 			essenceManager = (EssenceManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID + ":essenceManager");
+					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID + "_essenceManager");
 			spellManager = (SpellManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + ":spellManager");
+					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + "_spellManager");
 
 		});
 		ServerTickEvents.START_SERVER_TICK.register(server -> {

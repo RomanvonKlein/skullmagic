@@ -19,7 +19,6 @@ public class SkullPedestalBlockEntity extends BlockEntity {
 
     public SkullPedestalBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY, pos, state);
-        SkullMagic.LOGGER.info("Creating SkullpedestalBlockEntity");
     }
 
     @Override
