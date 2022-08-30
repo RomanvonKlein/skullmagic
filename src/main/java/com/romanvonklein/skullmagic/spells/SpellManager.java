@@ -5,12 +5,14 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.apache.commons.lang3.function.TriFunction;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
+import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -56,29 +58,49 @@ public class SpellManager extends PersistentState {
             new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-                    int meteoriteCount = 25;
+                    int meteoriteCount = 100;
                     int minPower = 1;
                     int maxPower = 5;
                     int height = 256;
                     int radius = 7;
-                    // TODO: maybe delay some of these for a bit ? >> Big tick-task system? :O
+                    int maxDelay = 40;
+                    // TODO: way too strong. i love it
                     HitResult result = player.raycast(100, 1, false);
                     if (result != null) {
                         Vec3d center = result.getPos();
                         Vec3f angle = Direction.DOWN.getUnitVector();
                         Random rand = new Random();
                         for (int i = 0; i < meteoriteCount; i++) {
-                            FireballEntity ent = new FireballEntity(world, player, angle.getX(), angle.getY(),
-                                    angle.getZ(), rand.nextInt(1, 5));
-                            ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius, height,
-                                    center.z - radius + 2 * rand.nextFloat() * radius);
-                            ent.setVelocity(0, -15, 0);
-                            world.spawnEntity(ent);
+                            DelayedTask tsk = new DelayedTask(rand.nextInt(0, maxDelay),
+                                    new TriFunction<Object[], Object, Object, Boolean>() {
+                                        @Override
+                                        public Boolean apply(Object[] data, Object n1, Object n2) {
+                                            FireballEntity ent = new FireballEntity(world, player, angle.getX(),
+                                                    angle.getY(), angle.getZ(),
+                                                    rand.nextInt(minPower, maxPower));
+                                            ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
+                                                    height, center.z - radius + 2 * rand.nextFloat() * radius);
+                                            ent.setVelocity(0, -15, 0);
+                                            world.spawnEntity(ent);
+                                            return true;
+                                        }
+                                    }, null);
+                            SkullMagic.taskManager.queueTask(tsk);
                         }
                     }
                     return true;
                 }
-            }));
+            }),
+            "wolfpack",
+            new Spell(100, 500, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    return true;
+                }
+
+            })
+
+    );
 
     public boolean castSpell(String spellName, ServerPlayerEntity player,
             World world) {

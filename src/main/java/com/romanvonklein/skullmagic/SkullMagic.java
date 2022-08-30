@@ -16,6 +16,7 @@ import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.spells.SpellManager;
+import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -57,6 +58,7 @@ public class SkullMagic implements ModInitializer {
 	// custom managers
 	public static EssenceManager essenceManager;
 	public static SpellManager spellManager;
+	public static TaskManager taskManager;
 
 	@Override
 	public void onInitialize() {
@@ -100,10 +102,12 @@ public class SkullMagic implements ModInitializer {
 					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID + "_essenceManager");
 			spellManager = (SpellManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
 					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + "_spellManager");
+			taskManager = new TaskManager();
 		});
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			essenceManager.tick(server);
 			spellManager.tick(server);
+			taskManager.tick();
 		});
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) -> {
 			spellManager.playerJoined(serverPlayNetworkHandler.player);
