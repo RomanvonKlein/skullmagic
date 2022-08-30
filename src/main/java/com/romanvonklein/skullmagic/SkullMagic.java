@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +12,7 @@ import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.commands.Commands;
+import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.persistantState.EssenceManager;
 import com.romanvonklein.skullmagic.spells.SpellManager;
@@ -43,6 +46,8 @@ public class SkullMagic implements ModInitializer {
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block FireCannon = new FireCannon(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+
+	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
 
 	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
@@ -81,6 +86,13 @@ public class SkullMagic implements ModInitializer {
 				SkullAltar);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
 				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
+
+		// register items
+		knowledgeOrbs = KnowledgeOrb.generateKnowledgeOrbs();
+		for (KnowledgeOrb orb : knowledgeOrbs) {
+			Registry.register(Registry.ITEM, new Identifier(MODID, orb.spellName + "_orb"), orb);
+		}
+
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
@@ -88,7 +100,6 @@ public class SkullMagic implements ModInitializer {
 					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID + "_essenceManager");
 			spellManager = (SpellManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
 					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + "_spellManager");
-
 		});
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			essenceManager.tick(server);

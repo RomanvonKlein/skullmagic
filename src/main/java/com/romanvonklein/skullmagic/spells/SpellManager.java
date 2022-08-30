@@ -143,7 +143,8 @@ public class SpellManager extends PersistentState {
     public boolean learnSpell(ServerPlayerEntity player, String spellname) {
         UUID playerID = player.getUuid();
         boolean success = false;
-        if (this.availableSpells.containsKey(playerID) && SpellDict.containsKey(spellname)) {
+        if (this.availableSpells.containsKey(playerID) && SpellDict.containsKey(spellname)
+                && !this.availableSpells.get(playerID).containsKey(spellname)) {
             this.availableSpells.get(playerID).put(spellname, 0);
             ServerPackageSender.sendUpdateSpellListPackage(player);
             success = true;
