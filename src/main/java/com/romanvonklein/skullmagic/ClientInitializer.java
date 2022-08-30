@@ -2,11 +2,11 @@ package com.romanvonklein.skullmagic;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
 import com.romanvonklein.skullmagic.hud.EssenceStatus;
 import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
-import com.romanvonklein.skullmagic.persistantState.ClientEssenceManager;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
 
 import net.fabricmc.api.ClientModInitializer;

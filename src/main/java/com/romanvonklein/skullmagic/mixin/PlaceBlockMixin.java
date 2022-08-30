@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
-import com.romanvonklein.skullmagic.persistantState.EssenceManager;
+import com.romanvonklein.skullmagic.essence.EssenceManager;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

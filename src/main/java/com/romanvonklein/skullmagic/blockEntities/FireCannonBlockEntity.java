@@ -1,7 +1,7 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.persistantState.EssencePool;
+import com.romanvonklein.skullmagic.essence.EssencePool;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

@@ -2,7 +2,7 @@ package com.romanvonklein.skullmagic.spells;
 
 import org.apache.commons.lang3.function.TriFunction;
 
-import com.romanvonklein.skullmagic.persistantState.EssencePool;
+import com.romanvonklein.skullmagic.essence.EssencePool;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;

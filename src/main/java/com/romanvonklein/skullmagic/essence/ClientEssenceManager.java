@@ -1,4 +1,4 @@
-package com.romanvonklein.skullmagic.persistantState;
+package com.romanvonklein.skullmagic.essence;
 
 public class ClientEssenceManager {
     public int essence;

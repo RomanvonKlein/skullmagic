@@ -2,30 +2,37 @@ package com.romanvonklein.skullmagic.spells;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.function.TriFunction;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
-import com.romanvonklein.skullmagic.persistantState.EssencePool;
 
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
+import net.minecraft.world.EntityList;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 public class SpellManager extends PersistentState {
     private int cooldownIntervall = 10;
     private int remainingCooldown = cooldownIntervall;
     public Map<UUID, Map<String, Integer>> availableSpells = new HashMap<>();
 
-    public static Map<String, ? extends Spell> SpellDict = Map.of("fireball",
+    public static Map<String, ? extends Spell> SpellDict = Map.of(
+            "fireball",
             new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
@@ -37,10 +44,38 @@ public class SpellManager extends PersistentState {
                     return true;
                 }
             }),
-            "selfheal", new Spell(50, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            "selfheal",
+            new Spell(50, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     player.heal(4.0f);
+                    return true;
+                }
+            }),
+            "meteoritestorm",
+            new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    int meteoriteCount = 25;
+                    int minPower = 1;
+                    int maxPower = 5;
+                    int height = 256;
+                    int radius = 7;
+                    // TODO: maybe delay some of these for a bit ? >> Big tick-task system? :O
+                    HitResult result = player.raycast(100, 1, false);
+                    if (result != null) {
+                        Vec3d center = result.getPos();
+                        Vec3f angle = Direction.DOWN.getUnitVector();
+                        Random rand = new Random();
+                        for (int i = 0; i < meteoriteCount; i++) {
+                            FireballEntity ent = new FireballEntity(world, player, angle.getX(), angle.getY(),
+                                    angle.getZ(), rand.nextInt(1, 5));
+                            ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius, height,
+                                    center.z - radius + 2 * rand.nextFloat() * radius);
+                            ent.setVelocity(0, -15, 0);
+                            world.spawnEntity(ent);
+                        }
+                    }
                     return true;
                 }
             }));

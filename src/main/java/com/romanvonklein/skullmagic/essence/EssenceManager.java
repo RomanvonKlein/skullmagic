@@ -1,4 +1,4 @@
-package com.romanvonklein.skullmagic.persistantState;
+package com.romanvonklein.skullmagic.essence;
 
 import java.util.ArrayList;
 import java.util.HashMap;

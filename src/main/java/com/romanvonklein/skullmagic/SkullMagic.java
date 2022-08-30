@@ -12,9 +12,9 @@ import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.commands.Commands;
+import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
-import com.romanvonklein.skullmagic.persistantState.EssenceManager;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.fabricmc.api.ModInitializer;
