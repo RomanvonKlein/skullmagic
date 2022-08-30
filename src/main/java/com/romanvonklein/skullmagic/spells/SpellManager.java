@@ -1,11 +1,11 @@
 package com.romanvonklein.skullmagic.spells;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
 import org.apache.commons.lang3.function.TriFunction;
 
 import com.romanvonklein.skullmagic.SkullMagic;
@@ -14,19 +14,19 @@ import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
-import net.minecraft.world.EntityList;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 public class SpellManager extends PersistentState {
     private int cooldownIntervall = 10;
@@ -71,7 +71,8 @@ public class SpellManager extends PersistentState {
                         Vec3f angle = Direction.DOWN.getUnitVector();
                         Random rand = new Random();
                         for (int i = 0; i < meteoriteCount; i++) {
-                            DelayedTask tsk = new DelayedTask(rand.nextInt(0, maxDelay),
+                            DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
+                                    rand.nextInt(0, maxDelay),
                                     new TriFunction<Object[], Object, Object, Boolean>() {
                                         @Override
                                         public Boolean apply(Object[] data, Object n1, Object n2) {
@@ -95,6 +96,31 @@ public class SpellManager extends PersistentState {
             new Spell(100, 500, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    int wolfCount = 3;
+                    int wolfLifeTime = 20 ;//* 60;// ~one minute of lifetime
+                    ArrayList<WolfEntity> wolfesSpawned = new ArrayList<>();
+                    for (int i = 0; i < wolfCount; i++) {
+                        WolfEntity wolf = new WolfEntity(EntityType.WOLF, world);
+                        world.spawnEntity(wolf);
+                        wolf.setTamed(true);
+                        wolf.setOwner(player);
+                        wolf.setPosition(player.getPos());
+                        wolfesSpawned.add(wolf);
+                    }
+                    SkullMagic.taskManager.queueTask(new DelayedTask("wolfpack_spell_kill_wolfes", wolfLifeTime,
+                            new TriFunction<Object[], Object, Object, Boolean>() {
+                                @Override
+                                public Boolean apply(Object[] data, Object n1, Object n2) {
+                                    ArrayList<WolfEntity> wolfes = (ArrayList<WolfEntity>) data[0];
+                                    for (WolfEntity wolf : wolfes) {
+                                        if (wolf.isAlive()) {
+                                            wolf.kill();
+                                        }
+                                    }
+                                    return true;
+                                }
+                            },
+                            new Object[] { wolfesSpawned }));
                     return true;
                 }
 
