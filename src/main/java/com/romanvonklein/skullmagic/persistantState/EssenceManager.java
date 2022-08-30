@@ -35,8 +35,6 @@ import net.minecraft.world.World;
  * charge rates and player linked to them.
  */
 public class EssenceManager extends PersistentState {
-    // TODO: is there something multiworld like? that goes above dimensions? if so,
-    // anything static here should not be stati...
     private Map<RegistryKey<World>, Map<BlockPos, EssencePool>> EssencePools = new HashMap<>();
 
     private Map<RegistryKey<World>, Map<BlockPos, EssencePool>> pedestalsToEssencePools = new HashMap<>();

@@ -31,15 +31,12 @@ public class PlaceBlockMixin {
             // cases:
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 // skull placed on pedestal?
-                SkullMagic.LOGGER.info("placed a skull");
                 SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar(world, pos.down());
             } else if (blockIdentifier
                     .equals(BlockEntityType.getId(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY).toString())) {
                 // pedestal placed under skull?
                 SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar(world, pos);
-                SkullMagic.LOGGER.info("placed a skull pedestal");
             } else if (blockIdentifier.equals(BlockEntityType.getId(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).toString())) {
-                SkullMagic.LOGGER.info("placed a skull altar");
                 // altar places around valid pedestal - skull combination?
                 SkullMagic.essenceManager.createNewEssencePool(world, pos);
                 SkullMagic.essenceManager.tryLinkNearbyUnlinkedPedestals(world, pos);

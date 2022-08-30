@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 public class Spell {
 
     public int essenceCost;
-    // TODO: implement cooldown
     public int cooldownTicks;
 
     public TriFunction<ServerPlayerEntity, World, EssencePool, Boolean> action;

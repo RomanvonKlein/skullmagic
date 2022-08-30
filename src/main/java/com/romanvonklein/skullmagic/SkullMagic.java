@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -50,6 +51,7 @@ public class SkullMagic implements ModInitializer {
 
 	// custom managers
 	public static EssenceManager essenceManager;
+	public static SpellManager spellManager;
 
 	@Override
 	public void onInitialize() {
@@ -84,13 +86,19 @@ public class SkullMagic implements ModInitializer {
 			LOGGER.info("Initializing Essence Manager");
 			essenceManager = (EssenceManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
 					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID);
+			spellManager = (SpellManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
+					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID);
 
 		});
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			essenceManager.tick(server);
 		});
+		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) -> {
+			spellManager.playerJoined(serverPlayNetworkHandler.player);
+		});
 
 		// TODO: this only applies when the altar is broken by a player - other events
+		//isnt this double? as its also in the onBreak methods of the blocks?
 		// (explosions, ...) might cause trouble
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
 			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
@@ -107,7 +115,7 @@ public class SkullMagic implements ModInitializer {
 					String spellname = buf.readString(100);
 					if (essenceManager.playerHasEssencePool(serverPlayerEntity.getUuid())) {
 						server.execute(() -> {
-							SpellManager.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
+							spellManager.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
 						});
 					}
 				});

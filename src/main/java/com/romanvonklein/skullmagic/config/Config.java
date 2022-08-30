@@ -29,6 +29,8 @@ public class Config {
         public int supplyWidth;
         public int supplyHeight;
 
+        public String[] defaultSpells;
+
         public ConfigData() {
             this.drops = new HashMap<String, Map<String, Float>>();
             this.skulls = new HashMap<String, Integer>();
@@ -74,7 +76,7 @@ public class Config {
     private static ConfigData getDefaultConfigData() {
         ConfigData defaultData = new ConfigData();
 
-        //mobdrops
+        // mobdrops
         HashMap<String, Float> zombieDrops = new HashMap<>();
         zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 0.1f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
@@ -88,7 +90,7 @@ public class Config {
         enderDragonDrops.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 1.0f);
         defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ENDER_DRAGON).toString(), enderDragonDrops);
 
-        //skull values
+        // skull values
         defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);
@@ -97,6 +99,7 @@ public class Config {
         defaultData.scanWidth = 5;
         defaultData.supplyWidth = 32;
         defaultData.supplyHeight = 16;
+        defaultData.defaultSpells = new String[] { "fireball" };
 
         return defaultData;
     }
