@@ -18,28 +18,32 @@ public class ClientPackageReceiver {
                     + " had wrong number of int parameters: " + arr.length);
         } else {
             client.execute(() -> {
-                if (ClientInitializer.clientEssenceManager == null) {
-                    ClientInitializer.clientEssenceManager = new ClientEssenceManager();
+                ClientEssenceManager manager = ClientInitializer.getClientEssenceManager();
+                if (manager == null) {
+                    ClientInitializer.createClientEssenceManager(arr[0], arr[0], arr[0]);
+                } else {
+                    ClientInitializer.getClientEssenceManager().essence = arr[0];
+                    ClientInitializer.getClientEssenceManager().maxEssence = arr[1];
+                    ClientInitializer.getClientEssenceManager().essenceChargeRate = arr[2];
                 }
-                ClientInitializer.clientEssenceManager.essence = arr[0];
-                ClientInitializer.clientEssenceManager.maxEssence = arr[1];
-                ClientInitializer.clientEssenceManager.essenceChargeRate = arr[2];
             });
         }
     }
 
     public static void receiveUnlikeEssencePoolPacket(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
-        ClientInitializer.clientEssenceManager = null;
+        ClientInitializer.unsetClientEssenceManager();
     }
 
     public static void receiveUpdateSpellListPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
-        ClientInitializer.clientSpellManager.spellList.clear();
-        String msgString = buf.readString();
-        for (String valuePair : msgString.split(";")) {
-            String[] parts = valuePair.split(":");
-            ClientInitializer.clientSpellManager.spellList.put(parts[0], Integer.parseInt(parts[1]));
+        ClientInitializer.getClientSpellManager().spellList.clear();
+        if (buf.isReadable(1)) {
+            String msgString = buf.readString();
+            for (String valuePair : msgString.split(";")) {
+                String[] parts = valuePair.split(":");
+                ClientInitializer.getClientSpellManager().spellList.put(parts[0], Integer.parseInt(parts[1]));
+            }
         }
     }
 }

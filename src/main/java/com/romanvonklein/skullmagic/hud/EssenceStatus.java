@@ -20,7 +20,7 @@ public class EssenceStatus {
     public static void drawEssenceStatus(MatrixStack matrixStack, float tickDelta) {
 
         // collect data to draw for player
-        if (ClientInitializer.clientEssenceManager != null) {
+        if (ClientInitializer.getClientEssenceManager() != null) {
             // TODO: cleanup - maybe make all sizes and positions cofigurable?
             int borderwidth = 5;
             int barwidth = 100;
@@ -30,12 +30,12 @@ public class EssenceStatus {
                 pxPerEssence = Math
                         .toIntExact(
                                 Math.round(Double.valueOf(barwidth)
-                                        / Double.valueOf(ClientInitializer.clientEssenceManager.maxEssence)));
+                                        / Double.valueOf(ClientInitializer.getClientEssenceManager().maxEssence)));
 
             } catch (Exception e) {
                 SkullMagic.LOGGER.error(
                         "weird error calculating pxPerEssence with maxEssence: "
-                                + ClientInitializer.clientEssenceManager.maxEssence);
+                                + ClientInitializer.getClientEssenceManager().maxEssence);
             }
             int x = 10;
             int y = 10;
@@ -43,40 +43,41 @@ public class EssenceStatus {
             drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
                     barheight + 2 * borderwidth, 0xc2c2c2);
             // essence
-            drawRect(matrixStack, x, y, ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight,
+            drawRect(matrixStack, x, y, ClientInitializer.getClientEssenceManager().essence * pxPerEssence, barheight,
                     0x114c9e);
             // empty
-            drawRect(matrixStack, x + ClientInitializer.clientEssenceManager.essence * pxPerEssence, y,
-                    barwidth - ClientInitializer.clientEssenceManager.essence * pxPerEssence, barheight, 0x787f8a);
+            drawRect(matrixStack, x + ClientInitializer.getClientEssenceManager().essence * pxPerEssence, y,
+                    barwidth - ClientInitializer.getClientEssenceManager().essence * pxPerEssence, barheight, 0x787f8a);
 
             // spell cooldown bar
-
-            TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-            int cooldownLeft = ClientInitializer.clientSpellManager.spellList
-                    .get(ClientInitializer.clientSpellManager.selectedSpellName);
-            int maxCoolDown = SpellManager.SpellDict
-                    .get(ClientInitializer.clientSpellManager.selectedSpellName).cooldownTicks;
-            int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
-            int pxPerTick = 1;
-            y += 3 * borderwidth + barheight;
-            try {
-                pxPerTick = Math.toIntExact(
-                        Math.round(Double.valueOf(barwidth) / Double.valueOf(maxCoolDown)));
-            } catch (Exception e) {
-                SkullMagic.LOGGER.error("could not calculate dimensions for hud rendering correctly");
+            if (ClientInitializer.getClientSpellManager().spellList
+                    .containsKey(ClientInitializer.getClientSpellManager().selectedSpellName)) {
+                TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
+                int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
+                        .get(ClientInitializer.getClientSpellManager().selectedSpellName);
+                int maxCoolDown = SpellManager.SpellDict
+                        .get(ClientInitializer.getClientSpellManager().selectedSpellName).cooldownTicks;
+                int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
+                int pxPerTick = 1;
+                y += 3 * borderwidth + barheight;
+                try {
+                    pxPerTick = Math.toIntExact(
+                            Math.round(Double.valueOf(barwidth) / Double.valueOf(maxCoolDown)));
+                } catch (Exception e) {
+                    SkullMagic.LOGGER.error("could not calculate dimensions for hud rendering correctly");
+                }
+                // border
+                drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
+                        barheight + 2 * borderwidth, 0xc2c2c2);
+                // cooldown
+                drawRect(matrixStack, x, y, cooldownLeft * pxPerTick, barheight,
+                        0xff9933);
+                // empty
+                drawRect(matrixStack, x + cooldownLeft * pxPerTick, y,
+                        barwidth - cooldownLeft * pxPerTick, barheight, 0x66ff66);
+                // selected spellname
+                renderer.draw(matrixStack, ClientInitializer.getClientSpellManager().selectedSpellName, y, x, color);
             }
-            // border
-            drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
-                    barheight + 2 * borderwidth, 0xc2c2c2);
-            // cooldown
-            drawRect(matrixStack, x, y, cooldownLeft * pxPerTick, barheight,
-                    0xff9933);
-            // empty
-            drawRect(matrixStack, x + cooldownLeft * pxPerTick, y,
-                    barwidth - cooldownLeft * pxPerTick, barheight, 0x66ff66);
-            // selected spellname
-            renderer.draw(matrixStack, ClientInitializer.clientSpellManager.selectedSpellName, y, x, color);
-
         }
     }
 

@@ -85,20 +85,21 @@ public class SkullMagic implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
 			essenceManager = (EssenceManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID);
+					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID + ":essenceManager");
 			spellManager = (SpellManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID);
+					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + ":spellManager");
 
 		});
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			essenceManager.tick(server);
+			spellManager.tick(server);
 		});
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) -> {
 			spellManager.playerJoined(serverPlayNetworkHandler.player);
 		});
 
 		// TODO: this only applies when the altar is broken by a player - other events
-		//isnt this double? as its also in the onBreak methods of the blocks?
+		// isnt this double? as its also in the onBreak methods of the blocks?
 		// (explosions, ...) might cause trouble
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
 			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {

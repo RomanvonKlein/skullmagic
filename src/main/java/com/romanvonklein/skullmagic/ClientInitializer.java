@@ -21,8 +21,8 @@ public class ClientInitializer implements ClientModInitializer {
     // keybindings
     private static KeyBinding primarySpellKeyBinding;
     private static KeyBinding cycleSpellKeyBinding;
-    public static ClientEssenceManager clientEssenceManager;
-    public static ClientSpellManager clientSpellManager;
+    private static ClientEssenceManager clientEssenceManager;
+    private static ClientSpellManager clientSpellManager;
 
     @Override
     public void onInitializeClient() {
@@ -62,6 +62,28 @@ public class ClientInitializer implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_SPELL_LIST,
                 ClientPackageReceiver::receiveUpdateSpellListPackage);
+    }
+
+    public static ClientSpellManager getClientSpellManager() {
+        if (clientSpellManager == null) {
+            clientSpellManager = new ClientSpellManager();
+        }
+        return clientSpellManager;
+    }
+
+    public static ClientEssenceManager getClientEssenceManager() {
+        return clientEssenceManager;
+    }
+
+    public static void unsetClientEssenceManager() {
+        clientEssenceManager = null;
+    }
+
+    public static void createClientEssenceManager(int essence, int maxEssence, int essenceChargeRate) {
+        clientEssenceManager = new ClientEssenceManager();
+        clientEssenceManager.essence = essence;
+        clientEssenceManager.maxEssence = maxEssence;
+        clientEssenceManager.essenceChargeRate = essenceChargeRate;
     }
 
 }

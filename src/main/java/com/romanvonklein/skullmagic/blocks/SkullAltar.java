@@ -57,7 +57,6 @@ public class SkullAltar extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
             BlockHitResult hit) {
         if (!world.isClient) {
-            SkullMagic.LOGGER.info("Current Essence manager: " + SkullMagic.essenceManager);
             SkullMagic.essenceManager.trySetLinkedPlayer(player, pos);
         }
         return ActionResult.SUCCESS;
