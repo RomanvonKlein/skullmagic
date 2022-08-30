@@ -53,10 +53,10 @@ public class SpellManager extends PersistentState {
             if (availableSpells.containsKey(playerID)
                     && availableSpells.get(playerID).containsKey(spellName)) {
                 if (availableSpells.get(playerID).get(spellName) <= 0) {
-                    availableSpells.get(playerID).put(spellName, SpellDict.get(spellName).cooldownTicks);
                     EssencePool pool = SkullMagic.essenceManager.getEssencePoolForPlayer(playerID);
                     Spell spell = SpellDict.get(spellName);
                     if (pool.getEssence() >= spell.essenceCost) {
+                        availableSpells.get(playerID).put(spellName, SpellDict.get(spellName).cooldownTicks);
                         success = spell.action.apply(player, world, pool);
                         if (success) {
                             pool.discharge(spell.essenceCost);

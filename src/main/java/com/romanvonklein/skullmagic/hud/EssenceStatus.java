@@ -76,7 +76,7 @@ public class EssenceStatus {
                 drawRect(matrixStack, x + cooldownLeft * pxPerTick, y,
                         barwidth - cooldownLeft * pxPerTick, barheight, 0x66ff66);
                 // selected spellname
-                renderer.draw(matrixStack, ClientInitializer.getClientSpellManager().selectedSpellName, y, x, color);
+                renderer.draw(matrixStack, ClientInitializer.getClientSpellManager().selectedSpellName, x, y, color);
             }
         }
     }
