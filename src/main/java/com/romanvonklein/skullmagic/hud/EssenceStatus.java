@@ -24,7 +24,7 @@ public class EssenceStatus {
                         // TODO: cleanup - maybe make all sizes and positions cofigurable?
                         int borderwidth = 5;
                         int barwidth = 100;
-                        int barheight = 25;
+                        int barheight = 5;
                         int pxPerEssence = 1;
                         try {
                                 pxPerEssence = ClientInitializer.getClientEssenceManager().maxEssence == 0 ? 1
@@ -40,9 +40,6 @@ public class EssenceStatus {
                         }
                         int x = 10;
                         int y = 10;
-                        // border
-                        drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
-                                        barheight + 2 * borderwidth, 0xc2c2c2);
                         // essence
                         drawRect(matrixStack, x, y, ClientInitializer.getClientEssenceManager().essence * pxPerEssence,
                                         barheight,
@@ -51,6 +48,10 @@ public class EssenceStatus {
                         drawRect(matrixStack, x + ClientInitializer.getClientEssenceManager().essence * pxPerEssence, y,
                                         barwidth - ClientInitializer.getClientEssenceManager().essence * pxPerEssence,
                                         barheight, 0x787f8a);
+                        // border
+                        drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
+                                        barheight + 2 * borderwidth);
+
                         // essence in numbers
                         TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
                         renderer.draw(matrixStack,
@@ -139,6 +140,41 @@ public class EssenceStatus {
                 vertexbuffer.end();
                 BufferRenderer.draw(vertexbuffer);
                 RenderSystem.enableTexture();
+                RenderSystem.disableBlend();
+                RenderSystem.enableDepthTest();
+        }
+
+        /**
+         * Draws a rectangle on the screen
+         * 
+         * @param posX
+         *               the x positon on the screen
+         * @param posY
+         *               the y positon on the screen
+         * @param width
+         *               the width of the rectangle
+         * @param height
+         *               the height of the rectangle
+         * @param color
+         *               the color of the rectangle
+         */
+        private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height) {
+
+                RenderSystem.enableBlend();
+                RenderSystem.enableTexture();
+                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShaderTexture(0, SkullMagic.ESSENCE_BAR_FRAME_TEXTURE);
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.disableDepthTest();
+                BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
+                vertexbuffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY + height, 0).texture(0.0f, 1.0f).next();
+                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY + height, 0).texture(1.0f, 1.0f)
+                                .next();
+                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).texture(1.0f, 0.0f).next();
+                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).texture(0.0f, 0.0f).next();
+                vertexbuffer.end();
+                BufferRenderer.draw(vertexbuffer);
                 RenderSystem.disableBlend();
                 RenderSystem.enableDepthTest();
         }

@@ -70,6 +70,9 @@ public class SkullMagic implements ModInitializer {
 	public static final EntityModelLayer MODEL_EFFECT_BALL_LAYER = new EntityModelLayer(
 			new Identifier(MODID, "effectball"), "main");
 
+	// textures
+	public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
+
 	// custom managers
 	public static EssenceManager essenceManager;
 	public static SpellManager spellManager;
@@ -119,7 +122,12 @@ public class SkullMagic implements ModInitializer {
 		EntityRendererRegistry.register(EFFECT_BALL, (context) -> {
 			return new FlyingItemEntityRenderer<EffectBall>(context, 1.0f, false);
 		});
-		//EntityModelLayerRegistry.registerModelLayer(MODEL_EFFECT_BALL_LAYER, CubeEntityModel::getTexturedModelData);
+
+		// register textures
+		// Registry.register(Registry.)
+		ESSENCE_BAR_FRAME_TEXTURE = new Identifier(MODID, "textures/gui/essencebar.png");
+		// EntityModelLayerRegistry.registerModelLayer(MODEL_EFFECT_BALL_LAYER,
+		// CubeEntityModel::getTexturedModelData);
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
