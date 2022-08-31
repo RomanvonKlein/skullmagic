@@ -97,7 +97,7 @@ public class SpellManager extends PersistentState {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     int wolfCount = 3;
-                    int wolfLifeTime = 20 ;//* 60;// ~one minute of lifetime
+                    int wolfLifeTime = 20 * 60;// ~one minute of lifetime
                     ArrayList<WolfEntity> wolfesSpawned = new ArrayList<>();
                     for (int i = 0; i < wolfCount; i++) {
                         WolfEntity wolf = new WolfEntity(EntityType.WOLF, world);
@@ -123,10 +123,7 @@ public class SpellManager extends PersistentState {
                             new Object[] { wolfesSpawned }));
                     return true;
                 }
-
-            })
-
-    );
+            }));
 
     public boolean castSpell(String spellName, ServerPlayerEntity player,
             World world) {

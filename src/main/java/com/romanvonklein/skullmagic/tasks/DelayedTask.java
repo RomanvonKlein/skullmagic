@@ -2,8 +2,6 @@ package com.romanvonklein.skullmagic.tasks;
 
 import org.apache.commons.lang3.function.TriFunction;
 
-import com.romanvonklein.skullmagic.SkullMagic;
-
 public class DelayedTask {
     public int delayRemaining;
     private Object[] data;
@@ -20,7 +18,6 @@ public class DelayedTask {
     }
 
     public boolean action() {
-        SkullMagic.LOGGER.info("Executing task");
         return this.actionFunc.apply(this.data, null, null);
     }
 }

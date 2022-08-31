@@ -11,9 +11,7 @@ public class TaskManager {
         ArrayList<DelayedTask> done = new ArrayList<>();
         for (DelayedTask task : this.queued) {
             if (task.delayRemaining > 0) {
-                SkullMagic.LOGGER.info("Counting down from " + task.delayRemaining);
                 task.delayRemaining--;
-                SkullMagic.LOGGER.info("to " + task.delayRemaining);
             } else {
                 try {
                     if (task.action()) {
@@ -25,8 +23,6 @@ public class TaskManager {
             }
         }
         for (DelayedTask task : done) {
-            SkullMagic.LOGGER.info("Removing finished task: " + task.name);
-
             queued.remove(task);
         }
     }
