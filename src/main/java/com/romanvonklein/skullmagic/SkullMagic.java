@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.romanvonklein.skullmagic.blockEntities.BlockPlacerBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blocks.BlockPlacer;
 import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
@@ -49,9 +51,12 @@ public class SkullMagic implements ModInitializer {
 	// blocks
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+
 	public static Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block FireCannon = new FireCannon(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+	public static Block BlockPlacer = new BlockPlacer(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
@@ -60,6 +65,7 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
 	public static BlockEntityType<SkullPedestalBlockEntity> SKULL_PEDESTAL_BLOCK_ENTITY;
 	public static BlockEntityType<FireCannonBlockEntity> FIRE_CANNON_BLOCK_ENTITY;
+	public static BlockEntityType<BlockPlacerBlockEntity> BLOCK_PLACER_BLOCK_ENTITY;
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
@@ -78,6 +84,8 @@ public class SkullMagic implements ModInitializer {
 		// register blockentities
 		FIRE_CANNON_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":fire_cannon_block_entity",
 				FabricBlockEntityTypeBuilder.create(FireCannonBlockEntity::new, FireCannon).build(null));
+		BLOCK_PLACER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":block_placer_block_entity",
+				FabricBlockEntityTypeBuilder.create(BlockPlacerBlockEntity::new, BlockPlacer).build(null));
 		SKULL_ALTAR_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":skull_altar_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullAltarBlockEntity::new, SkullAltar).build(null));
 		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
