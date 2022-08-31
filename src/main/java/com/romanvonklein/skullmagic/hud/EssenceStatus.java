@@ -23,6 +23,7 @@ public class EssenceStatus {
                 // collect data to draw for player
                 if (ClientInitializer.getClientEssenceManager() != null) {
                         // TODO: cleanup - maybe make all sizes and positions cofigurable?
+                        int symbolSpace = 16;
                         int borderwidth = 5;
                         int barwidth = 100;
                         int barheight = 5;
@@ -40,7 +41,7 @@ public class EssenceStatus {
                                                                 + ClientInitializer
                                                                                 .getClientEssenceManager().maxEssence);
                         }
-                        int x = 10;
+                        int x = 10 + symbolSpace + borderwidth;
                         int y = 10;
                         // essence
                         drawRect(matrixStack, x, y, ClientInitializer.getClientEssenceManager().essence * pxPerEssence,
@@ -52,30 +53,30 @@ public class EssenceStatus {
                                         barheight, 0x787f8a);
                         // border
                         drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
-                                        barheight + 2 * borderwidth, SkullMagic.ESSENCE_BAR_FRAME_TEXTURE);
+                                        barheight + 2 * borderwidth, ClientInitializer.ESSENCE_BAR_FRAME_TEXTURE);
 
                         // essence in numbers
-                        /*
-                         * TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-                         * renderer.draw(matrixStack,
-                         * Double.valueOf(ClientInitializer.getClientEssenceManager().essence) + "/"
-                         * + Double.valueOf(ClientInitializer
-                         * .getClientEssenceManager().maxEssence),
-                         * x,
-                         * y, 0xc2c2c2);
-                         */
-                        // spell cooldown bar
-                        if (ClientInitializer.getClientSpellManager().spellList
-                                        .containsKey(ClientInitializer.getClientSpellManager().selectedSpellName)) {
 
-                                int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
-                                                .get(ClientInitializer.getClientSpellManager().selectedSpellName);
+                        TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
+                        renderer.draw(matrixStack,
+                                        Double.valueOf(ClientInitializer.getClientEssenceManager().essence) + "/"
+                                                        + Double.valueOf(ClientInitializer
+                                                                        .getClientEssenceManager().maxEssence),
+                                        x + 2 * borderwidth + barwidth,
+                                        y - 1, 0xc2c2c2);
+
+                        // spell cooldown bar
+                        String spellname = ClientInitializer.getClientSpellManager().selectedSpellName;
+                        int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
+                                        .get(spellname);
+                        if (spellname != null && ClientInitializer.getClientSpellManager().spellList
+                                        .containsKey(spellname)) {
+                                y += 3 * borderwidth + barheight;
+
                                 int maxCoolDown = SpellManager.SpellDict
-                                                .get(ClientInitializer
-                                                                .getClientSpellManager().selectedSpellName).cooldownTicks;
+                                                .get(spellname).cooldownTicks;
                                 int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
                                 double pxPerTick = 1;
-                                y += 3 * borderwidth + barheight;
                                 try {
                                         pxPerTick = Double.valueOf(barwidth)
                                                         / Double.valueOf(maxCoolDown);
@@ -97,22 +98,26 @@ public class EssenceStatus {
                                 // border
                                 drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
                                                 barwidth + 2 * borderwidth,
-                                                barheight + 2 * borderwidth, SkullMagic.COOLDOWN_BAR_FRAME_TEXTURE);
-                                // icon
-                                if (SkullMagic.SPELL_ICONS.containsKey(ClientInitializer
-                                                .getClientSpellManager().selectedSpellName)) {
+                                                barheight + 2 * borderwidth,
+                                                ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
 
-                                        drawTextureRect(matrixStack, x + barwidth / 2 - iconWidth / 2, y - borderwidth,
+                                // cooldown counter
+                                if (cooldownLeft != 0) {
+
+                                        renderer.draw(matrixStack, Integer.toString(cooldownLeft / 20),
+                                                        x + 2 * borderwidth + barwidth,
+                                                        y - 1, color);
+                                }
+
+                                // icon
+                                if (ClientInitializer.SPELL_ICONS.containsKey(ClientInitializer
+                                                .getClientSpellManager().selectedSpellName)) {
+                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth, y - borderwidth,
                                                         iconWidth,
-                                                        iconWidth, SkullMagic.SPELL_ICONS.get(ClientInitializer
+                                                        iconWidth, ClientInitializer.SPELL_ICONS.get(ClientInitializer
                                                                         .getClientSpellManager().selectedSpellName));
                                 }
-                                // selected spellname
-                                /*
-                                 * renderer.draw(matrixStack,
-                                 * ClientInitializer.getClientSpellManager().selectedSpellName,
-                                 * x, y, color);
-                                 */
+
                         }
                 }
         }

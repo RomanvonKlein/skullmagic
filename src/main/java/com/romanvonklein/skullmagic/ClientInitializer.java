@@ -1,22 +1,30 @@
 package com.romanvonklein.skullmagic;
 
+import java.util.HashMap;
+
 import org.lwjgl.glfw.GLFW;
 
 import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
 import com.romanvonklein.skullmagic.hud.EssenceStatus;
+import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
+import com.romanvonklein.skullmagic.entities.EffectBall;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
+import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Identifier;
 
 public class ClientInitializer implements ClientModInitializer {
     // keybindings
@@ -24,6 +32,15 @@ public class ClientInitializer implements ClientModInitializer {
     private static KeyBinding cycleSpellKeyBinding;
     private static ClientEssenceManager clientEssenceManager;
     private static ClientSpellManager clientSpellManager;
+
+    // entity renderers
+    public static final EntityModelLayer MODEL_EFFECT_BALL_LAYER = new EntityModelLayer(
+            new Identifier(SkullMagic.MODID, "effectball"), "main");
+
+    // textures
+    public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
+    public static Identifier COOLDOWN_BAR_FRAME_TEXTURE;
+    public static HashMap<String, Identifier> SPELL_ICONS;
 
     @Override
     public void onInitializeClient() {
@@ -53,6 +70,19 @@ public class ClientInitializer implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             clientEssenceManager = null;
         });
+        // register entity renderers
+        EntityRendererRegistry.register(SkullMagic.EFFECT_BALL, (context) -> {
+            return new FlyingItemEntityRenderer<EffectBall>(context, 1.0f, false);
+        });
+
+        // register textures
+        ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/essencebar.png");
+        COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/cooldownbar.png");
+        SPELL_ICONS = new HashMap<>();
+        for (KnowledgeOrb orb : SkullMagic.knowledgeOrbs) {
+            SPELL_ICONS.put(orb.spellName,
+                    new Identifier(SkullMagic.MODID, "textures/gui/" + orb.spellName + "_icon.png"));
+        }
 
         // clientside hud render stuff
         HudRenderCallback.EVENT.register(EssenceStatus::drawEssenceStatus);

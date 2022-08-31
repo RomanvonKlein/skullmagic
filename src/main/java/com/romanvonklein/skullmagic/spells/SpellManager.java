@@ -133,8 +133,8 @@ public class SpellManager extends PersistentState {
             new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-
-                    return false;
+                    
+                    return true;
                 }
             }),
             "slowball",
@@ -178,6 +178,7 @@ public class SpellManager extends PersistentState {
                         world.playSound(center.x, center.y, center.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT,
                                 SoundCategory.PLAYERS, 1.0f, 1.0f, true);
                         player.teleport(center.x, center.y, center.z, true);
+                        success = true;
                     }
                     return success;
                 }

@@ -1,7 +1,6 @@
 package com.romanvonklein.skullmagic;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import com.romanvonklein.skullmagic.spells.SpellManager;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -34,8 +32,6 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -67,14 +63,7 @@ public class SkullMagic implements ModInitializer {
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
 
-	// entity renderers
-	public static final EntityModelLayer MODEL_EFFECT_BALL_LAYER = new EntityModelLayer(
-			new Identifier(MODID, "effectball"), "main");
-
-	// textures
-	public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
-	public static Identifier COOLDOWN_BAR_FRAME_TEXTURE;
-	public static HashMap<String, Identifier> SPELL_ICONS;
+	
 	// custom managers
 	public static EssenceManager essenceManager;
 	public static SpellManager spellManager;
@@ -120,18 +109,7 @@ public class SkullMagic implements ModInitializer {
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, EffectBall::new)
 						.dimensions(EntityDimensions.fixed(0.75f, 0.75f)).build());
 
-		// register entity renderers
-		EntityRendererRegistry.register(EFFECT_BALL, (context) -> {
-			return new FlyingItemEntityRenderer<EffectBall>(context, 1.0f, false);
-		});
-
-		// register textures
-		ESSENCE_BAR_FRAME_TEXTURE = new Identifier(MODID, "textures/gui/essencebar.png");
-		COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(MODID, "texture/gui/cooldownbar.png");
-		SPELL_ICONS = new HashMap<>();
-		for (KnowledgeOrb orb : knowledgeOrbs) {
-			SPELL_ICONS.put(orb.spellName, new Identifier(MODID, "textures/gui/" + orb.spellName + "_icon.png"));
-		}
+		
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
