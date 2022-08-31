@@ -88,6 +88,7 @@ public class EffectBall extends AbstractFireballEntity {
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putByte("radius", (byte) this.radius);
+        nbt.putInt("statuseffect", StatusEffect.getRawId(this.effect));
     }
 
     @Override
@@ -95,6 +96,9 @@ public class EffectBall extends AbstractFireballEntity {
         super.readCustomDataFromNbt(nbt);
         if (nbt.contains("radius")) {
             this.radius = nbt.getByte("radius");
+        }
+        if (nbt.contains("statuseffect")) {
+            this.effect = StatusEffect.byRawId(nbt.getInt("statuseffect"));
         }
     }
 

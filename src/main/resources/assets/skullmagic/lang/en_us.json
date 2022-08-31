@@ -5,6 +5,15 @@
     "key.skullmagic.primary": "Cast Primary Spell",
     "key.skullmagic.cycle": "Cycle Primary Spell",
     "category.skullmagic.spells": "Skullmagic Spells",
-    "item.skullmagic.fireball_orb":"Orb of Fireballs",
-    "item.skullmagic.selfheal_orb":"Orb of Self Healing"
+    "item.skullmagic.fireball_orb":"Scroll of Fireballs",
+    "item.skullmagic.wolfpack_orb":"Scroll of Wolf Packs",
+    "item.skullmagic.slowball_orb":"Scroll of Slowballs",
+    "item.skullmagic.poisonball_orb":"Scroll of Poisonballs",
+    "item.skullmagic.meteoritestorm_orb":"Scroll of Meteorite Storms",
+    "item.skullmagic.selfheal_orb":"Scroll of Self Healing",
+    "item.skullmagic.firebreath_orb":"Scroll of Firebreath",
+    "item.skullmagic.speedbuff_orb":"Scroll of Speed",
+    "item.skullmagic.teleport_orb":"Scroll of Teleporting",
+    "item.skullmagic.resistancebuff_orb":"Scroll of Resistance"
+
 }

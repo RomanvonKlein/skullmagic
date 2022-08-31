@@ -16,6 +16,8 @@ import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.projectile.FireballEntity;
@@ -23,6 +25,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -152,24 +156,31 @@ public class SpellManager extends PersistentState {
             new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-
-                    return false;
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 500, 1));
+                    return true;
                 }
             }),
             "resistancebuff",
             new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-
-                    return false;
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500, 1));
+                    return true;
                 }
             }),
             "teleport",
-            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(100, 800, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-
-                    return false;
+                    boolean success = false;
+                    HitResult result = player.raycast(100, 1, false);
+                    if (result != null) {
+                        Vec3d center = result.getPos();
+                        world.playSound(center.x, center.y, center.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT,
+                                SoundCategory.PLAYERS, 1.0f, 1.0f, true);
+                        player.teleport(center.x, center.y, center.z, true);
+                    }
+                    return success;
                 }
             }),
             "poisonball",

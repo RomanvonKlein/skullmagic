@@ -84,8 +84,7 @@ public class EssenceStatus {
                                                 barheight + 2 * borderwidth, 0xc2c2c2);
                                 // cooldown
                                 int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
-                                int rechargedBarWidth = Math
-                                                .toIntExact(Math.round(barwidth - cooldownLeft * pxPerTick));
+                                int rechargedBarWidth = barwidth - cooldownBarWidth;
                                 drawRect(matrixStack, x, y, cooldownBarWidth,
                                                 barheight,
                                                 0xff9933);
