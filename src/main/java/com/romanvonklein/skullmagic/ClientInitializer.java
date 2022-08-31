@@ -12,6 +12,7 @@ import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
 import com.romanvonklein.skullmagic.entities.EffectBall;
+import com.romanvonklein.skullmagic.entities.FireBreath;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -36,6 +37,8 @@ public class ClientInitializer implements ClientModInitializer {
     // entity renderers
     public static final EntityModelLayer MODEL_EFFECT_BALL_LAYER = new EntityModelLayer(
             new Identifier(SkullMagic.MODID, "effectball"), "main");
+    public static final EntityModelLayer MODEL_FIRE_BREATH_LAYER = new EntityModelLayer(
+            new Identifier(SkullMagic.MODID, "firebreath"), "main");
 
     // textures
     public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
@@ -73,6 +76,9 @@ public class ClientInitializer implements ClientModInitializer {
         // register entity renderers
         EntityRendererRegistry.register(SkullMagic.EFFECT_BALL, (context) -> {
             return new FlyingItemEntityRenderer<EffectBall>(context, 1.0f, false);
+        });
+        EntityRendererRegistry.register(SkullMagic.FIRE_BREATH, (context) -> {
+            return new FlyingItemEntityRenderer<FireBreath>(context, 1.0f, false);
         });
 
         // register textures

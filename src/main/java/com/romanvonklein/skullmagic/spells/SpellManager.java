@@ -11,6 +11,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.entities.EffectBall;
+import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
@@ -133,7 +134,38 @@ public class SpellManager extends PersistentState {
             new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-                    
+                    int shotsPerTick = 2;
+                    int tickDuration = 30;
+                    int breathLife = 20;
+                    int burnDuration = 30;
+                    for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more memory
+                                                            // efficient.
+                        SkullMagic.taskManager.queueTask(new DelayedTask("spawn_fire_breath_task", i,
+                                new TriFunction<Object[], Object, Object, Boolean>() {
+                                    @Override
+                                    public Boolean apply(Object[] data, Object n1, Object n2) {
+                                        int shotsPerTick = ((int[]) data[0])[0];
+                                        int breathLife = ((int[]) data[0])[1];
+                                        int burnDuration = ((int[]) data[0])[2];
+
+                                        Random rand = new Random();
+                                        Vec3d dir = player.getRotationVector().normalize();
+
+                                        for (int i = 0; i < shotsPerTick; i++) {
+                                            FireBreath entity = FireBreath.createFireBreath(world, player,
+                                                    dir.x + rand.nextFloat() * 0.5,
+                                                    dir.y + rand.nextFloat() * 0.5, dir.z + rand.nextFloat() * 0.5,
+                                                    burnDuration, breathLife);
+                                            entity.setPosition(
+                                                    player.getPos().add(dir.multiply(0.5))
+                                                            .add(0, player.getEyeHeight(player.getPose()), 0));
+                                            world.spawnEntity(entity);
+                                        }
+                                        return true;
+                                    }
+                                },
+                                new Object[] { new int[] { shotsPerTick, breathLife, burnDuration } }));
+                    }
                     return true;
                 }
             }),

@@ -13,6 +13,7 @@ import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.entities.EffectBall;
+import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
@@ -62,8 +63,8 @@ public class SkullMagic implements ModInitializer {
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
+	public static EntityType<FireBreath> FIRE_BREATH;
 
-	
 	// custom managers
 	public static EssenceManager essenceManager;
 	public static SpellManager spellManager;
@@ -108,8 +109,10 @@ public class SkullMagic implements ModInitializer {
 		EFFECT_BALL = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "effect_ball"),
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, EffectBall::new)
 						.dimensions(EntityDimensions.fixed(0.75f, 0.75f)).build());
+		FIRE_BREATH = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "fire_breath"),
+				FabricEntityTypeBuilder.create(SpawnGroup.MISC, FireBreath::new)
+						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
 
-		
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
