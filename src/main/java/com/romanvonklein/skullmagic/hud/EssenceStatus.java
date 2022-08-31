@@ -14,6 +14,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 
 public class EssenceStatus {
 
@@ -26,6 +27,7 @@ public class EssenceStatus {
                         int barwidth = 100;
                         int barheight = 5;
                         int pxPerEssence = 1;
+                        int iconWidth = 16;
                         try {
                                 pxPerEssence = ClientInitializer.getClientEssenceManager().maxEssence == 0 ? 1
                                                 : Math.toIntExact(Math.round(Double.valueOf(barwidth)
@@ -50,17 +52,18 @@ public class EssenceStatus {
                                         barheight, 0x787f8a);
                         // border
                         drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
-                                        barheight + 2 * borderwidth);
+                                        barheight + 2 * borderwidth, SkullMagic.ESSENCE_BAR_FRAME_TEXTURE);
 
                         // essence in numbers
-                        TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-                        renderer.draw(matrixStack,
-                                        Double.valueOf(ClientInitializer.getClientEssenceManager().essence) + "/"
-                                                        + Double.valueOf(ClientInitializer
-                                                                        .getClientEssenceManager().maxEssence),
-                                        x,
-                                        y, 0xc2c2c2);
-
+                        /*
+                         * TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
+                         * renderer.draw(matrixStack,
+                         * Double.valueOf(ClientInitializer.getClientEssenceManager().essence) + "/"
+                         * + Double.valueOf(ClientInitializer
+                         * .getClientEssenceManager().maxEssence),
+                         * x,
+                         * y, 0xc2c2c2);
+                         */
                         // spell cooldown bar
                         if (ClientInitializer.getClientSpellManager().spellList
                                         .containsKey(ClientInitializer.getClientSpellManager().selectedSpellName)) {
@@ -80,9 +83,7 @@ public class EssenceStatus {
                                         SkullMagic.LOGGER.error(
                                                         "could not calculate dimensions for hud rendering correctly");
                                 }
-                                // border
-                                drawRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
-                                                barheight + 2 * borderwidth, 0xc2c2c2);
+
                                 // cooldown
                                 int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
                                 int rechargedBarWidth = barwidth - cooldownBarWidth;
@@ -93,9 +94,25 @@ public class EssenceStatus {
                                 drawRect(matrixStack, x + cooldownBarWidth, y,
                                                 rechargedBarWidth,
                                                 barheight, 0x66ff66);
+                                // border
+                                drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
+                                                barwidth + 2 * borderwidth,
+                                                barheight + 2 * borderwidth, SkullMagic.COOLDOWN_BAR_FRAME_TEXTURE);
+                                // icon
+                                if (SkullMagic.SPELL_ICONS.containsKey(ClientInitializer
+                                                .getClientSpellManager().selectedSpellName)) {
+
+                                        drawTextureRect(matrixStack, x + barwidth / 2 - iconWidth / 2, y - borderwidth,
+                                                        iconWidth,
+                                                        iconWidth, SkullMagic.SPELL_ICONS.get(ClientInitializer
+                                                                        .getClientSpellManager().selectedSpellName));
+                                }
                                 // selected spellname
-                                renderer.draw(matrixStack, ClientInitializer.getClientSpellManager().selectedSpellName,
-                                                x, y, color);
+                                /*
+                                 * renderer.draw(matrixStack,
+                                 * ClientInitializer.getClientSpellManager().selectedSpellName,
+                                 * x, y, color);
+                                 */
                         }
                 }
         }
@@ -145,7 +162,7 @@ public class EssenceStatus {
         }
 
         /**
-         * Draws a rectangle on the screen
+         * Draws a texture on the screen
          * 
          * @param posX
          *               the x positon on the screen
@@ -158,12 +175,12 @@ public class EssenceStatus {
          * @param color
          *               the color of the rectangle
          */
-        private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height) {
-
+        private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height,
+                        Identifier texture) {
                 RenderSystem.enableBlend();
                 RenderSystem.enableTexture();
                 RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                RenderSystem.setShaderTexture(0, SkullMagic.ESSENCE_BAR_FRAME_TEXTURE);
+                RenderSystem.setShaderTexture(0, texture);
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.disableDepthTest();
                 BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();

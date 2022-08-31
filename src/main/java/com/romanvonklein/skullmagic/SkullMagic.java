@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,8 @@ public class SkullMagic implements ModInitializer {
 
 	// textures
 	public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
-
+	public static Identifier COOLDOWN_BAR_FRAME_TEXTURE;
+	public static HashMap<String, Identifier> SPELL_ICONS;
 	// custom managers
 	public static EssenceManager essenceManager;
 	public static SpellManager spellManager;
@@ -124,10 +126,12 @@ public class SkullMagic implements ModInitializer {
 		});
 
 		// register textures
-		// Registry.register(Registry.)
 		ESSENCE_BAR_FRAME_TEXTURE = new Identifier(MODID, "textures/gui/essencebar.png");
-		// EntityModelLayerRegistry.registerModelLayer(MODEL_EFFECT_BALL_LAYER,
-		// CubeEntityModel::getTexturedModelData);
+		COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(MODID, "texture/gui/cooldownbar.png");
+		SPELL_ICONS = new HashMap<>();
+		for (KnowledgeOrb orb : knowledgeOrbs) {
+			SPELL_ICONS.put(orb.spellName, new Identifier(MODID, "textures/gui/" + orb.spellName + "_icon.png"));
+		}
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");
