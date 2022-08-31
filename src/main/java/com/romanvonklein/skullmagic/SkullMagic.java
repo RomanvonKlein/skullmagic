@@ -12,6 +12,7 @@ import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.commands.Commands;
+import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
@@ -19,6 +20,7 @@ import com.romanvonklein.skullmagic.spells.SpellManager;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -27,9 +29,15 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
+import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
@@ -54,6 +62,13 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
 	public static BlockEntityType<SkullPedestalBlockEntity> SKULL_PEDESTAL_BLOCK_ENTITY;
 	public static BlockEntityType<FireCannonBlockEntity> FIRE_CANNON_BLOCK_ENTITY;
+
+	// entities
+	public static EntityType<EffectBall> EFFECT_BALL;
+
+	// entity renderers
+	public static final EntityModelLayer MODEL_EFFECT_BALL_LAYER = new EntityModelLayer(
+			new Identifier(MODID, "effectball"), "main");
 
 	// custom managers
 	public static EssenceManager essenceManager;
@@ -95,6 +110,16 @@ public class SkullMagic implements ModInitializer {
 			Registry.register(Registry.ITEM, new Identifier(MODID, orb.spellName + "_orb"), orb);
 		}
 
+		// register entities
+		EFFECT_BALL = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "effect_ball"),
+				FabricEntityTypeBuilder.create(SpawnGroup.MISC, EffectBall::new)
+						.dimensions(EntityDimensions.fixed(0.75f, 0.75f)).build());
+
+		// register entity renderers
+		EntityRendererRegistry.register(EFFECT_BALL, (context) -> {
+			return new FlyingItemEntityRenderer<EffectBall>(context, 1.0f, false);
+		});
+		//EntityModelLayerRegistry.registerModelLayer(MODEL_EFFECT_BALL_LAYER, CubeEntityModel::getTexturedModelData);
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Essence Manager");

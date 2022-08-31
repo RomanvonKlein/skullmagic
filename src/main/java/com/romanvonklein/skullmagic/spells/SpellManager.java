@@ -10,11 +10,13 @@ import org.apache.commons.lang3.function.TriFunction;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -123,7 +125,80 @@ public class SpellManager extends PersistentState {
                             new Object[] { wolfesSpawned }));
                     return true;
                 }
-            }));
+            }),
+            "firebreath",
+            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+
+                    return false;
+                }
+            }),
+            "slowball",
+            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    if (!world.isClient) {
+                        Vec3d velocity = player.getRotationVector().multiply(8.0);
+                        EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y, velocity.z,
+                                StatusEffects.SLOWNESS, 4.0f);
+                        ball.setPosition(player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
+                        world.spawnEntity(ball);
+                    }
+                    return true;
+                }
+            }),
+            "speedbuff",
+            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+
+                    return false;
+                }
+            }),
+            "resistancebuff",
+            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+
+                    return false;
+                }
+            }),
+            "teleport",
+            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+
+                    return false;
+                }
+            }),
+            "poisonball",
+            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                @Override
+                public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    if (!world.isClient) {
+                        Vec3d velocity = player.getRotationVector().multiply(8.0);
+                        EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y, velocity.z,
+                                StatusEffects.POISON, 4.0f);
+                        ball.setPosition(player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
+                        world.spawnEntity(ball);
+                    }
+                    return true;
+                }
+            })/*
+               * ,
+               * "invisibility",
+               * new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
+               * Boolean>() {
+               * 
+               * @Override
+               * public Boolean apply(ServerPlayerEntity player, World world, EssencePool
+               * altar) {
+               * 
+               * return false;
+               * }
+               * })
+               */);
 
     public boolean castSpell(String spellName, ServerPlayerEntity player,
             World world) {
