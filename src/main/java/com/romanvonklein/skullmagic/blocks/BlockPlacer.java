@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.blocks;
 
+import java.util.Optional;
+
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.BlockPlacerBlockEntity;
 
@@ -71,5 +73,13 @@ public class BlockPlacer extends AConsumerBlock {
         return ActionResult.CONSUME;
     }
 
-    
+    @Override
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        Optional<BlockPlacerBlockEntity> opt = world.getBlockEntity(pos, SkullMagic.BLOCK_PLACER_BLOCK_ENTITY);
+        if (opt.isPresent()) {
+            opt.get().dropInventory();
+        }
+        super.onBreak(world, pos, state, player);
+    }
+
 }

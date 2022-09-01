@@ -5,14 +5,20 @@ import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.inventory.IImplementedInventory;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.pattern.CachedBlockPosition;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.AutomaticItemPlacementContext;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -21,10 +27,13 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class BlockPlacerBlockEntity extends BlockEntity
@@ -48,7 +57,26 @@ public class BlockPlacerBlockEntity extends BlockEntity
             if (power > 0 && be.lastTickRedstonePower == 0) {
                 EssencePool pool = SkullMagic.essenceManager.getEssencePoolForConsumer(world.getRegistryKey(), pos);
                 if (pool != null && pool.linkedPlayerID != null) {
-
+                    PlayerEntity player = world.getPlayerByUuid(pool.linkedPlayerID);
+                    if (pool.getEssence() >= be.essenceCost && player != null) {
+                        Direction target = Direction.UP;
+                        if (state.contains(Properties.FACING)) {
+                            target = state.get(Properties.FACING);
+                        }
+                        BlockPos targetPos = pos.add(target.getVector());
+                        for (ItemStack stack : be.getItems()) {
+                            if (world.getBlockState(targetPos).equals(Blocks.AIR.getDefaultState())) {
+                                if (stack.getItem().getClass().isAssignableFrom(BlockItem.class)) {
+                                    if (((BlockItem) stack.getItem()).place(
+                                            new AutomaticItemPlacementContext(world, targetPos, target, stack, target))
+                                            .isAccepted()) {
+                                        pool.discharge(be.essenceCost);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 } else {
                     world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE,
                             SoundCategory.BLOCKS, 1.0f, 1.0f, true);
@@ -127,6 +155,14 @@ public class BlockPlacerBlockEntity extends BlockEntity
     @Override
     public void onInventoryChanged(Inventory var1) {
         this.markDirty();
+    }
+
+    public void dropInventory() {
+        for (int i = 0; i < INVENTORY_SIZE; i++) {
+            world.spawnEntity(
+                    new ItemEntity(world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.getStack(i)));
+            this.setStack(i, Items.AIR.getDefaultStack());
+        }
     }
 
 }

@@ -67,10 +67,10 @@ public class EssenceStatus {
 
                         // spell cooldown bar
                         String spellname = ClientInitializer.getClientSpellManager().selectedSpellName;
-                        int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
-                                        .get(spellname);
                         if (spellname != null && ClientInitializer.getClientSpellManager().spellList
                                         .containsKey(spellname)) {
+                                int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
+                                                .get(spellname);
                                 y += 3 * borderwidth + barheight;
 
                                 int maxCoolDown = SpellManager.SpellDict
