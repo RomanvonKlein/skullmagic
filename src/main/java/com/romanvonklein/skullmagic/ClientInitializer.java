@@ -4,15 +4,16 @@ import java.util.HashMap;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.romanvonklein.skullmagic.entities.EffectBall;
+import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
 import com.romanvonklein.skullmagic.hud.EssenceStatus;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
+import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
-import com.romanvonklein.skullmagic.entities.EffectBall;
-import com.romanvonklein.skullmagic.entities.FireBreath;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -21,6 +22,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
@@ -90,6 +92,8 @@ public class ClientInitializer implements ClientModInitializer {
                     new Identifier(SkullMagic.MODID, "textures/gui/" + orb.spellName + "_icon.png"));
         }
 
+        // screenstuff
+        HandledScreens.register(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, BlockPlacerScreen::new);
         // clientside hud render stuff
         HudRenderCallback.EVENT.register(EssenceStatus::drawEssenceStatus);
 

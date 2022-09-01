@@ -125,7 +125,6 @@ public class EssencePool extends PersistentState {
     }
 
     public static EssencePool fromNbt(NbtCompound tag) {
-        System.out.println("Reading this EssencePools from NBT");
         EssencePool pool = new EssencePool();
         if (tag.contains("linkedPlayerID")) {
             pool.linkedPlayerID = tag.getUuid("linkedPlayerID");

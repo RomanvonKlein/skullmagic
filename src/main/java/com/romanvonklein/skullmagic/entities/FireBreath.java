@@ -39,7 +39,6 @@ public class FireBreath extends AbstractFireballEntity {
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
         if (!this.world.isClient) {
-            SkullMagic.LOGGER.info("hit block");
             Direction direction = blockHitResult.getSide();
             BlockPos pos = blockHitResult.getBlockPos().offset(direction);
             if (this.world.getBlockState(pos) == Blocks.AIR.getDefaultState()) {
@@ -65,7 +64,6 @@ public class FireBreath extends AbstractFireballEntity {
         if (!this.world.isClient) {
             Entity ent = entityHitResult.getEntity();
             if (ent.getType() != SkullMagic.FIRE_BREATH) {
-                SkullMagic.LOGGER.info("hit entity");
                 entityHitResult.getEntity().setOnFireFor(this.burnDuration);
                 this.discard();
             }

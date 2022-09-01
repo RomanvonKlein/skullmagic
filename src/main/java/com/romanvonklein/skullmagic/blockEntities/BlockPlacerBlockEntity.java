@@ -2,16 +2,22 @@ package com.romanvonklein.skullmagic.blockEntities;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.essence.EssencePool;
+import com.romanvonklein.skullmagic.inventory.IImplementedInventory;
+import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.InventoryProvider;
-import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
+import net.minecraft.inventory.InventoryChangedListener;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.Generic3x3ContainerScreenHandler;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -20,16 +26,19 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
-public class BlockPlacerBlockEntity extends LootableContainerBlockEntity implements InventoryProvider {
+public class BlockPlacerBlockEntity extends BlockEntity
+        implements NamedScreenHandlerFactory, IImplementedInventory, InventoryChangedListener {
     private int lastTickRedstonePower = 0;
     private int essenceCost = 75;
-    private DefaultedList<ItemStack> inventory;
+    // private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(3,
+    // ItemStack.EMPTY);
     private static final int INVENTORY_SIZE = 9;
+    SimpleInventory inventory = new SimpleInventory(INVENTORY_SIZE);
 
     public BlockPlacerBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.BLOCK_PLACER_BLOCK_ENTITY, pos, state);
+        this.inventory.addListener(this);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, BlockPlacerBlockEntity be) {
@@ -50,26 +59,20 @@ public class BlockPlacerBlockEntity extends LootableContainerBlockEntity impleme
     }
 
     @Override
-    protected Text getContainerName() {
-        // versions 1.18.2 and below
-        return new TranslatableText("container.chest");
-        // versions since 1.19
-        // return Text.translatable("container.chest");
+    public void writeNbt(NbtCompound tag) {
+        super.writeNbt(tag);
+
+        Inventories.writeNbt(tag, this.getItems());
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        return null;// new BlockPlacerScreenHandler(syncId, playerInventory);
-    }
-
-    @Override
-    protected DefaultedList<ItemStack> getInvStackList() {
-        return this.inventory;
-    }
-
-    @Override
-    protected void setInvStackList(DefaultedList<ItemStack> list) {
-        this.inventory = list;
+    public void readNbt(NbtCompound tag) {
+        DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, new ItemStack(Items.AIR));
+        Inventories.readNbt(tag, items);
+        for (ItemStack stack : items) {
+            this.inventory.addStack(stack);
+        }
+        super.readNbt(tag);
     }
 
     @Override
@@ -77,26 +80,53 @@ public class BlockPlacerBlockEntity extends LootableContainerBlockEntity impleme
         return INVENTORY_SIZE;
     }
 
+    // @Override
+    // protected ScreenHandler createScreenHandler(int syncId, PlayerInventory
+    // playerInventory) {
+    // return SkullMagic.BLOCK_PLACER_SCREEN_HANDLER.create(syncId,
+    // playerInventory);
+    // }
+
     @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
-        this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        if (!this.deserializeLootTable(tag)) {
-            Inventories.readNbt(tag, this.inventory);
-        }
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity var3) {
+        return new Generic3x3ContainerScreenHandler(syncId, playerInventory, inventory)/*
+                                                                                        * {
+                                                                                        * 
+                                                                                        * @Override
+                                                                                        * public ItemStack
+                                                                                        * transferSlot(PlayerEntity
+                                                                                        * player, int index) {
+                                                                                        * ItemStack result =
+                                                                                        * super.transferSlot(player,
+                                                                                        * index);
+                                                                                        * inventory.markDirty();
+                                                                                        * return result;
+                                                                                        * }
+                                                                                        * }
+                                                                                        */;
     }
 
     @Override
-    public void writeNbt(NbtCompound tag) {
-        super.writeNbt(tag);
-        if (!this.serializeLootTable(tag)) {
-            Inventories.writeNbt(tag, this.inventory);
-        }
+    public Text getDisplayName() {
+        // versions 1.18.2 and below
+        return new TranslatableText("skullmagic.blockplacer.guiname");
+        // versions since 1.19
+        // return Text.translatable("container.chest");
     }
 
     @Override
-    public SidedInventory getInventory(BlockState var1, WorldAccess var2, BlockPos var3) {
-        // TODO Auto-generated method stub
-        return null;
+    public DefaultedList<ItemStack> getItems() {
+        ItemStack[] stacks = new ItemStack[INVENTORY_SIZE];
+        for (int i = 0; i < INVENTORY_SIZE; i++) {
+            stacks[i] = this.inventory.getStack(i);
+        }
+        DefaultedList<ItemStack> list = DefaultedList.copyOf(this.inventory.getStack(0), stacks);
+        return list;
     }
+
+    @Override
+    public void onInventoryChanged(Inventory var1) {
+        this.markDirty();
+    }
+
 }

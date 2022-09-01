@@ -19,6 +19,7 @@ import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
+import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
@@ -40,6 +41,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -70,6 +72,9 @@ public class SkullMagic implements ModInitializer {
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
 	public static EntityType<FireBreath> FIRE_BREATH;
+
+	// screen handlers
+	public static ScreenHandlerType<BlockPlacerScreenHandler> BLOCK_PLACER_SCREEN_HANDLER;
 
 	// custom managers
 	public static EssenceManager essenceManager;
@@ -107,6 +112,9 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
 				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
 
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "block_placer"), BlockPlacer);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "block_placer"),
+				new BlockItem(BlockPlacer, new FabricItemSettings().group(ItemGroup.MISC)));
 		// register items
 		knowledgeOrbs = KnowledgeOrb.generateKnowledgeOrbs();
 		for (KnowledgeOrb orb : knowledgeOrbs) {
@@ -120,6 +128,11 @@ public class SkullMagic implements ModInitializer {
 		FIRE_BREATH = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "fire_breath"),
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, FireBreath::new)
 						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
+
+		// register screenhandler stuff
+		BLOCK_PLACER_SCREEN_HANDLER = Registry.register(
+				Registry.SCREEN_HANDLER, new Identifier(MODID, "block_placer_screen_handler"),
+				new ScreenHandlerType<>((syncId, inventory) -> new BlockPlacerScreenHandler(syncId, inventory)));
 
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
