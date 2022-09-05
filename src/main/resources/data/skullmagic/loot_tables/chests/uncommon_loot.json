@@ -1,0 +1,33 @@
+{
+    "pools": [
+        {
+            "rolls": {
+                "min": 0,
+                "max": 2
+            },
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:fireball_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:poisonball_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:wolfpack_orb"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "skullmagic:chests/common_loot"
+                }
+            ]
+        }
+    ]
+}

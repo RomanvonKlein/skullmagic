@@ -1,0 +1,38 @@
+{
+    "pools": [
+        {
+            "rolls": {
+                "min": 0,
+                "max": 1
+            },
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:meteoritestorm_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:teleport_orb"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "skullmagic:chests/common_loot"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "skullmagic:chests/uncommon_loot"
+                }
+            ]
+        }
+    ]
+}
