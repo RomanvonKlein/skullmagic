@@ -11,13 +11,14 @@ public class Spell {
 
     public int essenceCost;
     public int cooldownTicks;
-
+    public int learnLevelCost;
     public TriFunction<ServerPlayerEntity, World, EssencePool, Boolean> action;
 
-    public Spell(int essenceCost, int cooldownTicks,
+    public Spell(int essenceCost, int cooldownTicks, int learnLevelCost,
             TriFunction<ServerPlayerEntity, World, EssencePool, Boolean> action) {
         this.essenceCost = essenceCost;
         this.cooldownTicks = cooldownTicks;
+        this.learnLevelCost = learnLevelCost;
         this.action = action;
     }
 

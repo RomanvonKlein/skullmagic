@@ -27,6 +27,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -41,7 +42,7 @@ public class SpellManager extends PersistentState {
 
     public static Map<String, ? extends Spell> SpellDict = Map.of(
             "fireball",
-            new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     Vec3d angle = player.getRotationVector();
@@ -53,7 +54,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "selfheal",
-            new Spell(50, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(50, 100, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     player.heal(4.0f);
@@ -61,7 +62,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "meteoritestorm",
-            new Spell(100, 100, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(100, 100, 40, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     int meteoriteCount = 100;
@@ -99,7 +100,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "wolfpack",
-            new Spell(100, 500, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(100, 500, 25, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     int wolfCount = 3;
@@ -131,7 +132,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "firebreath",
-            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(50, 150, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     int shotsPerTick = 2;
@@ -170,7 +171,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "slowball",
-            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     if (!world.isClient) {
@@ -184,7 +185,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "speedbuff",
-            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 500, 1));
@@ -192,7 +193,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "resistancebuff",
-            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500, 1));
@@ -200,7 +201,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "teleport",
-            new Spell(100, 800, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(100, 800, 30, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     boolean success = false;
@@ -216,7 +217,7 @@ public class SpellManager extends PersistentState {
                 }
             }),
             "poisonball",
-            new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+            new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                 @Override
                 public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                     if (!world.isClient) {
@@ -341,10 +342,27 @@ public class SpellManager extends PersistentState {
         boolean success = false;
         if (this.availableSpells.containsKey(playerID) && SpellDict.containsKey(spellname)
                 && !this.availableSpells.get(playerID).containsKey(spellname)) {
-            this.availableSpells.get(playerID).put(spellname, 0);
-            ServerPackageSender.sendUpdateSpellListPackage(player);
-            success = true;
+            // check player level and deduct if sufficient
+            int spellcost = SpellManager.getLevelCost(spellname);
+            if (player.experienceLevel >= spellcost) {
+                // player.getServer().level
+                player.addExperienceLevels(-spellcost);
+                this.availableSpells.get(playerID).put(spellname, 0);
+                ServerPackageSender.sendUpdateSpellListPackage(player);
+                success = true;
+            } else {
+                player.sendMessage(new TranslatableText("skullmagic.message.missing_required_level")
+                        .append(Integer.toString(spellcost)), true);
+            }
         }
         return success;
+    }
+
+    public static int getLevelCost(String spellName) {
+        int result = 0;
+        if (SpellDict.containsKey(spellName)) {
+            result = SpellDict.get(spellName).learnLevelCost;
+        }
+        return result;
     }
 }

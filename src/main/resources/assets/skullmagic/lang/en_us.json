@@ -15,5 +15,7 @@
     "item.skullmagic.firebreath_orb": "Scroll of Firebreath",
     "item.skullmagic.speedbuff_orb": "Scroll of Speed",
     "item.skullmagic.teleport_orb": "Scroll of Teleporting",
-    "item.skullmagic.resistancebuff_orb": "Scroll of Resistance"
+    "item.skullmagic.resistancebuff_orb": "Scroll of Resistance",
+    "skullmagic.message.missing_required_level": "Can't affort level cost: ",
+    "tooltip.skullmagic.level_cost": "Level cost: "
 }
