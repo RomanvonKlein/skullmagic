@@ -16,8 +16,9 @@ public class ServerPackageSender {
             String appendix = entry.getKey() + ":" + Integer.toString(entry.getValue()) + ";";
             builder.append(appendix);
         });
-        buf.writeString(builder.toString());
-
+        String result = builder.toString();
+        buf.writeString(result);
+        SkullMagic.LOGGER.info("Player connected with spells: " + result);
         ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_SPELL_LIST, buf);
     }
 }

@@ -299,10 +299,8 @@ public class SpellManager extends PersistentState {
      */
     public void playerJoined(ServerPlayerEntity player) {
         if (!this.availableSpells.containsKey(player.getUuid())) {
-            SkullMagic.LOGGER.info("Creating new entry for player with id '" + player.getUuidAsString() + "'");
             this.availableSpells.put(player.getUuid(), new HashMap<>());
             for (String spellname : Config.getConfig().defaultSpells) {
-                SkullMagic.LOGGER.info("adding Spell '" + spellname + "'");
                 this.availableSpells.get(player.getUuid()).put(spellname, 0);
             }
         }

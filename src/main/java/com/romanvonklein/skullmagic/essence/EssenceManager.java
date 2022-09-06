@@ -62,7 +62,6 @@ public class EssenceManager extends PersistentState {
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
-        SkullMagic.LOGGER.info("Saving nbt for EssenceManager");
         // essence pools
         NbtCompound EssencePoolsNBT = new NbtCompound();
         EssencePools.keySet().forEach(dimension -> {
