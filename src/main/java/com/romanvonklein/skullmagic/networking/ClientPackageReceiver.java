@@ -42,7 +42,9 @@ public class ClientPackageReceiver {
             String msgString = buf.readString();
             for (String valuePair : msgString.split(";")) {
                 String[] parts = valuePair.split(":");
-                ClientInitializer.getClientSpellManager().spellList.put(parts[0], Integer.parseInt(parts[1]));
+                if (parts.length > 1) {
+                    ClientInitializer.getClientSpellManager().spellList.put(parts[0], Integer.parseInt(parts[1]));
+                }
             }
         }
     }

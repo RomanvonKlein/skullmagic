@@ -37,12 +37,20 @@ public class SkullMagicSkullBlockEntityRenderer
     private static final Map<SkullMagicSkullBlock.SkullType, Identifier> TEXTURES = Util.make(Maps.newHashMap(),
             map -> {
                 map.put(SkullMagicSkullBlock.SkullType.ENDERMAN,
-                        new Identifier("textures/entity/skeleton/skeleton.png"));
+                        new Identifier("textures/entity/enderman/enderman.png"));
+                map.put(SkullMagicSkullBlock.SkullType.BLAZE,
+                        new Identifier("textures/entity/blaze.png"));
+                map.put(SkullMagicSkullBlock.SkullType.SPIDER,
+                        new Identifier("textures/entity/spider/spider.png"));
             });
 
     public static Map<SkullMagicSkullBlock.SkullType, SkullBlockEntityModel> getModels(EntityModelLoader modelLoader) {
         ImmutableMap.Builder<SkullMagicSkullBlock.SkullType, SkullBlockEntityModel> builder = ImmutableMap.builder();
         builder.put(SkullMagicSkullBlock.SkullType.ENDERMAN,
+                new SkullEntityModel(modelLoader.getModelPart(EntityModelLayers.SKELETON_SKULL)));
+        builder.put(SkullMagicSkullBlock.SkullType.BLAZE,
+                new SkullEntityModel(modelLoader.getModelPart(EntityModelLayers.SKELETON_SKULL)));
+        builder.put(SkullMagicSkullBlock.SkullType.SPIDER,
                 new SkullEntityModel(modelLoader.getModelPart(EntityModelLayers.SKELETON_SKULL)));
         return builder.build();
     }
@@ -88,6 +96,6 @@ public class SkullMagicSkullBlockEntityRenderer
 
     public static RenderLayer getRenderLayer(SkullMagicSkullBlock.SkullType type) {
         Identifier identifier = TEXTURES.get(type);
-        return RenderLayer.getEntityCutoutNoCull(identifier);
+        return RenderLayer.getEntityCutoutNoCullZOffset(identifier);
     }
 }

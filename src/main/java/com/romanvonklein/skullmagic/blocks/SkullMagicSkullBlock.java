@@ -80,7 +80,9 @@ public class SkullMagicSkullBlock extends SkullMagicAbstractSkullBlock {
     }
 
     public static enum SkullType {
-        ENDERMAN;
+        ENDERMAN,
+        BLAZE,
+        SPIDER;
     }
 
     @Override

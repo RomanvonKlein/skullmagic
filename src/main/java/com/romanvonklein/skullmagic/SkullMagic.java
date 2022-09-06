@@ -56,18 +56,20 @@ public class SkullMagic implements ModInitializer {
 	// blocks
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
-
 	public static Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block FireCannon = new FireCannon(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block BlockPlacer = new BlockPlacer(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
-
-	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
-
 	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.ENDERMAN,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
+	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.SPIDER,
+			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
+	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.BLAZE,
+			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
+
+	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
 
 	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
@@ -106,7 +108,8 @@ public class SkullMagic implements ModInitializer {
 
 		SKULL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_block_entity",
-				FabricBlockEntityTypeBuilder.create(SkullMagicSkullBlockEntity::new, ENDERMAN_HEAD_BLOCK).build(null));
+				FabricBlockEntityTypeBuilder.create(SkullMagicSkullBlockEntity::new, ENDERMAN_HEAD_BLOCK,
+						SPIDER_HEAD_BLOCK, BLAZE_HEAD_BLOCK).build(null));
 
 		// register blocks
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "fire_cannon"), FireCannon);
@@ -130,6 +133,12 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "enderman_head"), ENDERMAN_HEAD_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "enderman_head"),
 				new BlockItem(ENDERMAN_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "spider_head"), SPIDER_HEAD_BLOCK);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "spider_head"),
+				new BlockItem(SPIDER_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "blaze_head"), BLAZE_HEAD_BLOCK);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "blaze_head"),
+				new BlockItem(BLAZE_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
 
 		// register items
 		knowledgeOrbs = KnowledgeOrb.generateKnowledgeOrbs();

@@ -99,7 +99,7 @@ public class Config {
         defaultData.scanWidth = 5;
         defaultData.supplyWidth = 32;
         defaultData.supplyHeight = 16;
-        defaultData.defaultSpells = new String[] { "fireball" };
+        defaultData.defaultSpells = new String[] {};
 
         return defaultData;
     }

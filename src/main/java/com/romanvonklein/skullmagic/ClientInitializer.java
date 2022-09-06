@@ -1,12 +1,10 @@
 package com.romanvonklein.skullmagic;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.google.common.collect.Maps;
-import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
+import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
@@ -23,6 +21,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -31,7 +30,6 @@ import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 public class ClientInitializer implements ClientModInitializer {
     // keybindings
@@ -50,11 +48,6 @@ public class ClientInitializer implements ClientModInitializer {
     public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
     public static Identifier COOLDOWN_BAR_FRAME_TEXTURE;
     public static HashMap<String, Identifier> SPELL_ICONS;
-    public static final Map<SkullMagicSkullBlock.SkullType, Identifier> SKULL_TEXTURES = Util.make(Maps.newHashMap(),
-            map -> {
-                map.put(SkullMagicSkullBlock.SkullType.ENDERMAN,
-                        new Identifier("textures/entity/enderman/enderman.png"));
-            });
 
     @Override
     public void onInitializeClient() {
@@ -91,6 +84,8 @@ public class ClientInitializer implements ClientModInitializer {
         EntityRendererRegistry.register(SkullMagic.FIRE_BREATH, (context) -> {
             return new FlyingItemEntityRenderer<FireBreath>(context, 1.0f, false);
         });
+
+        BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
         // public static final EntityModelLayer WITHER_SKULL =
         // EntityModelLayers.registerMain("wither_skull");
 
@@ -98,7 +93,9 @@ public class ClientInitializer implements ClientModInitializer {
         ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/essencebar.png");
         COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/cooldownbar.png");
         SPELL_ICONS = new HashMap<>();
-        for (KnowledgeOrb orb : SkullMagic.knowledgeOrbs) {
+        for (
+
+        KnowledgeOrb orb : SkullMagic.knowledgeOrbs) {
             SPELL_ICONS.put(orb.spellName,
                     new Identifier(SkullMagic.MODID, "textures/gui/" + orb.spellName + "_icon.png"));
         }
