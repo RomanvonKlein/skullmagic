@@ -284,7 +284,7 @@ public class SpellManager extends PersistentState {
             availableSpells.keySet().forEach((uuid) -> {
                 for (ServerWorld world : server.getWorlds()) {
                     ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(uuid);
-                    if (player != null) {
+                    if (player != null && SkullMagic.essenceManager.playerHasEssencePool(player.getUuid())) {
                         ServerPackageSender.sendUpdateSpellListPackage(player);
                         break;
                     }

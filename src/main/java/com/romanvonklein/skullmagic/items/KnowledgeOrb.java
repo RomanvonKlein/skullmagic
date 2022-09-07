@@ -43,22 +43,8 @@ public class KnowledgeOrb extends Item {
             if (SkullMagic.spellManager.learnSpell((ServerPlayerEntity) user, this.spellName)) {
                 result = new TypedActionResult<ItemStack>(ActionResult.SUCCESS, ItemStack.EMPTY);
 
-                world.playSound(
-                        null, // Player - if non-null, will play sound for every nearby player *except* the
-                        // specified player
-                        new BlockPos(user.getBlockX(), user.getBlockY(), user.getBlockZ()), // The position of where the
-                        // sound will come from
-                        SoundEvents.ENTITY_PLAYER_LEVELUP, // The sound that will play, in this case, the sound the
-                                                           // anvil
-                        // plays when it lands.
-                        SoundCategory.BLOCKS, // This determines which of the volume sliders affect this sound
-                        1f, // Volume multiplier, 1 is normal, 0.5 is half volume, etc
-                        1f // Pitch multiplier, 1 is normal, 0.5 is half pitch, etc
-                );
-
-                // world.playSound(user.getBlockX(), user.getBlockY(), user.getBlockZ(),
-                // SoundEvents.ENTITY_PLAYER_LEVELUP,
-                // SoundCategory.PLAYERS, 1.0f, 1.0f, true);
+                world.playSound(null, new BlockPos(user.getBlockX(), user.getBlockY(), user.getBlockZ()),
+                        SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.BLOCKS, 1f, 1f);
             }
         }
         return result;
