@@ -2,7 +2,7 @@
   "type": "minecraft:village",
   "config": {
     "start_pool": "skullmagic:overworld/dark_tower_base",
-    "size": 3
+    "size": 7
   },
   "biomes": "#minecraft:has_structure/mineshaft",
   "adapt_noise": true,

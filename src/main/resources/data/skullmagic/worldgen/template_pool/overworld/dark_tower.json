@@ -10,6 +10,15 @@
         "projection": "rigid",
         "processors": "minecraft:empty"
       }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_02",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
     }
   ]
 }
