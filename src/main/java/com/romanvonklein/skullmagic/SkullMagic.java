@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.romanvonklein.skullmagic.blockEntities.BlockPlacerBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
@@ -23,6 +26,7 @@ import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
 import com.romanvonklein.skullmagic.spells.SpellManager;
+import com.romanvonklein.skullmagic.structurefeatures.DarkTowerFeature;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
@@ -45,13 +49,44 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.StructureFeature;
+import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 
 public class SkullMagic implements ModInitializer {
 	public static String MODID = "skullmagic";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+
+	// structure features
+	public static final Codec<StructurePoolFeatureConfig> SKULLMAGIC_CODEC = RecordCodecBuilder
+			.create(instance -> instance
+					.group(StructurePool.REGISTRY_CODEC.fieldOf("start_pool")
+							.forGetter(t -> ((StructurePoolFeatureConfig) t).getStartPool()),
+							Codec.intRange(0, 1000).fieldOf("size")
+									.forGetter(StructurePoolFeatureConfig::getSize))
+					.apply(instance,
+							StructurePoolFeatureConfig::new));
+	/*
+	 * .create(instance -> instance
+	 * .group(((MapCodec) StructurePool.REGISTRY_CODEC.fieldOf("start_pool"))
+	 * .forGetter(t -> ((StructurePoolFeatureConfig) t).getStartPool()),
+	 * ((MapCodec) Codec.intRange(0, 1000).fieldOf("size"))
+	 * .forGetter(t -> {
+	 * SkullMagic.LOGGER.info("Getting size for structurePool");
+	 * return ((StructurePoolFeatureConfig) t).getSize();
+	 * }))
+	 * .apply(instance,
+	 * (t, u) -> new StructurePoolFeatureConfig(((RegistryEntry<StructurePool>) t),
+	 * ((int) u))));
+	 */
+	public static final StructureFeature<StructurePoolFeatureConfig> DARK_TOWER = Registry.register(
+			Registry.STRUCTURE_FEATURE,
+			MODID + ":dark_tower",
+			new DarkTowerFeature(SKULLMAGIC_CODEC));
 
 	// blocks
 	public static final Block SkullPedestal = new SkullPedestal(
@@ -168,6 +203,7 @@ public class SkullMagic implements ModInitializer {
 					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + "_spellManager");
 			taskManager = new TaskManager();
 		});
+
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			essenceManager.tick(server);
 			spellManager.tick(server);
