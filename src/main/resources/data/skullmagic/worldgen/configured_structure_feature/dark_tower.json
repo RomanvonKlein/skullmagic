@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:village",
+  "type": "skullmagic:dark_tower",
   "config": {
     "start_pool": "skullmagic:overworld/dark_tower_base",
     "size": 7
