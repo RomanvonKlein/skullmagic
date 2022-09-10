@@ -3,7 +3,7 @@
   "fallback": "skullmagic:overworld/dark_tower_terminators",
   "elements": [
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_01",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_02",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_03",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_05",
@@ -48,7 +48,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_06",

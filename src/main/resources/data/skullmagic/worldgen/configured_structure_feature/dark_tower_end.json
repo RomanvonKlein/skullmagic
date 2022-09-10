@@ -2,7 +2,7 @@
   "type": "skullmagic:dark_tower",
   "config": {
     "start_pool": "skullmagic:end/dark_tower_base_end",
-    "size": 10
+    "size": 8
   },
   "biomes": "#minecraft:has_structure/end_city",
   "adapt_noise": true,
