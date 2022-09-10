@@ -157,6 +157,43 @@
                     "location_predicate": {
                         "predicate_type": "minecraft:always_true"
                     }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_slab"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_deepslate_slab",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_stairs"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_deepslate_stairs",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_block"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_deepslate",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
                 }
             ],
             "processor_type": "minecraft:rule"
