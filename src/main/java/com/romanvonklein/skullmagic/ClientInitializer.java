@@ -17,6 +17,7 @@ import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -26,6 +27,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
@@ -77,6 +79,7 @@ public class ClientInitializer implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             clientEssenceManager = null;
         });
+
         // register entity renderers
         EntityRendererRegistry.register(SkullMagic.EFFECT_BALL, (context) -> {
             return new FlyingItemEntityRenderer<EffectBall>(context, 1.0f, false);
@@ -86,8 +89,7 @@ public class ClientInitializer implements ClientModInitializer {
         });
 
         BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
-        // public static final EntityModelLayer WITHER_SKULL =
-        // EntityModelLayers.registerMain("wither_skull");
+        BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
 
         // register textures
         ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/essencebar.png");

@@ -8,12 +8,14 @@ import org.slf4j.LoggerFactory;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.romanvonklein.skullmagic.blockEntities.BlockPlacerBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.CapacityCrystalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.BlockPlacer;
 import com.romanvonklein.skullmagic.blocks.FireCannon;
+import com.romanvonklein.skullmagic.blocks.CapacityCrystal;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
@@ -29,6 +31,7 @@ import com.romanvonklein.skullmagic.structurefeatures.DarkTowerFeature;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -42,6 +45,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -87,6 +91,8 @@ public class SkullMagic implements ModInitializer {
 			new DarkTowerFeature(SKULLMAGIC_CODEC));
 
 	// blocks
+	public static final Block CapacityCrystal = new CapacityCrystal(
+			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).requiresTool().nonOpaque());
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block SkullAltar = new SkullAltar(
@@ -110,6 +116,7 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<FireCannonBlockEntity> FIRE_CANNON_BLOCK_ENTITY;
 	public static BlockEntityType<BlockPlacerBlockEntity> BLOCK_PLACER_BLOCK_ENTITY;
 	public static BlockEntityType<SkullMagicSkullBlockEntity> SKULL_BLOCK_ENTITY;
+	public static BlockEntityType<CapacityCrystalBlockEntity> CAPACITY_CRYSTAL_BLOCK_ENTITY;
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
@@ -129,6 +136,9 @@ public class SkullMagic implements ModInitializer {
 		Commands.registerCommands();
 
 		// register blockentities
+		CAPACITY_CRYSTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+				MODID + ":capacity_crystal_block_entity",
+				FabricBlockEntityTypeBuilder.create(CapacityCrystalBlockEntity::new, CapacityCrystal).build(null));
 		FIRE_CANNON_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":fire_cannon_block_entity",
 				FabricBlockEntityTypeBuilder.create(FireCannonBlockEntity::new, FireCannon).build(null));
 		BLOCK_PLACER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":block_placer_block_entity",
@@ -145,9 +155,12 @@ public class SkullMagic implements ModInitializer {
 						SPIDER_HEAD_BLOCK, BLAZE_HEAD_BLOCK).build(null));
 
 		// register blocks
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "capacity_crystal"), CapacityCrystal);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "capacity_crystal"),
+				new BlockItem(CapacityCrystal, new FabricItemSettings().group(ItemGroup.MISC)));
+				
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "fire_cannon"), FireCannon);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "fire_cannon"),
-
 				new BlockItem(FireCannon, new FabricItemSettings().group(ItemGroup.MISC)));
 
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);

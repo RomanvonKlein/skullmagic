@@ -3,11 +3,7 @@ package com.romanvonklein.skullmagic.structurefeatures;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.structure.StructureGeneratorFactory;
-import net.minecraft.structure.StructureSetKeys;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
-import net.minecraft.world.gen.random.AtomicSimpleRandom;
-import net.minecraft.world.gen.random.ChunkRandom;
 
 public class DarkTowerFeature extends DarkTowerJigsawFeature {
     public DarkTowerFeature(Codec<StructurePoolFeatureConfig> configCodec) {

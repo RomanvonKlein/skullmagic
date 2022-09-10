@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.spongepowered.asm.mixin.Overwrite;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;

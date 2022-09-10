@@ -477,4 +477,22 @@ public class EssenceManager extends PersistentState {
             this.consumersToEssencePools.get(registryKey).remove(pos);
         }
     }
+
+    public void removeCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos) {
+        if (this.consumersToEssencePools.containsKey(registryKey)
+                && this.consumersToEssencePools.get(registryKey).containsKey(pos)) {
+            EssencePool pool = this.consumersToEssencePools.get(registryKey).get(pos);
+            pool.reduceMaxEssence(Config.getConfig().capacityCrystalStrength);
+        }
+        this.removeConsumer(registryKey, pos);
+    }
+
+    public boolean tryAddCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos, UUID placerID) {
+        if (addConsumer(registryKey, pos, placerID)) {
+            this.consumersToEssencePools.get(registryKey).get(pos).maxEssence += Config
+                    .getConfig().capacityCrystalStrength;
+            return true;
+        }
+        return false;
+    }
 }

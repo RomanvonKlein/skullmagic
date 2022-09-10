@@ -7,16 +7,12 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.StructureGeneratorFactory;
-import net.minecraft.structure.StructureSetKeys;
 import net.minecraft.structure.pool.StructurePools;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
-import net.minecraft.world.gen.random.AtomicSimpleRandom;
-import net.minecraft.world.gen.random.ChunkRandom;
 
 public class DarkTowerJigsawFeature extends StructureFeature<StructurePoolFeatureConfig> {
 

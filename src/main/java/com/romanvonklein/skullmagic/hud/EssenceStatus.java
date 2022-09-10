@@ -27,13 +27,13 @@ public class EssenceStatus {
                         int borderwidth = 5;
                         int barwidth = 100;
                         int barheight = 5;
-                        int pxPerEssence = 1;
+                        double pxPerEssence = 1.0;
                         int iconWidth = 16;
                         try {
                                 pxPerEssence = ClientInitializer.getClientEssenceManager().maxEssence == 0 ? 1
-                                                : Math.toIntExact(Math.round(Double.valueOf(barwidth)
+                                                : Double.valueOf(barwidth)
                                                                 / Double.valueOf(ClientInitializer
-                                                                                .getClientEssenceManager().maxEssence)));
+                                                                                .getClientEssenceManager().maxEssence);
 
                         } catch (Exception e) {
                                 SkullMagic.LOGGER.error(
@@ -44,12 +44,19 @@ public class EssenceStatus {
                         int x = 10 + symbolSpace + borderwidth;
                         int y = 10;
                         // essence
-                        drawRect(matrixStack, x, y, ClientInitializer.getClientEssenceManager().essence * pxPerEssence,
+                        drawRect(matrixStack, x, y,
+                                        Math.toIntExact(Math.round(Double
+                                                        .valueOf(ClientInitializer.getClientEssenceManager().essence)
+                                                        * pxPerEssence)),
                                         barheight,
                                         0x114c9e);
                         // empty
-                        drawRect(matrixStack, x + ClientInitializer.getClientEssenceManager().essence * pxPerEssence, y,
-                                        barwidth - ClientInitializer.getClientEssenceManager().essence * pxPerEssence,
+                        drawRect(matrixStack, x + Math.toIntExact(Math.round(Double
+                                        .valueOf(ClientInitializer.getClientEssenceManager().essence) * pxPerEssence)),
+                                        y,
+                                        barwidth - Math.toIntExact(Math.round(Double
+                                                        .valueOf(ClientInitializer.getClientEssenceManager().essence)
+                                                        * pxPerEssence)),
                                         barheight, 0x787f8a);
                         // border
                         drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,

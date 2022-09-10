@@ -35,14 +35,14 @@ public class EssencePool extends PersistentState {
     public EssencePool() {
         this.essence = 0;
         this.essenceChargeRate = 0;
-        this.maxEssence = 100;
+        this.maxEssence = Config.getConfig().altarCapacity;
     }
 
     public EssencePool(BlockPos pos) {
         this.position = pos;
         this.essence = 0;
         this.essenceChargeRate = 0;
-        this.maxEssence = 100;
+        this.maxEssence = Config.getConfig().altarCapacity;
     }
 
     public EssencePool(BlockPos pos, int essence, int essenceChargeRate, int maxEssence) {
@@ -50,6 +50,13 @@ public class EssencePool extends PersistentState {
         this.essence = essence;
         this.essenceChargeRate = essenceChargeRate;
         this.maxEssence = maxEssence;
+    }
+
+    public void reduceMaxEssence(int amount) {
+        this.maxEssence -= amount;
+        if (maxEssence < Config.getConfig().altarCapacity) {
+            maxEssence = Config.getConfig().altarCapacity;
+        }
     }
 
     public void tick(World world) {

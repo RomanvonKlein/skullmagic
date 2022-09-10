@@ -31,6 +31,10 @@ public class Config {
 
         public String[] defaultSpells;
 
+        public int capacityCrystalStrength;
+
+        public int altarCapacity;
+
         public ConfigData() {
             this.drops = new HashMap<String, Map<String, Float>>();
             this.skulls = new HashMap<String, Integer>();
@@ -112,6 +116,10 @@ public class Config {
         defaultData.supplyWidth = 32;
         defaultData.supplyHeight = 16;
         defaultData.defaultSpells = new String[] {};
+
+        // other values
+        defaultData.capacityCrystalStrength = 100;
+        defaultData.altarCapacity = 100;
 
         return defaultData;
     }
