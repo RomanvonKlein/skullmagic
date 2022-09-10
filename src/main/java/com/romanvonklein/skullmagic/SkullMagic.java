@@ -13,12 +13,14 @@ import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.WitherEnergyChannelerBlockEntity;
 import com.romanvonklein.skullmagic.blocks.BlockPlacer;
-import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.CapacityCrystal;
+import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
+import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
@@ -31,7 +33,6 @@ import com.romanvonklein.skullmagic.structurefeatures.DarkTowerFeature;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -45,7 +46,6 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -101,6 +101,8 @@ public class SkullMagic implements ModInitializer {
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static Block BlockPlacer = new BlockPlacer(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.ENDERMAN,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.SPIDER,
@@ -117,6 +119,7 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<BlockPlacerBlockEntity> BLOCK_PLACER_BLOCK_ENTITY;
 	public static BlockEntityType<SkullMagicSkullBlockEntity> SKULL_BLOCK_ENTITY;
 	public static BlockEntityType<CapacityCrystalBlockEntity> CAPACITY_CRYSTAL_BLOCK_ENTITY;
+	public static BlockEntityType<WitherEnergyChannelerBlockEntity> WITHER_ENERGY_CHANNELER_BLOCK_ENTITY;
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
@@ -136,6 +139,10 @@ public class SkullMagic implements ModInitializer {
 		Commands.registerCommands();
 
 		// register blockentities
+		WITHER_ENERGY_CHANNELER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+				MODID + ":wither_energy_channeler_block_entity",
+				FabricBlockEntityTypeBuilder.create(WitherEnergyChannelerBlockEntity::new, WitherEnergyChanneler)
+						.build(null));
 		CAPACITY_CRYSTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
 				MODID + ":capacity_crystal_block_entity",
 				FabricBlockEntityTypeBuilder.create(CapacityCrystalBlockEntity::new, CapacityCrystal).build(null));
@@ -155,10 +162,14 @@ public class SkullMagic implements ModInitializer {
 						SPIDER_HEAD_BLOCK, BLAZE_HEAD_BLOCK).build(null));
 
 		// register blocks
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "wither_energy_channeler"), WitherEnergyChanneler);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "wither_energy_channeler"),
+				new BlockItem(WitherEnergyChanneler, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "capacity_crystal"), CapacityCrystal);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "capacity_crystal"),
 				new BlockItem(CapacityCrystal, new FabricItemSettings().group(ItemGroup.MISC)));
-				
+
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "fire_cannon"), FireCannon);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "fire_cannon"),
 				new BlockItem(FireCannon, new FabricItemSettings().group(ItemGroup.MISC)));
