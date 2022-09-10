@@ -17,6 +17,18 @@
                 {
                     "type": "minecraft:item",
                     "name": "skullmagic:wolfpack_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:lapis_lazuli"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:redstone"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:diamond"
                 }
             ]
         },
@@ -29,7 +41,6 @@
                 }
             ]
         },
-        
         {
             "rolls": 1,
             "entries": [
