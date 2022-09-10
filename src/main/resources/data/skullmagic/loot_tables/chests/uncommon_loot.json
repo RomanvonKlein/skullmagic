@@ -28,6 +28,24 @@
                     "name": "skullmagic:chests/common_loot"
                 }
             ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "minecraft:chests/village/village_armorer"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "minecraft:chests/village/village_weaponsmith"
+                }
+            ]
         }
     ]
 }

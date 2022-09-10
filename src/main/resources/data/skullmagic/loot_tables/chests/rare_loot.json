@@ -13,6 +13,10 @@
                 {
                     "type": "minecraft:item",
                     "name": "skullmagic:teleport_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:shockwave_orb"
                 }
             ]
         },
