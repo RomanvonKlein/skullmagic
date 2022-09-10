@@ -7,6 +7,9 @@
         "skullmagic:capacity_crystal",
         "skullmagic:wither_energy_channeler",
         "skullmagic:block_placer",
-        "skullmagic:block_user"
+        "skullmagic:block_user",
+        "skullmagic:enderman_head",
+        "skullmagic:spider_head",
+        "skullmagic:blaze_head"
     ]
 }
