@@ -6,7 +6,7 @@
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "skullmagic:skull_altar"
+                    "name": "skullmagic:wither_energy_channeler"
                 }
             ],
             "conditions": [

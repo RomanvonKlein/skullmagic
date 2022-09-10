@@ -94,19 +94,19 @@ public class SkullMagic implements ModInitializer {
 
 	// blocks
 	public static final Block BLOCK_USER_BLOCK = new BlockUser(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static final Block CapacityCrystal = new CapacityCrystal(
-			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).nonOpaque());
 	public static final Block SkullPedestal = new SkullPedestal(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block SkullAltar = new SkullAltar(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block FireCannon = new FireCannon(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block BlockPlacer = new BlockPlacer(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.ENDERMAN,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.SPIDER,

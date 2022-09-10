@@ -1,6 +1,12 @@
 {
     "replace": false,
     "values": [
-        "skullmagic:skull_pedestal"
+        "skullmagic:skull_pedestal",
+        "skullmagic:skull_altar",
+        "skullmagic:fire_cannon",
+        "skullmagic:capacity_crystal",
+        "skullmagic:wither_energy_channeler",
+        "skullmagic:block_placer",
+        "skullmagic:block_user"
     ]
 }
