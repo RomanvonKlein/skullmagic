@@ -29,6 +29,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
@@ -208,8 +209,8 @@ public class SpellManager extends PersistentState {
                     HitResult result = player.raycast(100, 1, false);
                     if (result != null) {
                         Vec3d center = result.getPos();
-                        world.playSound(center.x, center.y, center.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT,
-                                SoundCategory.PLAYERS, 1.0f, 1.0f, true);
+                        world.playSound(null, new BlockPos(center),
+                                SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
                         player.teleport(center.x, center.y, center.z, true);
                         success = true;
                     }

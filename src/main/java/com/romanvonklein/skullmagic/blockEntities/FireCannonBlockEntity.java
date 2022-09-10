@@ -44,6 +44,8 @@ public class FireCannonBlockEntity extends AEssenceConsumer {
                         ent.setVelocity(new Vec3d(angle.getX(), angle.getY(), angle.getZ()));
                         world.spawnEntity(ent);
                         pool.discharge(be.essenceCost);
+                        world.playSound(null, new BlockPos(pos),
+                        SoundEvents.ENTITY_GHAST_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
                     } else {
                         SkullMagic.LOGGER.info("Insufficient essence in pool!");
                     }

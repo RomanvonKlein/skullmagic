@@ -1,8 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "WGW",
-    " X ",
+    " G ",
+    " W ",
     " X "
   ],
   "key": {
@@ -10,14 +10,14 @@
       "item": "minecraft:amethyst_shard"
     },
     "G": {
-      "item": "minecraft:nether_star"
+      "item": "minecraft:wither_skeleton_skull"
     },
     "X": {
       "item": "minecraft:iron_ingot"
     }
   },
   "result": {
-    "item": "skullmagic:capacity_crystal",
+    "item": "skullmagic:wither_energy_channeler",
     "count": 1
   }
 }

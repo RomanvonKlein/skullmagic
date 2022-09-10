@@ -52,8 +52,8 @@ public class WitherEnergyChannelerBlockEntity extends AEssenceConsumer {
                         if (skull != null) {
                             pool.discharge(essenceCost);
                             world.setBlockState(skull, Blocks.WITHER_SKELETON_SKULL.getDefaultState());
-                            world.playSound(skull.getX(), skull.getY(), skull.getZ(),
-                                    SoundEvents.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
+                            world.playSound(null, new BlockPos(pos),
+                                    SoundEvents.ENTITY_WITHER_SKELETON_DEATH, SoundCategory.BLOCKS, 1f, 1f);
                         }
                     }
                 }
