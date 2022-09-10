@@ -1,0 +1,60 @@
+{
+  "name": "skullmagic:end/dark_tower_end",
+  "fallback": "skullmagic:end/dark_tower_terminators_end",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_01",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_02",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_03",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_04",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_05",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_06",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    }
+  ]
+}

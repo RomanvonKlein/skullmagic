@@ -1,0 +1,15 @@
+{
+  "name": "skullmagic:end/dark_tower_end",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:end/dark_tower/dark_tower_top_01",
+        "projection": "rigid",
+        "processors": "skullmagic:test_endify"
+      }
+    }
+  ]
+}

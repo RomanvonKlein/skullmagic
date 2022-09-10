@@ -92,7 +92,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
             if (structurePoolFeatureConfig.getSize() <= 0) {
                 return;
             }
-            int boundaries = 160;
+            int boundaries = 240;
             Box box = new Box(i - boundaries, k - boundaries, j - boundaries, i + boundaries + 1, k + boundaries + 1, j + boundaries + 1);
             StructurePoolGenerator structurePoolGenerator = new StructurePoolGenerator(registry,
                     structurePoolFeatureConfig.getSize(), pieceFactory, chunkGenerator, structureManager, list,
