@@ -8,7 +8,7 @@
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_base",
         "projection": "rigid",
-        "processors": "minecraft:empty"
+        "processors": "skullmagic:stone_degradation"
       }
     }
   ]

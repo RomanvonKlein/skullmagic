@@ -83,7 +83,6 @@ public class SkullMagicSkullBlockEntityRenderer
         if (direction == null) {
             matrices.translate(0.5, 0.0, 0.5);
         } else {
-            float f = 0.25f;
             matrices.translate(0.5f - (float) direction.getOffsetX() * 0.25f, 0.25,
                     0.5f - (float) direction.getOffsetZ() * 0.25f);
         }

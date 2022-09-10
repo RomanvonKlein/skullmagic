@@ -6,8 +6,7 @@
   "mixins": [
     "SkullMagicMixin",
     "EntityMixin",
-    "PlaceBlockMixin",
-    "StructurePoolFeatureConfigMixin"
+    "PlaceBlockMixin"
   ],
   "client": [],
   "injectors": {
