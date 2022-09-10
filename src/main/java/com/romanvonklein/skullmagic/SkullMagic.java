@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.romanvonklein.skullmagic.blockEntities.BlockPlacerBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.BlockUserBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.CapacityCrystalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
@@ -15,6 +16,7 @@ import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.WitherEnergyChannelerBlockEntity;
 import com.romanvonklein.skullmagic.blocks.BlockPlacer;
+import com.romanvonklein.skullmagic.blocks.BlockUser;
 import com.romanvonklein.skullmagic.blocks.CapacityCrystal;
 import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
@@ -91,6 +93,8 @@ public class SkullMagic implements ModInitializer {
 			new DarkTowerFeature(SKULLMAGIC_CODEC));
 
 	// blocks
+	public static final Block BLOCK_USER_BLOCK = new BlockUser(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool().nonOpaque());
 	public static final Block CapacityCrystal = new CapacityCrystal(
 			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).requiresTool().nonOpaque());
 	public static final Block SkullPedestal = new SkullPedestal(
@@ -120,6 +124,7 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<SkullMagicSkullBlockEntity> SKULL_BLOCK_ENTITY;
 	public static BlockEntityType<CapacityCrystalBlockEntity> CAPACITY_CRYSTAL_BLOCK_ENTITY;
 	public static BlockEntityType<WitherEnergyChannelerBlockEntity> WITHER_ENERGY_CHANNELER_BLOCK_ENTITY;
+	public static BlockEntityType<BlockUserBlockEntity> BLOCK_USER_BLOCK_ENTITY;
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
@@ -143,6 +148,9 @@ public class SkullMagic implements ModInitializer {
 				MODID + ":wither_energy_channeler_block_entity",
 				FabricBlockEntityTypeBuilder.create(WitherEnergyChannelerBlockEntity::new, WitherEnergyChanneler)
 						.build(null));
+		BLOCK_USER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+				MODID + ":block_user_block_entity",
+				FabricBlockEntityTypeBuilder.create(BlockUserBlockEntity::new, BLOCK_USER_BLOCK).build(null));
 		CAPACITY_CRYSTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
 				MODID + ":capacity_crystal_block_entity",
 				FabricBlockEntityTypeBuilder.create(CapacityCrystalBlockEntity::new, CapacityCrystal).build(null));
@@ -162,6 +170,9 @@ public class SkullMagic implements ModInitializer {
 						SPIDER_HEAD_BLOCK, BLAZE_HEAD_BLOCK).build(null));
 
 		// register blocks
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "block_user"), BLOCK_USER_BLOCK);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "block_user"),
+				new BlockItem(BLOCK_USER_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "wither_energy_channeler"), WitherEnergyChanneler);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "wither_energy_channeler"),
 				new BlockItem(WitherEnergyChanneler, new FabricItemSettings().group(ItemGroup.MISC)));

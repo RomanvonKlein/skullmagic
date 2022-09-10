@@ -2,6 +2,8 @@ package com.romanvonklein.skullmagic.blocks;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
+import com.romanvonklein.skullmagic.essence.EssenceManager;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -18,6 +20,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 //TODO: does this even need to still be a blockentity
 public class SkullAltar extends BlockWithEntity {
@@ -67,5 +70,11 @@ public class SkullAltar extends BlockWithEntity {
         if (!world.isClient) {
             SkullMagic.essenceManager.removeSkullAltar(world, pos);
         }
+    }
+
+    @Override
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        SkullMagic.essenceManager.removeSkullAltar(world, pos);
+        super.onDestroyedByExplosion(world, pos, explosion);
     }
 }

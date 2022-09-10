@@ -11,6 +11,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 public abstract class AConsumerBlock extends BlockWithEntity {
 
@@ -38,6 +39,14 @@ public abstract class AConsumerBlock extends BlockWithEntity {
                 world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE,
                         SoundCategory.BLOCKS, 1.0f, 1.0f, true);
             }
+        }
+    }
+
+    @Override
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        super.onDestroyedByExplosion(world, pos, explosion);
+        if (!world.isClient) {
+            SkullMagic.essenceManager.removeConsumer(world.getRegistryKey(), pos);
         }
     }
 }

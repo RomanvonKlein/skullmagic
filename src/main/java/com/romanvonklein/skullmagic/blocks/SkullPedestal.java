@@ -17,6 +17,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 public class SkullPedestal extends BlockWithEntity {
     public static final BooleanProperty CONNECTED = BooleanProperty.of("connected");
@@ -25,10 +26,9 @@ public class SkullPedestal extends BlockWithEntity {
 
     public SkullPedestal(Settings settings) {
         super(settings);
-        //TODO: is this state even used anymore?
+        // TODO: is this state even used anymore?
         setDefaultState(getStateManager().getDefaultState().with(CONNECTED, false));
     }
-    
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -58,8 +58,15 @@ public class SkullPedestal extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.LOGGER.info("Broke a Skull Pedestal.");
             SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos);
         }
+    }
+
+    @Override
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        if (!world.isClient) {
+            SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos);
+        }
+        super.onDestroyedByExplosion(world, pos, explosion);
     }
 }

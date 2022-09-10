@@ -17,6 +17,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 public class CapacityCrystal extends BlockWithEntity {
     public static final BooleanProperty CONNECTED = BooleanProperty.of("connected");
@@ -60,5 +61,11 @@ public class CapacityCrystal extends BlockWithEntity {
         if (!world.isClient && placer != null) {
             SkullMagic.essenceManager.tryAddCapacityCrystal(world.getRegistryKey(), pos, placer.getUuid());
         }
+    }
+
+    @Override
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        SkullMagic.essenceManager.removeCapacityCrystal(world.getRegistryKey(), pos);
+        super.onDestroyedByExplosion(world, pos, explosion);
     }
 }
