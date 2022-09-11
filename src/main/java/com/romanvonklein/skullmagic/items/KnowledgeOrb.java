@@ -40,7 +40,7 @@ public class KnowledgeOrb extends Item {
         TypedActionResult<ItemStack> result = super.use(world, user, hand);
         // should the itemstack be checked first??
         if (!world.isClient) {
-            if (SkullMagic.spellManager.learnSpell((ServerPlayerEntity) user, this.spellName)) {
+            if (SkullMagic.spellManager.learnSpell((ServerPlayerEntity) user, this.spellName, false)) {
                 result = new TypedActionResult<ItemStack>(ActionResult.SUCCESS, ItemStack.EMPTY);
 
                 world.playSound(null, new BlockPos(user.getBlockX(), user.getBlockY(), user.getBlockZ()),

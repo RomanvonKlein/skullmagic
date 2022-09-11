@@ -72,10 +72,10 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "meteoritestorm",
-                new Spell(100, 100, 40, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(500, 600, 45, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
-                        int meteoriteCount = 100;
+                        int meteoriteCount = 40;
                         int minPower = 1;
                         int maxPower = 5;
                         int height = 256;
@@ -391,22 +391,28 @@ public class SpellManager extends PersistentState {
         return spmngr;
     }
 
-    public boolean learnSpell(ServerPlayerEntity player, String spellname) {
+    public boolean learnSpell(ServerPlayerEntity player, String spellname, boolean force) {
         UUID playerID = player.getUuid();
         boolean success = false;
         if (this.availableSpells.containsKey(playerID) && SpellDict.containsKey(spellname)
                 && !this.availableSpells.get(playerID).containsKey(spellname)) {
             // check player level and deduct if sufficient
-            int spellcost = SpellManager.getLevelCost(spellname);
-            if (player.experienceLevel >= spellcost) {
-                // player.getServer().level
-                player.addExperienceLevels(-spellcost);
+            if (force) {
                 this.availableSpells.get(playerID).put(spellname, 0);
                 ServerPackageSender.sendUpdateSpellListPackage(player);
                 success = true;
             } else {
-                player.sendMessage(new TranslatableText("skullmagic.message.missing_required_level")
-                        .append(Integer.toString(spellcost)), true);
+                int spellcost = SpellManager.getLevelCost(spellname);
+                if (player.experienceLevel >= spellcost) {
+                    // player.getServer().level
+                    player.addExperienceLevels(-spellcost);
+                    this.availableSpells.get(playerID).put(spellname, 0);
+                    ServerPackageSender.sendUpdateSpellListPackage(player);
+                    success = true;
+                } else {
+                    player.sendMessage(new TranslatableText("skullmagic.message.missing_required_level")
+                            .append(Integer.toString(spellcost)), true);
+                }
             }
         }
         return success;
