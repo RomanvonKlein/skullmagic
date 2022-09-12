@@ -302,7 +302,7 @@ public class SpellManager extends PersistentState {
             World world) {
         boolean success = false;
         if (SpellDict.containsKey(spellName)) {
-            UUID playerID = player.getUuid();
+            UUID playerID = player.getGameProfile().getId();
             if (availableSpells.containsKey(playerID)
                     && availableSpells.get(playerID).containsKey(spellName)) {
                 if (availableSpells.get(playerID).get(spellName) <= 0) {
@@ -338,7 +338,8 @@ public class SpellManager extends PersistentState {
             availableSpells.keySet().forEach((uuid) -> {
                 for (ServerWorld world : server.getWorlds()) {
                     ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(uuid);
-                    if (player != null && SkullMagic.essenceManager.playerHasEssencePool(player.getUuid())) {
+                    if (player != null
+                            && SkullMagic.essenceManager.playerHasEssencePool(player.getGameProfile().getId())) {
                         ServerPackageSender.sendUpdateSpellListPackage(player);
                         break;
                     }
@@ -353,10 +354,10 @@ public class SpellManager extends PersistentState {
      * @param player
      */
     public void playerJoined(ServerPlayerEntity player) {
-        if (!this.availableSpells.containsKey(player.getUuid())) {
-            this.availableSpells.put(player.getUuid(), new HashMap<>());
+        if (!this.availableSpells.containsKey(player.getGameProfile().getId())) {
+            this.availableSpells.put(player.getGameProfile().getId(), new HashMap<>());
             for (String spellname : Config.getConfig().defaultSpells) {
-                this.availableSpells.get(player.getUuid()).put(spellname, 0);
+                this.availableSpells.get(player.getGameProfile().getId()).put(spellname, 0);
             }
         }
         ServerPackageSender.sendUpdateSpellListPackage(player);
@@ -392,7 +393,7 @@ public class SpellManager extends PersistentState {
     }
 
     public boolean learnSpell(ServerPlayerEntity player, String spellname, boolean force) {
-        UUID playerID = player.getUuid();
+        UUID playerID = player.getGameProfile().getId();
         boolean success = false;
         if (this.availableSpells.containsKey(playerID) && SpellDict.containsKey(spellname)
                 && !this.availableSpells.get(playerID).containsKey(spellname)) {

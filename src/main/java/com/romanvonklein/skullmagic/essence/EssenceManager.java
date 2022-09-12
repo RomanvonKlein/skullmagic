@@ -231,7 +231,7 @@ public class EssenceManager extends PersistentState {
     public void trySetLinkedPlayer(PlayerEntity player, BlockPos pos) {
         if (!player.world.isClient) {
 
-            UUID playerID = player.getUuid();
+            UUID playerID = player.getGameProfile().getId();
             RegistryKey<World> key = player.getWorld().getRegistryKey();
             if (!(this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos))) {
                 SkullMagic.LOGGER.debug("no valid mana pool was found for skullaltar. Creating one.");

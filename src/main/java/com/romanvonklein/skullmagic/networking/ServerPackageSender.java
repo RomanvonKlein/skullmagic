@@ -12,7 +12,7 @@ public class ServerPackageSender {
         StringBuilder builder = new StringBuilder();
         PacketByteBuf buf = PacketByteBufs.create();
         // String msg = "";
-        SkullMagic.spellManager.availableSpells.get(player.getUuid()).entrySet().forEach((entry) -> {
+        SkullMagic.spellManager.availableSpells.get(player.getGameProfile().getId()).entrySet().forEach((entry) -> {
             String appendix = entry.getKey() + ":" + Integer.toString(entry.getValue()) + ";";
             builder.append(appendix);
         });

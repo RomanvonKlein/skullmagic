@@ -3,7 +3,6 @@ package com.romanvonklein.skullmagic.networking;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
-import com.romanvonklein.skullmagic.spells.ClientSpellManager;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

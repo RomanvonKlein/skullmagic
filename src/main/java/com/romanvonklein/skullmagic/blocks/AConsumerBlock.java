@@ -7,6 +7,7 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +33,8 @@ public abstract class AConsumerBlock extends BlockWithEntity {
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
         if (!world.isClient) {
-            if (SkullMagic.essenceManager.addConsumer(world.getRegistryKey(), pos, placer.getUuid())) {
+            if ((placer instanceof ServerPlayerEntity) && SkullMagic.essenceManager.addConsumer(world.getRegistryKey(),
+                    pos, ((ServerPlayerEntity) placer).getGameProfile().getId())) {
                 world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE,
                         SoundCategory.BLOCKS, 1.0f, 1.0f, true);
             } else {

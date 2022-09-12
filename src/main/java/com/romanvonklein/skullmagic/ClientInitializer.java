@@ -1,11 +1,9 @@
 package com.romanvonklein.skullmagic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Map.Entry;
 
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.entities.EffectBall;
@@ -18,7 +16,6 @@ import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
-import com.romanvonklein.skullmagic.spells.Spell;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.fabricmc.api.ClientModInitializer;

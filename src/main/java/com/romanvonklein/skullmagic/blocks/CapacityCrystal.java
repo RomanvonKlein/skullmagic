@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -58,8 +59,9 @@ public class CapacityCrystal extends BlockWithEntity {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        if (!world.isClient && placer != null) {
-            SkullMagic.essenceManager.tryAddCapacityCrystal(world.getRegistryKey(), pos, placer.getUuid());
+        if (!world.isClient && placer != null && placer instanceof ServerPlayerEntity) {
+            SkullMagic.essenceManager.tryAddCapacityCrystal(world.getRegistryKey(), pos,
+                    ((ServerPlayerEntity) placer).getGameProfile().getId());
         }
     }
 
