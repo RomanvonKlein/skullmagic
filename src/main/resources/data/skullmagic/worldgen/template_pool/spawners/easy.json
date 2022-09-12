@@ -1,6 +1,6 @@
 {
   "name": "skullmagic:spawners/easy",
-  "fallback": "minecraft:empty",
+  "fallback": "skullmagic:spawners/easy",
   "elements": [
     {
       "weight": 1,

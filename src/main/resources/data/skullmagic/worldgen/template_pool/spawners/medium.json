@@ -1,6 +1,6 @@
 {
   "name": "skullmagic:spawners/medium",
-  "fallback": "minecraft:empty",
+  "fallback": "skullmagic:spawners/medium",
   "elements": [
     {
       "weight": 1,

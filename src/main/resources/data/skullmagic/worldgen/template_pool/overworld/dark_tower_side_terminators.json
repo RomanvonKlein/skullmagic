@@ -1,6 +1,6 @@
 {
   "name": "skullmagic:overworld/dark_tower_side_terminators",
-  "fallback": "minecraft:empty",
+  "fallback": "skullmagic:overworld/dark_tower_side_terminators",
   "elements": [
     {
       "weight": 1,
@@ -12,7 +12,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_side_02",
