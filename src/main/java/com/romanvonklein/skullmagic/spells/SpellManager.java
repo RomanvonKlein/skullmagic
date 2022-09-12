@@ -298,6 +298,11 @@ public class SpellManager extends PersistentState {
         return spellList;
     }
 
+    @Override
+    public boolean isDirty() {
+        return true;
+    }
+
     public boolean castSpell(String spellName, ServerPlayerEntity player,
             World world) {
         boolean success = false;
