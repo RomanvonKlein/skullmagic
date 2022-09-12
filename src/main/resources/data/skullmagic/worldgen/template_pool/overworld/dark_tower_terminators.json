@@ -1,6 +1,6 @@
 {
   "name": "skullmagic:overworld/dark_tower",
-  "fallback": "minecraft:empty",
+  "fallback": "skullmagic:overworld/dark_tower_terminators",
   "elements": [
     {
       "weight": 1,

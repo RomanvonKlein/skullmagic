@@ -2,9 +2,9 @@
   "type": "skullmagic:dark_tower",
   "config": {
     "start_pool": "skullmagic:overworld/dark_tower_base",
-    "size": 10
+    "size": 11
   },
-  "biomes": "#minecraft:has_structure/mineshaft",
+  "biomes": "#minecraft:is_forest",
   "adapt_noise": true,
   "spawn_overrides": {}
 }

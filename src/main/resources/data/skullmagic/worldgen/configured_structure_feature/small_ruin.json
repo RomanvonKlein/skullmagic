@@ -4,7 +4,7 @@
     "start_pool": "skullmagic:overworld/altar",
     "size": 3
   },
-  "biomes": "#minecraft:has_structure/mineshaft",
+  "biomes": "#c:plains",
   "adapt_noise": true,
   "spawn_overrides": {}
 }

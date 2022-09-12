@@ -3,7 +3,7 @@
   "fallback": "skullmagic:overworld/dark_tower_terminators",
   "elements": [
     {
-      "weight": 2,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_01",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_02",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_03",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_05",
@@ -48,10 +48,28 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_06",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_07",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_08",
         "projection": "rigid",
         "processors": "skullmagic:stone_degradation"
       }

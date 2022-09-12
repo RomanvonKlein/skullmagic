@@ -1,0 +1,24 @@
+{
+  "name": "skullmagic:overworld/dark_tower_side_terminators",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_side_01",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_side_02",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    }
+  ]
+}
