@@ -2,7 +2,6 @@ package com.romanvonklein.skullmagic.blocks;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
-import com.romanvonklein.skullmagic.essence.EssenceManager;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;

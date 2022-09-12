@@ -1,8 +1,11 @@
 package com.romanvonklein.skullmagic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Map.Entry;
 
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.entities.EffectBall;
@@ -15,6 +18,8 @@ import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
 import com.romanvonklein.skullmagic.spells.ClientSpellManager;
+import com.romanvonklein.skullmagic.spells.Spell;
+import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -37,6 +42,9 @@ public class ClientInitializer implements ClientModInitializer {
     // keybindings
     private static KeyBinding primarySpellKeyBinding;
     private static KeyBinding cycleSpellKeyBinding;
+
+    private static HashMap<String, KeyBinding> spellKeyBindings = new HashMap<String, KeyBinding>();
+
     private static ClientEssenceManager clientEssenceManager;
     private static ClientSpellManager clientSpellManager;
 
@@ -55,17 +63,23 @@ public class ClientInitializer implements ClientModInitializer {
     public void onInitializeClient() {
         // keybinds
         primarySpellKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.skullmagic.primary", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_R, // The keycode of the key
-                "category.skullmagic.spells" // The translation key of the keybinding's category.
-        ));
+                "key.skullmagic.primary",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_R,
+                "category.skullmagic.spells"));
         cycleSpellKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.skullmagic.cycle", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_G, // The keycode of the key
-                "category.skullmagic.spells" // The translation key of the keybinding's category.
-        ));
+                "key.skullmagic.cycle",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
+                "category.skullmagic.spells"));
+        // register all spell keybinds (set to none by default)
+        for (String spellName : SpellManager.SpellDict.keySet()) {
+            spellKeyBindings.put(spellName, KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                    "key.skullmagic." + spellName,
+                    InputUtil.Type.KEYSYM,
+                    GLFW.GLFW_KEY_UNKNOWN,
+                    "category.skullmagic.spells")));
+        }
 
         // register action for keybind
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -74,6 +88,11 @@ public class ClientInitializer implements ClientModInitializer {
             }
             while (cycleSpellKeyBinding.wasPressed()) {
                 clientSpellManager.cycleSpell();
+            }
+            for (Entry<String, KeyBinding> spellEntry : spellKeyBindings.entrySet()) {
+                while (spellEntry.getValue().wasPressed()) {
+                    ClientPackageSender.sendCastSpellPackage(spellEntry.getKey());
+                }
             }
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
