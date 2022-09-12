@@ -116,13 +116,32 @@ public class EssenceStatus {
                                                         y - 1, color);
                                 }
 
-                                // icon
-                                if (ClientInitializer.SPELL_ICONS.containsKey(ClientInitializer
-                                                .getClientSpellManager().selectedSpellName)) {
+                                String selectedSpellName = ClientInitializer.getClientSpellManager().selectedSpellName;
+                                String nextSpellName = ClientInitializer.getClientSpellManager().getNextSpellname();
+                                String prevSpellName = ClientInitializer.getClientSpellManager().getPrevSpellname();
+
+                                // icons
+                                // previous
+                                if (ClientInitializer.SPELL_ICONS.containsKey(prevSpellName)) {
+                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth - iconWidth / 2,
+                                                        y - borderwidth - iconWidth / 2,
+                                                        iconWidth,
+                                                        iconWidth, ClientInitializer.SPELL_ICONS.get(prevSpellName));
+                                }
+                                // next
+                                if (ClientInitializer.SPELL_ICONS.containsKey(nextSpellName)) {
+                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth - iconWidth / 2,
+                                                        y - borderwidth + iconWidth / 2,
+                                                        iconWidth,
+                                                        iconWidth,
+                                                        ClientInitializer.SPELL_ICONS.get(nextSpellName));
+                                }
+                                // current
+                                if (ClientInitializer.SPELL_ICONS.containsKey(selectedSpellName)) {
                                         drawTextureRect(matrixStack, x - iconWidth - borderwidth, y - borderwidth,
                                                         iconWidth,
-                                                        iconWidth, ClientInitializer.SPELL_ICONS.get(ClientInitializer
-                                                                        .getClientSpellManager().selectedSpellName));
+                                                        iconWidth,
+                                                        ClientInitializer.SPELL_ICONS.get(selectedSpellName));
                                 }
 
                         }

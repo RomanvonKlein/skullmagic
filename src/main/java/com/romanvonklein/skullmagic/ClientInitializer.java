@@ -36,6 +36,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ClientInitializer implements ClientModInitializer {
@@ -88,6 +89,7 @@ public class ClientInitializer implements ClientModInitializer {
             }
             while (cycleSpellKeyBinding.wasPressed()) {
                 clientSpellManager.cycleSpell();
+                client.player.sendMessage(Text.of(clientSpellManager.selectedSpellName), true);
             }
             for (Entry<String, KeyBinding> spellEntry : spellKeyBindings.entrySet()) {
                 while (spellEntry.getValue().wasPressed()) {

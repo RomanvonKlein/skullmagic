@@ -3,6 +3,7 @@ package com.romanvonklein.skullmagic.networking;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
+import com.romanvonklein.skullmagic.spells.ClientSpellManager;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -40,12 +41,8 @@ public class ClientPackageReceiver {
         ClientInitializer.getClientSpellManager().spellList.clear();
         if (buf.isReadable(1)) {
             String msgString = buf.readString();
-            for (String valuePair : msgString.split(";")) {
-                String[] parts = valuePair.split(":");
-                if (parts.length > 1) {
-                    ClientInitializer.getClientSpellManager().spellList.put(parts[0], Integer.parseInt(parts[1]));
-                }
-            }
+            ClientInitializer.getClientSpellManager().loadSpells(msgString);
+            
         }
     }
 }

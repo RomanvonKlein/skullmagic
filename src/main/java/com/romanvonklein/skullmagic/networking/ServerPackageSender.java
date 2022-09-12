@@ -18,7 +18,6 @@ public class ServerPackageSender {
         });
         String result = builder.toString();
         buf.writeString(result);
-        SkullMagic.LOGGER.info("Player connected with spells: " + result);
         ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_SPELL_LIST, buf);
     }
 }
