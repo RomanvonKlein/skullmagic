@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 public class EffectBall extends AbstractFireballEntity {
     private float radius;
     private StatusEffect effect;
+    private int power;
 
     public EffectBall(EntityType<? extends AbstractFireballEntity> type, World world) {
         super(type, world);
@@ -26,17 +27,18 @@ public class EffectBall extends AbstractFireballEntity {
     }
 
     private EffectBall(World world, LivingEntity owner, double velocityX, double velocityY, double velocityZ,
-            StatusEffect effect, float radius) {
+            StatusEffect effect, float radius, int power) {
         super((EntityType<? extends AbstractFireballEntity>) SkullMagic.EFFECT_BALL, owner, velocityX, velocityY,
                 velocityZ, world);
         this.radius = radius;
         this.effect = effect;
+        this.power = power;
     }
 
     public static EffectBall createEffectBall(World world, LivingEntity owner, double velocityX, double velocityY,
             double velocityZ,
-            StatusEffect effect, float radius) {
-        return new EffectBall(world, owner, velocityX, velocityY, velocityZ, effect, radius);
+            StatusEffect effect, float radius, int power) {
+        return new EffectBall(world, owner, velocityX, velocityY, velocityZ, effect, radius, power);
     }
 
     public void setEffect(StatusEffect effect) {
@@ -79,7 +81,7 @@ public class EffectBall extends AbstractFireballEntity {
             areaEffectCloudEntity.setDuration(400);
             areaEffectCloudEntity
                     .setRadiusGrowth(-areaEffectCloudEntity.getRadius() / (float) areaEffectCloudEntity.getDuration());
-            areaEffectCloudEntity.addEffect(new StatusEffectInstance(effect, 400, 1));
+            areaEffectCloudEntity.addEffect(new StatusEffectInstance(effect, 400, this.power));
             this.world.spawnEntity(areaEffectCloudEntity);
         }
     }

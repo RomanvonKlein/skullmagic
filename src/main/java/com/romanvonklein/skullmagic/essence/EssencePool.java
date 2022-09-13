@@ -146,7 +146,6 @@ public class EssencePool extends PersistentState {
         pool.position = new BlockPos(x, y, z);
         NbtCompound pedestalList = tag.getCompound("linkedPedestals");
         pedestalList.getKeys().forEach((shortString) -> {
-            // TODO: make this an int array for multiple values in skulls
             pool.linkedPedestals.put(Parsing.shortStringToBlockPos(shortString), pedestalList.getString(shortString));
         });
         NbtCompound linkedConsumersList = tag.getCompound("linkedConsumers");
@@ -157,7 +156,6 @@ public class EssencePool extends PersistentState {
     }
 
     public void removePedestal(BlockPos pos) {
-        // TODO: add more fields other than essencechargerate here...
         int lostChargeRate = Config.getConfig().skulls.get(this.linkedPedestals.get(pos));
         SkullMagic.LOGGER.info("Removing " + lostChargeRate + "from essence pool.");
         this.essenceChargeRate -= lostChargeRate;
@@ -165,7 +163,6 @@ public class EssencePool extends PersistentState {
     }
 
     public void linkPedestal(BlockPos pedestalPos, String skullIdentifier) {
-        // TODO: add more fields other than essencechargerate here...
         int addChargeRate = Config.getConfig().skulls.get(skullIdentifier);
         this.essenceChargeRate += addChargeRate;
         this.linkedPedestals.put(pedestalPos, skullIdentifier);

@@ -1,7 +1,6 @@
 package com.romanvonklein.skullmagic.spells;
 
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.command.argument.NbtElementArgumentType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
 

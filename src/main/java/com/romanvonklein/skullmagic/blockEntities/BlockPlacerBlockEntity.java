@@ -48,7 +48,6 @@ public class BlockPlacerBlockEntity extends BlockEntity
 
     public static void tick(World world, BlockPos pos, BlockState state, BlockPlacerBlockEntity be) {
         if (!world.isClient) {
-            // TODO: move this to abstract base class, similar to spells?
             int power = world.getReceivedRedstonePower(pos);
             if (power > 0 && be.lastTickRedstonePower == 0) {
                 EssencePool pool = SkullMagic.essenceManager.getEssencePoolForConsumer(world.getRegistryKey(), pos);

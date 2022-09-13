@@ -20,7 +20,6 @@ public class BlockUserBlockEntity extends AEssenceConsumer {
 
     private int lastTickRedstonePower = 0;
     private static int essenceCost = 150;
-    private static final int range = 1;
 
     public BlockUserBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.BLOCK_USER_BLOCK_ENTITY, pos, state);
@@ -39,7 +38,6 @@ public class BlockUserBlockEntity extends AEssenceConsumer {
                             target = state.get(Properties.FACING);
                         }
                         BlockPos targetPos = new BlockPos(pos.add(target.getVector()));
-                        // TODO: is this safe?
                         BlockState targetState = world.getBlockState(targetPos);
                         if (!targetState.equals(Blocks.AIR.getDefaultState())) {
                             BlockHitResult hit = new BlockHitResult(

@@ -2,7 +2,6 @@ package com.romanvonklein.skullmagic.commands;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -86,6 +85,7 @@ public class DebugCommands {
         }
 
         private static int output(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+                //TODO: also output spellManager data
                 SkullMagic.LOGGER.info("debugging command executed");
                 String jsonString = SkullMagic.essenceManager.toJsonString();
                 String dir = "./debug/";

@@ -9,11 +9,9 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.world.World;
 
 public class BlockPlacerScreenHandler extends ScreenHandler {
     private Inventory inventory;
-    private World world;
 
     public BlockPlacerScreenHandler(int syncId, PlayerInventory inv) {
         this(syncId, inv, new SimpleInventory(9));
@@ -23,7 +21,6 @@ public class BlockPlacerScreenHandler extends ScreenHandler {
         super(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, syncId);
         checkSize(inv, 3);
         this.inventory = inv;
-        this.world = playerInventory.player.world;
         inventory.onOpen(playerInventory.player);
 
         // Our Slots

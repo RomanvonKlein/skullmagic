@@ -44,23 +44,6 @@ public class PlaceBlockMixin {
         }
     }
 
-    // @Inject(at = @At("HEAD"), method =
-    // "onDestroyedByExplosion(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/explosion/Explosion;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V",
-    // cancellable = true)
-    // public void onDestroyedByExplosion(World world, BlockPos pos, Explosion
-    // explosion, CallbackInfo info) {
-    // /*
-    // * TODO: make use of this
-    // * SkullMagic.LOGGER.info(((BlockInvoker) this).toString() +
-    // * " destroyed by explosion!");
-    // */
-    // }
-
-    /*
-     * public void onBreak(net.minecraft.world.World world,
-     * net.minecraft.util.math.BlockPos pos, net.minecraft.block.BlockState state,
-     * net.minecraft.entity.player.PlayerEntity player)
-     */
     @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable = true)
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
         if (!world.isClient) {

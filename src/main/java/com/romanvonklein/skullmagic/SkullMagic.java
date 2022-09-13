@@ -246,9 +246,6 @@ public class SkullMagic implements ModInitializer {
 			spellManager.playerJoined(serverPlayNetworkHandler.player);
 		});
 
-		// TODO: this only applies when the altar is broken by a player - other events
-		// isnt this double? as its also in the onBreak methods of the blocks?
-		// (explosions, ...) might cause trouble
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
 			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
 				// broke a skullAltar
