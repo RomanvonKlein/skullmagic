@@ -2,6 +2,7 @@ package com.romanvonklein.skullmagic.commands;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -56,6 +57,32 @@ public class DebugCommands {
                                                                                                 StringArgumentType
                                                                                                                 .getString(context,
                                                                                                                                 "spellname")))))));
+                // learnall
+                commandDispatcher.register(CommandManager.literal("skullmagic")
+                                .then(CommandManager.literal("learnall").then(CommandManager
+                                                .argument("playername",
+                                                                StringArgumentType
+                                                                                .word())
+                                                .suggests((context, builder) -> CommandSource
+                                                                .suggestMatching(
+                                                                                ((ServerCommandSource) context
+                                                                                                .getSource())
+                                                                                                .getServer()
+                                                                                                .getPlayerManager()
+                                                                                                .getPlayerNames(),
+                                                                                builder))
+                                                .executes(
+                                                                (context) -> DebugCommands.learnAllSpellsForPlayer(
+                                                                                context, StringArgumentType
+                                                                                                .getString(context,
+                                                                                                                "playername"))))));
+        }
+
+        private static int learnAllSpellsForPlayer(CommandContext<ServerCommandSource> context, String playername) {
+                ServerCommandSource src = context.getSource();
+                SkullMagic.spellManager
+                                .learnAllSpellsForPlayer(src.getServer().getPlayerManager().getPlayer(playername));
+                return 1;
         }
 
         private static int output(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

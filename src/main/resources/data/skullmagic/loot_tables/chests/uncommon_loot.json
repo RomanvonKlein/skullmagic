@@ -16,6 +16,10 @@
                 },
                 {
                     "type": "minecraft:item",
+                    "name": "skullmagic:lightningstrike_orb"
+                },
+                {
+                    "type": "minecraft:item",
                     "name": "skullmagic:wolfpack_orb"
                 },
                 {

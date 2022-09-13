@@ -19,6 +19,7 @@ import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.WolfEntity;
@@ -72,7 +73,7 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "meteoritestorm",
-                new Spell(500, 600, 45, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(650, 600, 45, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
                         int meteoriteCount = 40;
@@ -281,20 +282,71 @@ public class SpellManager extends PersistentState {
                         }
                         return true;
                     }
-                }));/*
-                     * ,
-                     * "invisibility",
-                     * new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
-                     * Boolean>() {
-                     * 
-                     * @Override
-                     * public Boolean apply(ServerPlayerEntity player, World world, EssencePool
-                     * altar) {
-                     * 
-                     * return false;
-                     * }
-                     * })
-                     */
+                }));
+        spellList.put("lightningstrike",
+                new Spell(150, 100, 20, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                        HitResult result = player.raycast(100, 1, false);
+                        if (result != null) {
+                            Vec3d center = result.getPos();
+                            LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
+                            bolt.setPos(center.x, center.y, center.z);
+                            world.spawnEntity(bolt);
+                        }
+                        return true;
+                    }
+                }));
+        spellList.put("lightningstorm",
+                new Spell(500, 450, 40, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                        int lightningCount = 60;
+                        int minPower = 1;
+                        int maxPower = 5;
+                        int radius = 7;
+                        int maxDelay = 40;
+                        // TODO: way too strong. i love it
+                        HitResult result = player.raycast(100, 1, false);
+                        if (result != null) {
+                            Vec3d center = result.getPos();
+                            Vec3f angle = Direction.DOWN.getUnitVector();
+                            Random rand = new Random();
+                            for (int i = 0; i < lightningCount; i++) {
+                                DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
+                                        rand.nextInt(0, maxDelay),
+                                        new TriFunction<Object[], Object, Object, Boolean>() {
+                                            @Override
+                                            public Boolean apply(Object[] data, Object n1, Object n2) {
+                                                LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,
+                                                        world);
+                                                bolt.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
+                                                        center.y, center.z - radius + 2 * rand.nextFloat() * radius);
+                                                bolt.setVelocity(0, -15, 0);
+                                                world.spawnEntity(bolt);
+                                                return true;
+                                            }
+                                        }, null);
+                                SkullMagic.taskManager.queueTask(tsk);
+                            }
+                        }
+                        return true;
+                    }
+                }));
+        /*
+         * ,
+         * "invisibility",
+         * new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
+         * Boolean>() {
+         * 
+         * @Override
+         * public Boolean apply(ServerPlayerEntity player, World world, EssencePool
+         * altar) {
+         * 
+         * return false;
+         * }
+         * })
+         */
         return spellList;
     }
 
@@ -430,5 +482,12 @@ public class SpellManager extends PersistentState {
             result = SpellDict.get(spellName).learnLevelCost;
         }
         return result;
+    }
+
+    public void learnAllSpellsForPlayer(ServerPlayerEntity player) {
+        for (String spellname : SpellDict.keySet()) {
+
+            learnSpell(player, spellname, true);
+        }
     }
 }
