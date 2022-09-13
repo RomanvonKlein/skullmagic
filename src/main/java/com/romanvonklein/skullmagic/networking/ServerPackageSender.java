@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic.networking;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.spells.PlayerSpellData;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -13,7 +14,8 @@ public class ServerPackageSender {
         PacketByteBuf buf = PacketByteBufs.create();
         // String msg = "";
         SkullMagic.spellManager.availableSpells.get(player.getGameProfile().getId()).entrySet().forEach((entry) -> {
-            String appendix = entry.getKey() + ":" + Integer.toString(entry.getValue()) + ";";
+            PlayerSpellData spellData = entry.getValue();
+            String appendix = entry.getKey() + ":" + Integer.toString(spellData.cooldownLeft) + ";";
             builder.append(appendix);
         });
         String result = builder.toString();

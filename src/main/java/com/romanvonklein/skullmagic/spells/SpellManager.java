@@ -43,7 +43,7 @@ import net.minecraft.world.World;
 public class SpellManager extends PersistentState {
     private int cooldownIntervall = 10;
     private int remainingCooldown = cooldownIntervall;
-    public Map<UUID, Map<String, Integer>> availableSpells = new HashMap<>();
+    public Map<UUID, Map<String, PlayerSpellData>> availableSpells = new HashMap<>();
 
     public static Map<String, ? extends Spell> SpellDict = initSpells();
 
@@ -51,11 +51,12 @@ public class SpellManager extends PersistentState {
 
         Map<String, Spell> spellList = new HashMap<>();
         spellList.put("fireball",
-                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         Vec3d angle = player.getRotationVector();
                         Vec3d pos = player.getPos();
+                        World world = player.world;
                         FireballEntity ent = new FireballEntity(world, player, angle.getX(), angle.getY(), angle.getZ(),
                                 1);
                         ent.setPos(pos.x, pos.y + player.getHeight(), pos.z);
@@ -64,18 +65,18 @@ public class SpellManager extends PersistentState {
                     }
                 }));
         spellList.put("selfheal",
-                new Spell(50, 100, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(50, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.heal(4.0f);
                         return true;
                     }
                 }));
         spellList.put(
                 "meteoritestorm",
-                new Spell(650, 600, 45, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(650, 600, 45, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int meteoriteCount = 40;
                         int minPower = 1;
                         int maxPower = 5;
@@ -88,6 +89,8 @@ public class SpellManager extends PersistentState {
                             Vec3d center = result.getPos();
                             Vec3f angle = Direction.DOWN.getUnitVector();
                             Random rand = new Random();
+
+                            World world = player.world;
                             for (int i = 0; i < meteoriteCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
                                         rand.nextInt(0, maxDelay),
@@ -112,14 +115,16 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "wolfpack",
-                new Spell(100, 500, 25, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(100, 500, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int wolfCount = 3;
                         int wolfLifeTime = 20 * 60;// ~one minute of lifetime
                         ArrayList<WolfEntity> wolfesSpawned = new ArrayList<>();
                         for (int i = 0; i < wolfCount; i++) {
+                            World world = player.world;
                             WolfEntity wolf = new WolfEntity(EntityType.WOLF, world);
+
                             world.spawnEntity(wolf);
                             wolf.setTamed(true);
                             wolf.setOwner(player);
@@ -145,9 +150,9 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "firebreath",
-                new Spell(50, 150, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(50, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int shotsPerTick = 2;
                         int tickDuration = 30;
                         int breathLife = 20;
@@ -166,6 +171,7 @@ public class SpellManager extends PersistentState {
                                             Random rand = new Random();
                                             Vec3d dir = player.getRotationVector().normalize();
 
+                                            World world = player.world;
                                             for (int i = 0; i < shotsPerTick; i++) {
                                                 FireBreath entity = FireBreath.createFireBreath(world, player,
                                                         dir.x + rand.nextFloat() * 0.5,
@@ -186,9 +192,11 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "slowball",
-                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+
+                        World world = player.world;
                         if (!world.isClient) {
                             Vec3d velocity = player.getRotationVector().multiply(8.0);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
@@ -203,31 +211,33 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "speedbuff",
-                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 500, 1));
                         return true;
                     }
                 }));
         spellList.put(
                 "resistancebuff",
-                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500, 1));
                         return true;
                     }
                 }));
         spellList.put(
                 "teleport",
-                new Spell(100, 800, 30, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(100, 800, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         boolean success = false;
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
+
+                            World world = player.world;
                             world.playSound(null, new BlockPos(center),
                                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
                             player.teleport(center.x, center.y, center.z, true);
@@ -238,9 +248,11 @@ public class SpellManager extends PersistentState {
                 }));
         spellList.put(
                 "poisonball",
-                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+
+                        World world = player.world;
                         if (!world.isClient) {
                             Vec3d velocity = player.getRotationVector().multiply(8.0);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
@@ -254,9 +266,11 @@ public class SpellManager extends PersistentState {
                     }
                 }));
         spellList.put("shockwave",
-                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+
+                        World world = player.world;
                         if (!world.isClient) {
                             int range = 10;
                             int angle = 30;
@@ -284,23 +298,25 @@ public class SpellManager extends PersistentState {
                     }
                 }));
         spellList.put("lightningstrike",
-                new Spell(150, 100, 20, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(150, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
+                            World world = player.world;
                             LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
                             bolt.setPos(center.x, center.y, center.z);
+
                             world.spawnEntity(bolt);
                         }
                         return true;
                     }
                 }));
         spellList.put("lightningstorm",
-                new Spell(500, 450, 40, new TriFunction<ServerPlayerEntity, World, EssencePool, Boolean>() {
+                new Spell(500, 450, 40, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, World world, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int lightningCount = 60;
                         int minPower = 1;
                         int maxPower = 5;
@@ -318,6 +334,8 @@ public class SpellManager extends PersistentState {
                                         new TriFunction<Object[], Object, Object, Boolean>() {
                                             @Override
                                             public Boolean apply(Object[] data, Object n1, Object n2) {
+
+                                                World world = player.world;
                                                 LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,
                                                         world);
                                                 bolt.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
@@ -350,6 +368,8 @@ public class SpellManager extends PersistentState {
         return spellList;
     }
 
+    
+
     @Override
     public boolean isDirty() {
         return true;
@@ -362,12 +382,14 @@ public class SpellManager extends PersistentState {
             UUID playerID = player.getGameProfile().getId();
             if (availableSpells.containsKey(playerID)
                     && availableSpells.get(playerID).containsKey(spellName)) {
-                if (availableSpells.get(playerID).get(spellName) <= 0) {
+                PlayerSpellData spellData = availableSpells.get(playerID).get(spellName);
+                if (spellData.cooldownLeft <= 0) {
                     EssencePool pool = SkullMagic.essenceManager.getEssencePoolForPlayer(playerID);
                     Spell spell = SpellDict.get(spellName);
                     if (pool.getEssence() >= spell.essenceCost) {
-                        availableSpells.get(playerID).put(spellName, SpellDict.get(spellName).cooldownTicks);
-                        success = spell.action.apply(player, world, pool);
+                        spellData.cooldownLeft = SpellDict
+                                .get(spellName).cooldownTicks;
+                        success = spell.action.apply(player, spellData, pool);
                         if (success) {
                             pool.discharge(spell.essenceCost);
                         }
@@ -387,8 +409,8 @@ public class SpellManager extends PersistentState {
             remainingCooldown = cooldownIntervall;
             availableSpells.values().forEach((map) -> {
                 map.entrySet().forEach((entry) -> {
-                    if (entry.getValue() > 0) {
-                        entry.setValue(entry.getValue() - cooldownIntervall);
+                    if (entry.getValue().cooldownLeft > 0) {
+                        entry.getValue().cooldownLeft = entry.getValue().cooldownLeft - cooldownIntervall;
                     }
                 });
             });
@@ -414,7 +436,8 @@ public class SpellManager extends PersistentState {
         if (!this.availableSpells.containsKey(player.getGameProfile().getId())) {
             this.availableSpells.put(player.getGameProfile().getId(), new HashMap<>());
             for (String spellname : Config.getConfig().defaultSpells) {
-                this.availableSpells.get(player.getGameProfile().getId()).put(spellname, 0);
+                this.availableSpells.get(player.getGameProfile().getId()).put(spellname,
+                        new PlayerSpellData(0, 1.0, 1.0, 1.0));
             }
         }
         ServerPackageSender.sendUpdateSpellListPackage(player);
@@ -424,11 +447,14 @@ public class SpellManager extends PersistentState {
     public NbtCompound writeNbt(NbtCompound nbt) {
         NbtCompound playerSpellsNBT = new NbtCompound();
         availableSpells.keySet().forEach((uuid) -> {
-            NbtCompound playerCooldownsList = new NbtCompound();
+            NbtCompound playerSpellDataList = new NbtCompound();
             availableSpells.get(uuid).entrySet().forEach((entry) -> {
-                playerCooldownsList.putInt(entry.getKey(), entry.getValue());
+                PlayerSpellData spellData = entry.getValue();
+                NbtCompound playerSpellData = new NbtCompound();
+                spellData.writeNbt(playerSpellData);
+                playerSpellDataList.put(entry.getKey(), playerSpellData);
             });
-            playerSpellsNBT.put(uuid.toString(), playerCooldownsList);
+            playerSpellsNBT.put(uuid.toString(), playerSpellDataList);
         });
         nbt.put("playerSpells", playerSpellsNBT);
         return nbt;
@@ -442,7 +468,7 @@ public class SpellManager extends PersistentState {
                 spmngr.availableSpells.put(UUID.fromString(uuidStr), new HashMap<>());
                 playerSpells.getCompound(uuidStr).getKeys().forEach((spellname) -> {
                     spmngr.availableSpells.get(UUID.fromString(uuidStr)).put(spellname,
-                            playerSpells.getCompound(uuidStr).getInt(spellname));
+                            PlayerSpellData.fromNbt(playerSpells.getCompound(uuidStr)));
                 });
             });
         }
@@ -456,7 +482,7 @@ public class SpellManager extends PersistentState {
                 && !this.availableSpells.get(playerID).containsKey(spellname)) {
             // check player level and deduct if sufficient
             if (force) {
-                this.availableSpells.get(playerID).put(spellname, 0);
+                this.availableSpells.get(playerID).put(spellname, new PlayerSpellData(0, 1.0, 1.0, 1.0));
                 ServerPackageSender.sendUpdateSpellListPackage(player);
                 success = true;
             } else {
@@ -464,7 +490,7 @@ public class SpellManager extends PersistentState {
                 if (player.experienceLevel >= spellcost) {
                     // player.getServer().level
                     player.addExperienceLevels(-spellcost);
-                    this.availableSpells.get(playerID).put(spellname, 0);
+                    this.availableSpells.get(playerID).put(spellname, new PlayerSpellData(0, 1.0, 1.0, 1.0));
                     ServerPackageSender.sendUpdateSpellListPackage(player);
                     success = true;
                 } else {
@@ -489,5 +515,6 @@ public class SpellManager extends PersistentState {
 
             learnSpell(player, spellname, true);
         }
+
     }
 }
