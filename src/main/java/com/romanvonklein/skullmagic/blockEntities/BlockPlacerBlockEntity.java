@@ -4,6 +4,7 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.inventory.IImplementedInventory;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -112,21 +113,7 @@ public class BlockPlacerBlockEntity extends BlockEntity
 
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity var3) {
-        return new Generic3x3ContainerScreenHandler(syncId, playerInventory, inventory)/*
-                                                                                        * {
-                                                                                        * 
-                                                                                        * @Override
-                                                                                        * public ItemStack
-                                                                                        * transferSlot(PlayerEntity
-                                                                                        * player, int index) {
-                                                                                        * ItemStack result =
-                                                                                        * super.transferSlot(player,
-                                                                                        * index);
-                                                                                        * inventory.markDirty();
-                                                                                        * return result;
-                                                                                        * }
-                                                                                        * }
-                                                                                        */;
+        return new Generic3x3ContainerScreenHandler(syncId, playerInventory, inventory);
     }
 
     @Override
@@ -149,7 +136,7 @@ public class BlockPlacerBlockEntity extends BlockEntity
 
     @Override
     public void onInventoryChanged(Inventory var1) {
-        this.markDirty();
+        world.updateListeners(pos, null, null, Block.NOTIFY_LISTENERS);
     }
 
     public void dropInventory() {

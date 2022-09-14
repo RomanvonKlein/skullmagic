@@ -6,7 +6,7 @@
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "skullmagic:advanced_spell_altar"
+                    "name": "skullmagic:intermediate_spell_shrine"
                 }
             ],
             "conditions": [

@@ -11,10 +11,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -78,14 +79,14 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                 SpellPedestalBlockEntity ent = opt.get();
 
                 // check if the socket is empty
-                if (ent.scroll == null) {
+                if (ent.getScroll() == null) {
                     // if empty, check wether the player holds a valid scroll.
                     ItemStack itemStack = player.getMainHandStack();
                     if (itemStack.getItem() instanceof KnowledgeOrb) {
                         String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
                         if (SkullMagic.spellManager.tryAddSpellPedestal(world.getRegistryKey(), pos,
                                 player.getGameProfile().getId(), spellname)) {
-                            ent.scroll = itemStack.copy();
+                            ent.setScroll(itemStack.copy());
                             itemStack.decrement(1);
                             world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
                                     SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
@@ -102,13 +103,20 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     }
                 } else {
                     // if not empty, drop the contained item.
-                    player.giveItemStack(ent.scroll);
-                    ent.scroll = null;
+                    player.giveItemStack(ent.getScroll());
+                    ent.setScroll(null);
                     SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
                 }
             }
         }
         return result;
 
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+            BlockEntityType<T> type) {
+        return checkType(type, SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY,
+                (world1, pos, state1, be) -> SpellPedestalBlockEntity.tick(world1, pos, state1, be));
     }
 }

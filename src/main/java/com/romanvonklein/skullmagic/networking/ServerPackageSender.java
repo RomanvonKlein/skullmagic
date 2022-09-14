@@ -25,5 +25,6 @@ public class ServerPackageSender {
         String result = builder.toString();
         buf.writeString(result);
         ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_SPELL_LIST, buf);
+        
     }
 }

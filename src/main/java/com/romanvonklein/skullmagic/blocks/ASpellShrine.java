@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic.blocks;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
@@ -9,8 +10,12 @@ import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -55,26 +60,47 @@ public abstract class ASpellShrine extends BlockWithEntity {
             Optional<SpellShrineBlockEntity> opt = world.getBlockEntity(pos, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY);
             // check if the socket is empty
             if (opt.isPresent()) {
-                SpellShrineBlockEntity blockEnt = opt.get();
-                if (blockEnt.scroll == null) {
-                    // if empty, check wether the player holds a valid scroll.
-                    ItemStack itemStack = player.getMainHandStack();
-                    if (itemStack.getItem() instanceof KnowledgeOrb) {
-                        String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                        SkullMagic.spellManager.addNewSpellShrine(world, pos,
-                                player.getGameProfile().getId(), spellname);
-                        blockEnt.scroll = itemStack.copy();
-                        itemStack.decrement(1);
+                // dont do anything if the player already has a shrine for that spell assigned
+                // to him
+                ItemStack itemStack = player.getMainHandStack();
+                if (itemStack.getItem() instanceof KnowledgeOrb) {
+                    String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+                    UUID playerid = player.getGameProfile().getId();
+                    BlockPos current;
+                    if (SkullMagic.spellManager.playerToSpellShrine.containsKey(playerid)
+                            && SkullMagic.spellManager.playerToSpellShrine.get(playerid).containsKey(spellname)
+                            && (current = SkullMagic.spellManager.playerToSpellShrine.get(playerid)
+                                    .get(spellname)) != null) {
+                        player.sendMessage(Text.of("You already have a spell shrine for spell " + spellname + " at "
+                                + current.toShortString()), true);
+                    } else {
+                        SpellShrineBlockEntity blockEnt = opt.get();
+                        if (blockEnt.getScroll() == null) {
+                            // if empty, check wether the player holds a valid scroll.
+
+                            SkullMagic.spellManager.addNewSpellShrine(world, pos,
+                                    player.getGameProfile().getId(), spellname);
+                            blockEnt.setScroll(itemStack.copy());
+                            itemStack.decrement(1);
+
+                        } else {
+                            // if not empty, drop the contained item.
+                            player.giveItemStack(blockEnt.getScroll());
+                            blockEnt.setScroll(null);
+                            SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
+                        }
                     }
-                } else {
-                    // if not empty, drop the contained item.
-                    player.giveItemStack(blockEnt.scroll);
-                    blockEnt.scroll = null;
-                    SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
                 }
             }
         }
         return result;
 
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+            BlockEntityType<T> type) {
+        return checkType(type, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
+                (world1, pos, state1, be) -> SpellShrineBlockEntity.tick(world1, pos, state1, be));
     }
 }

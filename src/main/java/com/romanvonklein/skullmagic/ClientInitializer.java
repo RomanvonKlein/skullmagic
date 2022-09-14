@@ -1,11 +1,12 @@
 package com.romanvonklein.skullmagic;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererShrine;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
@@ -34,7 +35,6 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -112,7 +112,10 @@ public class ClientInitializer implements ClientModInitializer {
 
         BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
-
+        BlockEntityRendererRegistry.register(SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY,
+                ItemHolderBlockEntityRenderer::new);
+        BlockEntityRendererRegistry.register(SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
+                ItemHolderBlockEntityRendererShrine::new);
         // register textures
         ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/essencebar.png");
         COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/cooldownbar.png");
