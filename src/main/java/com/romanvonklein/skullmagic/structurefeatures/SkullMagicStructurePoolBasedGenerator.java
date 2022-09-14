@@ -199,7 +199,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                     list.addAll(optional.get().getElementIndicesInRandomOrder(this.random));
                 }
                 list.addAll(optional2.get().getElementIndicesInRandomOrder(this.random));
-                Iterator iterator = list.iterator();
+                Iterator<StructurePoolElement> iterator = list.iterator();
                 while (iterator.hasNext() && (structurePoolElement2 = (StructurePoolElement) iterator
                         .next()) != EmptyPoolElement.INSTANCE) {
                     for (BlockRotation blockRotation2 : BlockRotation.randomRotationOrder(this.random)) {

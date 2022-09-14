@@ -324,7 +324,6 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            Vec3f angle = Direction.DOWN.getUnitVector();
                             Random rand = new Random();
                             for (int i = 0; i < lightningCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",

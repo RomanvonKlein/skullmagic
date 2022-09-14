@@ -20,7 +20,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -273,7 +272,8 @@ public class SpellManager extends PersistentState {
 
                         if (!this.pedestalsToSpellShrinePools.containsKey(registryKey)
                                 || !this.pedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
-                            if (opt.get().spellName != null && opt.get().spellName.equals(spellname)) {
+                            String spellName = opt.get().getSpellName();
+                            if (spellName != null && spellName.equals(spellname)) {
                                 addPedestalLink(registryKey, pool, candidatePos);
                             }
                         }

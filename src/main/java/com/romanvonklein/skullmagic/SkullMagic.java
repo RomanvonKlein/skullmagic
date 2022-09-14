@@ -23,11 +23,12 @@ import com.romanvonklein.skullmagic.blocks.BlockUser;
 import com.romanvonklein.skullmagic.blocks.CapacityCrystal;
 import com.romanvonklein.skullmagic.blocks.FireCannon;
 import com.romanvonklein.skullmagic.blocks.IntermediateSpellShrine;
+import com.romanvonklein.skullmagic.blocks.SimpleSpellPedestal;
 import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
-import com.romanvonklein.skullmagic.blocks.SpellPedestal;
+import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.entities.EffectBall;
@@ -111,7 +112,7 @@ public class SkullMagic implements ModInitializer {
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block ADVANCED_SPELL_SHRINE = new AdvancedSpellShrine(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block SPELL_PEDESTAL = new SpellPedestal(
+	public static Block SPELL_PEDESTAL = new SimpleSpellPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());

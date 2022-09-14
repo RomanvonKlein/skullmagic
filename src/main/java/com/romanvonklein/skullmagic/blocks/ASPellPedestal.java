@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.blocks;
 
+import java.util.Optional;
+
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
@@ -22,12 +24,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
-public class SpellPedestal extends BlockWithEntity {
-    public static final int scanRange = 5;
-    public static final int scanHeight = 1;
-    private ItemStack containedScroll = null;
-
-    public SpellPedestal(Settings settings) {
+public abstract class ASPellPedestal extends BlockWithEntity {
+    public ASPellPedestal(Settings settings) {
         super(settings);
     }
 
@@ -72,32 +70,36 @@ public class SpellPedestal extends BlockWithEntity {
             BlockHitResult hit) {
         ActionResult result = ActionResult.SUCCESS;
         if (!world.isClient) {
+            Optional<SpellPedestalBlockEntity> opt = world.getBlockEntity(pos, SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY);
+            if (opt.isPresent()) {
+                SpellPedestalBlockEntity ent = opt.get();
 
-            // check if the socket is empty
-            if (this.containedScroll == null) {
-                // if empty, check wether the player holds a valid scroll.
-                ItemStack itemStack = player.getMainHandStack();
-                if (itemStack.getItem() instanceof KnowledgeOrb) {
-                    String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                    if (SkullMagic.spellManager.tryAddSpellPedestal(world.getRegistryKey(), pos,
-                            player.getGameProfile().getId(), spellname)) {
-                        world.getBlockEntity(pos, SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY).get().spellName = spellname;
-                        this.containedScroll = itemStack.copy();
-                        itemStack.decrement(1);
+                // check if the socket is empty
+                if (ent.scroll == null) {
+                    // if empty, check wether the player holds a valid scroll.
+                    ItemStack itemStack = player.getMainHandStack();
+                    if (itemStack.getItem() instanceof KnowledgeOrb) {
+                        String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+                        if (SkullMagic.spellManager.tryAddSpellPedestal(world.getRegistryKey(), pos,
+                                player.getGameProfile().getId(), spellname)) {
+                            ent.scroll = itemStack.copy();
+                            itemStack.decrement(1);
+                        } else {
+                            player.sendMessage(
+                                    Text.of("Could not find a spell shrine linked to you and " + spellname
+                                            + " in range."),
+                                    true);
+                            result = ActionResult.FAIL;
+                        }
                     } else {
-                        player.sendMessage(
-                                Text.of("Could not find a spell shrine linked to you and " + spellname + " in range."),
-                                true);
-                        result = ActionResult.FAIL;
+                        player.sendMessage(Text.of("Not a valid scroll!"), true);
                     }
                 } else {
-                    player.sendMessage(Text.of("Not a valid scroll!"), true);
+                    // if not empty, drop the contained item.
+                    player.giveItemStack(ent.scroll);
+                    ent.scroll = null;
+                    SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
                 }
-            } else {
-                // if not empty, drop the contained item.
-                player.giveItemStack(this.containedScroll);
-                this.containedScroll = null;
-                SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
             }
         }
         return result;
