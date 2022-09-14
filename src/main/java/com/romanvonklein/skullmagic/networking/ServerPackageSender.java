@@ -16,9 +16,9 @@ public class ServerPackageSender {
         SkullMagic.spellManager.availableSpells.get(player.getGameProfile().getId()).entrySet().forEach((entry) -> {
             PlayerSpellData spellData = entry.getValue();
             String appendix = entry.getKey() + ":" + Integer.toString(spellData.cooldownLeft) + ","
-                    + Double.toString(spellData.efficiencyLevel) + ","
-                    + Double.toString(spellData.efficiencyLevel) + ","
-                    + Double.toString(spellData.cooldownReductionLevel)
+                    + Double.toString(spellData.getEfficiencyLevel()) + ","
+                    + Double.toString(spellData.getPowerLevel()) + ","
+                    + Double.toString(spellData.getCooldownReductionLevel())
                     + ";";
             builder.append(appendix);
         });

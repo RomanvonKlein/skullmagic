@@ -134,7 +134,7 @@ public class ClientInitializer implements ClientModInitializer {
                 ClientPackageReceiver::receiveEssenceChargeUpdate);
 
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UNLINK_ESSENCEPOOL_ID,
-                ClientPackageReceiver::receiveUnlikeEssencePoolPacket);
+                ClientPackageReceiver::receiveUnlinkEssencePoolPacket);
 
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_SPELL_LIST,
                 ClientPackageReceiver::receiveUpdateSpellListPackage);

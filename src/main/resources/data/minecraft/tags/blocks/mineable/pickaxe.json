@@ -3,6 +3,10 @@
     "values": [
         "skullmagic:skull_pedestal",
         "skullmagic:skull_altar",
+        "skullmagic:simple_spell_shrine",
+        "skullmagic:intermediate_spell_shrine",
+        "skullmagic:advanced_spell_shrine",
+        "skullmagic:spell_pedestal",
         "skullmagic:fire_cannon",
         "skullmagic:capacity_crystal",
         "skullmagic:wither_energy_channeler",

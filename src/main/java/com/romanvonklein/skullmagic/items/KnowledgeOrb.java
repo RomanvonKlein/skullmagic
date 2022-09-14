@@ -1,7 +1,6 @@
 package com.romanvonklein.skullmagic.items;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -11,11 +10,10 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.spells.PlayerSpellData;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
-import net.minecraft.client.MinecraftClient;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -23,9 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -65,12 +61,16 @@ public class KnowledgeOrb extends Item {
                 PlayerSpellData spellData = ClientInitializer.getClientSpellManager().spellList.get(this.spellName);
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spell_learned").formatted(Formatting.GREEN));
                 // current spell levels
+                double powerlevel = spellData.getPowerLevel();
+                double efficiencylevel = spellData.getEfficiencyLevel();
+                double cooldownLevel = spellData.getCooldownReductionLevel();
+
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spelldata_powerlevel")
-                        .append(Text.of(Double.toString(spellData.powerLevel))).formatted(Formatting.GRAY));
+                        .append(Text.of(Double.toString(powerlevel))).formatted(Formatting.GRAY));
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spelldata_efficiencylevel")
-                        .append(Text.of(Double.toString(spellData.efficiencyLevel))).formatted(Formatting.GRAY));
+                        .append(Text.of(Double.toString(efficiencylevel))).formatted(Formatting.GRAY));
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spelldata_cooldownreductionlevel")
-                        .append(Text.of(Double.toString(spellData.cooldownReductionLevel))).formatted(Formatting.GRAY));
+                        .append(Text.of(Double.toString(cooldownLevel))).formatted(Formatting.GRAY));
             } else {
                 ClientPlayerEntity player = MinecraftClient.getInstance().player;
                 if (SpellManager.getLevelCost(this.spellName) > player.experienceLevel) {

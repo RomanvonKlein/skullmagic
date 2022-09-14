@@ -1,16 +1,14 @@
 package com.romanvonklein.skullmagic.spells;
 
-import com.romanvonklein.skullmagic.SkullMagic;
-
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
 
 public class PlayerSpellData extends PersistentState {
     public int cooldownLeft;
-    public double efficiencyLevel;
-    public double powerLevel;
-    public double cooldownReductionLevel;
+    private double efficiencyLevel;
+    private double powerLevel;
+    private double cooldownReductionLevel;
 
     public PlayerSpellData(int cooldownLeft, double efficiencyLevel, double powerLevel,
             double cooldownReductionLevel) {
@@ -22,9 +20,9 @@ public class PlayerSpellData extends PersistentState {
 
     public PlayerSpellData() {
         this.cooldownLeft = 0;
-        this.efficiencyLevel = 0.0;
-        this.powerLevel = 0.0;
-        this.cooldownReductionLevel = 0.0;
+        this.efficiencyLevel = 1.0;
+        this.powerLevel = 1.0;
+        this.cooldownReductionLevel = 1.0;
 
     }
 
@@ -55,5 +53,21 @@ public class PlayerSpellData extends PersistentState {
     public int getMaxCooldown(int defaultCooldownTicks) {
         return (int) Math.round(defaultCooldownTicks
                 * (1 - Math.log(1 + (this.cooldownReductionLevel - 1) * 0.5)));
+    }
+
+    public double getEfficiencyLevel() {
+        return this.efficiencyLevel;
+    }
+
+    public double getPowerLevel() {
+        return this.powerLevel;
+    }
+
+    public double getCooldownReductionLevel() {
+        return this.cooldownReductionLevel;
+    }
+
+    public void setPowerLevel(double newPowerLevel) {
+        this.powerLevel = newPowerLevel;
     }
 }

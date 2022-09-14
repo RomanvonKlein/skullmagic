@@ -56,8 +56,8 @@ public class SpellManager extends PersistentState {
                     Spell spell = SpellDict.get(spellName);
 
                     int reducedEssenceCost = (int) Math.round(
-                            spell.essenceCost * (1 + spellData.powerLevel / 4)
-                                    * (1 - Math.log(1 + (spellData.efficiencyLevel - 1) * 0.5)));
+                            spell.essenceCost * (1 + spellData.getPowerLevel() / 4)
+                                    * (1 - Math.log(1 + (spellData.getEfficiencyLevel() - 1) * 0.5)));
                     if (pool.getEssence() >= reducedEssenceCost) {
                         spellData.cooldownLeft = spellData.getMaxCooldown(SpellDict.get(spellName).cooldownTicks);
 

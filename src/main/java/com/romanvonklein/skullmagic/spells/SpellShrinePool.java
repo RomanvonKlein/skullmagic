@@ -109,8 +109,8 @@ public class SpellShrinePool extends PersistentState {
         if (this.linkedPlayerID != null) {
             PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
             if (data != null) {
-                data.powerLevel = 1
-                        + Math.floor(Math.sqrt(this.strength));
+                data.setPowerLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
             }
         }
 
@@ -121,8 +121,8 @@ public class SpellShrinePool extends PersistentState {
         if (this.linkedPlayerID != null) {
             PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
             if (data != null) {
-                data.powerLevel = 1
-                        + Math.floor(Math.sqrt(this.strength));
+                data.setPowerLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
             }
         }
     }

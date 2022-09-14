@@ -30,7 +30,7 @@ public class ClientPackageReceiver {
         }
     }
 
-    public static void receiveUnlikeEssencePoolPacket(MinecraftClient client, ClientPlayNetworkHandler handler,
+    public static void receiveUnlinkEssencePoolPacket(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
         ClientInitializer.unsetClientEssenceManager();
     }

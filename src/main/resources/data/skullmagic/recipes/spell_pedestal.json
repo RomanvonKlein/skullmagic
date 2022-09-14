@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "DWD",
+        "DDD"
+    ],
+    "key": {
+        "W": {
+            "item": "minecraft:iron_block"
+        },
+        "D": {
+            "item": "minecraft:deepslate_bricks"
+        }
+    },
+    "result": {
+        "item": "skullmagic:spell_pedestal",
+        "count": 1
+    }
+}

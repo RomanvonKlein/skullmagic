@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtTypes;
 import net.minecraft.util.math.BlockPos;
 
 public class SpellPedestalBlockEntity extends BlockEntity {

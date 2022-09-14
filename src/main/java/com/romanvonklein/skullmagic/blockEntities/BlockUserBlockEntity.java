@@ -43,7 +43,7 @@ public class BlockUserBlockEntity extends AEssenceConsumer {
                             BlockHitResult hit = new BlockHitResult(
                                     new Vec3d(targetPos.getX(), targetPos.getX(), targetPos.getZ()),
                                     target.getOpposite(), targetPos, false);
-                            targetState.onUse(world, null, Hand.MAIN_HAND, hit);
+                            targetState.onUse(world, null, Hand.MAIN_HAND, hit);//TODO: does this even work?
                         }
                     }
                 }

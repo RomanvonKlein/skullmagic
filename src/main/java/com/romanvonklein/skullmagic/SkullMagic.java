@@ -28,7 +28,6 @@ import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
-import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.entities.EffectBall;
