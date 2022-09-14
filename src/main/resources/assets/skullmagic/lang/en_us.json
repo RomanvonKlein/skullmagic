@@ -34,5 +34,9 @@
     "item.skullmagic.teleport_orb": "Scroll of Teleporting",
     "item.skullmagic.resistancebuff_orb": "Scroll of Resistance",
     "skullmagic.message.missing_required_level": "Can't affort level cost: ",
-    "tooltip.skullmagic.level_cost": "Level cost: "
+    "tooltip.skullmagic.level_cost": "Level Cost: ",
+    "tooltip.skullmagic.spell_learned": "Spell Learned!",
+    "tooltip.skullmagic.spelldata_powerlevel": "Power Level: ",
+    "tooltip.skullmagic.spelldata_cooldownreductionlevel": "Cooldown Reduction Level: ",
+    "tooltip.skullmagic.spelldata_efficiencylevel": "Efficiency Level: "
 }
