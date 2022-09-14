@@ -41,13 +41,13 @@ public class SpellInitializer {
                 new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        Vec3d angle = player.getRotationVector();
+                        Vec3d angle = player.getRotationVector().normalize().multiply(spellData.powerLevel / 2 + 1.5);
                         Vec3d pos = player.getPos();
                         World world = player.world;
                         FireballEntity ent = new FireballEntity(world, player,
-                                angle.getX() * spellData.powerLevel / 2 + 0.5,
-                                angle.getY() * spellData.powerLevel / 2 + 0.5,
-                                angle.getZ() * spellData.powerLevel / 2 + 0.5,
+                                angle.getX(),
+                                angle.getY(),
+                                angle.getZ(),
                                 Math.max(1, Math.min((int) Math.round(spellData.powerLevel), 5)));
                         ent.setPos(pos.x, pos.y + player.getHeight(), pos.z);
                         world.spawnEntity(ent);
