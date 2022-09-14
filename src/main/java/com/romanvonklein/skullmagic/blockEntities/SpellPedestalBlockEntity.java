@@ -20,7 +20,6 @@ import net.minecraft.world.World;
 public class SpellPedestalBlockEntity extends BlockEntity {
 
     private ItemStack scroll;
-    private boolean scrollWasNullLastTick = true;
 
     public SpellPedestalBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY, pos, state);
@@ -28,23 +27,18 @@ public class SpellPedestalBlockEntity extends BlockEntity {
 
     @Override
     public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        if (!world.isClient) {
-
-            if (this.scroll != null) {
-                NbtCompound scrollCompound = new NbtCompound();
-                this.scroll.writeNbt(scrollCompound);
-                nbt.put("scroll", scrollCompound);
-            }
+        if (this.scroll != null) {
+            NbtCompound scrollCompound = new NbtCompound();
+            this.scroll.writeNbt(scrollCompound);
+            nbt.put("scroll", scrollCompound);
         }
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
+        this.scroll = null;
         if (nbt.contains("scroll", NbtType.COMPOUND)) {
             this.scroll = ItemStack.fromNbt(nbt.getCompound("scroll"));
-        } else {
-            this.scroll = null;
         }
     }
 
@@ -56,21 +50,6 @@ public class SpellPedestalBlockEntity extends BlockEntity {
         return result;
     }
 
-    public void setScroll(ItemStack stack) {
-        if (stack != null && !(stack.getItem() instanceof KnowledgeOrb)) {
-            SkullMagic.LOGGER.error("Something went wrong - cannot set scroll for pedestal to non-knowledgeorb item!");
-        }
-        this.scroll = stack;
-        if (!world.isClient) {
-            world.updateListeners(pos, this.getCachedState(), world.getBlockState(pos), Block.NOTIFY_LISTENERS);
-        }
-        this.markDirty();
-    }
-
-    public ItemStack getScroll() {
-        return this.scroll;
-    }
-
     @Nullable
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
@@ -80,6 +59,16 @@ public class SpellPedestalBlockEntity extends BlockEntity {
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         return createNbt();
+    }
+
+    public void setScroll(ItemStack newScroll) {
+        this.scroll = newScroll;
+        this.markDirty();
+        world.updateListeners(pos, this.getCachedState(), world.getBlockState(pos), Block.NOTIFY_LISTENERS);
+    }
+
+    public ItemStack getScroll() {
+        return this.scroll;
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, SpellPedestalBlockEntity be) {

@@ -114,7 +114,6 @@ public class EssenceManager extends PersistentState {
     }
 
     public static EssenceManager fromNbt(NbtCompound tag) {
-        System.out.println("Reading EssenceManager from NBT");
         EssenceManager essenceMngr = new EssenceManager();
         // read all essencePools
         if (tag.contains("essencePools")) {

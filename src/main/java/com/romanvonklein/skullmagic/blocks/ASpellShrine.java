@@ -60,37 +60,38 @@ public abstract class ASpellShrine extends BlockWithEntity {
             Optional<SpellShrineBlockEntity> opt = world.getBlockEntity(pos, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY);
             // check if the socket is empty
             if (opt.isPresent()) {
-                // dont do anything if the player already has a shrine for that spell assigned
-                // to him
-                ItemStack itemStack = player.getMainHandStack();
-                if (itemStack.getItem() instanceof KnowledgeOrb) {
-                    String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                    UUID playerid = player.getGameProfile().getId();
-                    BlockPos current;
-                    if (SkullMagic.spellManager.playerToSpellShrine.containsKey(playerid)
-                            && SkullMagic.spellManager.playerToSpellShrine.get(playerid).containsKey(spellname)
-                            && (current = SkullMagic.spellManager.playerToSpellShrine.get(playerid)
-                                    .get(spellname)) != null) {
-                        player.sendMessage(Text.of("You already have a spell shrine for spell " + spellname + " at "
-                                + current.toShortString()), true);
-                    } else {
-                        SpellShrineBlockEntity blockEnt = opt.get();
-                        if (blockEnt.getScroll() == null) {
-                            // if empty, check wether the player holds a valid scroll.
+                UUID playerid = player.getGameProfile().getId();
 
+                SpellShrineBlockEntity blockEnt = opt.get();
+                if (blockEnt.getScroll() == null) {
+                    // if empty, check wether the player holds a valid scroll.
+                    ItemStack itemStack = player.getMainHandStack();
+                    if (itemStack.getItem() instanceof KnowledgeOrb) {
+                        String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+                        // dont do anything if the player already has a shrine for that spell assigned
+                        // to him
+                        if (SkullMagic.spellManager.playerToSpellShrine.containsKey(playerid)
+                                && SkullMagic.spellManager.playerToSpellShrine.get(playerid).containsKey(spellname)) {
+                            player.sendMessage(
+                                    Text.of("You already have a shrine for the spell " + spellname
+                                            + " assigned to you at "
+                                            + SkullMagic.spellManager.playerToSpellShrine.get(playerid).get(spellname)
+                                                    .toShortString()),
+                                    true);
+                        } else {
                             SkullMagic.spellManager.addNewSpellShrine(world, pos,
                                     player.getGameProfile().getId(), spellname);
                             blockEnt.setScroll(itemStack.copy());
                             itemStack.decrement(1);
-
-                        } else {
-                            // if not empty, drop the contained item.
-                            player.giveItemStack(blockEnt.getScroll());
-                            blockEnt.setScroll(null);
-                            SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
                         }
                     }
+                } else {
+                    // if not empty, drop the contained item.
+                    player.giveItemStack(blockEnt.getScroll());
+                    blockEnt.setScroll(null);
+                    SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
                 }
+
             }
         }
         return result;

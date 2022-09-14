@@ -1,5 +1,6 @@
 package com.romanvonklein.skullmagic.spells;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -234,9 +235,16 @@ public class SpellManager extends PersistentState {
             SpellShrinePool pool = this.spellShrinePools.get(registryKey).get(pos);
             if (pool.linkedPlayerID != null) {
                 this.resetSpellUpgradesForPlayer(pool.linkedPlayerID, pool.getSpellName());
+                if (this.playerToSpellShrine.containsKey(pool.linkedPlayerID)
+                        && this.playerToSpellShrine.get(pool.linkedPlayerID).containsKey(pool.getSpellName())) {
+                    this.playerToSpellShrine.get(pool.linkedPlayerID).remove(pool.getSpellName());
+                }
+                this.playersToSpellPools.remove(pool.linkedPlayerID);
             }
             this.spellShrinePools.get(registryKey).remove(pos);
+
         }
+
     }
 
     public void resetSpellUpgradesForPlayer(UUID linkedPlayerID, String spellName) {

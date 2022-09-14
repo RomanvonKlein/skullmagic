@@ -82,10 +82,8 @@ public class SpellShrineBlockEntity extends BlockEntity {
 
     public void setScroll(ItemStack newScroll) {
         this.scroll = newScroll;
-        if (!world.isClient) {
-            world.updateListeners(pos, this.getCachedState(), world.getBlockState(pos), Block.NOTIFY_LISTENERS);
-        }
         this.markDirty();
+        world.updateListeners(pos, this.getCachedState(), world.getBlockState(pos), Block.NOTIFY_LISTENERS);
     }
 
     public ItemStack getScroll() {

@@ -105,7 +105,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     // if not empty, drop the contained item.
                     player.giveItemStack(ent.getScroll());
                     ent.setScroll(null);
-                    SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
+                    SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos);
                 }
             }
         }
