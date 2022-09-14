@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "skullmagic:block/simple_spell_shrine"
+        }
+    }
+}

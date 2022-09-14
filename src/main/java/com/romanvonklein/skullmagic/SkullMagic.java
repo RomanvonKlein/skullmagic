@@ -14,14 +14,20 @@ import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.WitherEnergyChannelerBlockEntity;
+import com.romanvonklein.skullmagic.blocks.AdvancedSpellShrine;
 import com.romanvonklein.skullmagic.blocks.BlockPlacer;
 import com.romanvonklein.skullmagic.blocks.BlockUser;
 import com.romanvonklein.skullmagic.blocks.CapacityCrystal;
 import com.romanvonklein.skullmagic.blocks.FireCannon;
+import com.romanvonklein.skullmagic.blocks.IntermediateSpellShrine;
+import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
+import com.romanvonklein.skullmagic.blocks.SpellPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.entities.EffectBall;
@@ -99,6 +105,14 @@ public class SkullMagic implements ModInitializer {
 			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).nonOpaque());
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+	public static Block SIMPLE_SPELL_SHRINE = new SimpleSpellShrine(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+	public static Block INTERMEDIATE_SPELL_SHRINE = new IntermediateSpellShrine(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+	public static Block ADVANCED_SPELL_SHRINE = new AdvancedSpellShrine(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+	public static Block SPELL_PEDESTAL = new SpellPedestal(
+			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static Block FireCannon = new FireCannon(
@@ -125,6 +139,8 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<CapacityCrystalBlockEntity> CAPACITY_CRYSTAL_BLOCK_ENTITY;
 	public static BlockEntityType<WitherEnergyChannelerBlockEntity> WITHER_ENERGY_CHANNELER_BLOCK_ENTITY;
 	public static BlockEntityType<BlockUserBlockEntity> BLOCK_USER_BLOCK_ENTITY;
+	public static BlockEntityType<SpellShrineBlockEntity> SPELL_SHRINE_BLOCK_ENTITY;
+	public static BlockEntityType<SpellPedestalBlockEntity> SPELL_PEDESTAL_BLOCK_ENTITY;
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
@@ -148,6 +164,13 @@ public class SkullMagic implements ModInitializer {
 				MODID + ":wither_energy_channeler_block_entity",
 				FabricBlockEntityTypeBuilder.create(WitherEnergyChannelerBlockEntity::new, WitherEnergyChanneler)
 						.build(null));
+		SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+				MODID + ":spell_pedestal_block_entity",
+				FabricBlockEntityTypeBuilder.create(SpellPedestalBlockEntity::new, SPELL_PEDESTAL).build(null));
+		SPELL_SHRINE_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+				MODID + ":spell_shrine_block_entity",
+				FabricBlockEntityTypeBuilder.create(SpellShrineBlockEntity::new, SIMPLE_SPELL_SHRINE,
+						INTERMEDIATE_SPELL_SHRINE, ADVANCED_SPELL_SHRINE).build(null));
 		BLOCK_USER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
 				MODID + ":block_user_block_entity",
 				FabricBlockEntityTypeBuilder.create(BlockUserBlockEntity::new, BLOCK_USER_BLOCK).build(null));
@@ -198,12 +221,31 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier(MODID, "block_placer"),
 				new BlockItem(BlockPlacer, new FabricItemSettings().group(ItemGroup.MISC)));
 
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_pedestal"), SPELL_PEDESTAL);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_pedestal"),
+				new BlockItem(SPELL_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
+
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "simple_spell_shrine"), SIMPLE_SPELL_SHRINE);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "simple_spell_shrine"),
+				new BlockItem(SIMPLE_SPELL_SHRINE, new FabricItemSettings().group(ItemGroup.MISC)));
+
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "intermediate_spell_shrine"),
+				INTERMEDIATE_SPELL_SHRINE);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "intermediate_spell_shrine"),
+				new BlockItem(INTERMEDIATE_SPELL_SHRINE, new FabricItemSettings().group(ItemGroup.MISC)));
+
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "advanced_spell_shrine"), ADVANCED_SPELL_SHRINE);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "advanced_spell_shrine"),
+				new BlockItem(ADVANCED_SPELL_SHRINE, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "enderman_head"), ENDERMAN_HEAD_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "enderman_head"),
 				new BlockItem(ENDERMAN_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "spider_head"), SPIDER_HEAD_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "spider_head"),
 				new BlockItem(SPIDER_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "blaze_head"), BLAZE_HEAD_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "blaze_head"),
 				new BlockItem(BLAZE_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));

@@ -18,6 +18,14 @@ public class PlayerSpellData extends PersistentState {
         this.cooldownReductionLevel = cooldownReductionLevel;
     }
 
+    public PlayerSpellData() {
+        this.cooldownLeft = 0;
+        this.efficiencyLevel = 0.0;
+        this.powerLevel = 0.0;
+        this.cooldownReductionLevel = 0.0;
+
+    }
+
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putInt("cooldown_remaining", this.cooldownLeft);

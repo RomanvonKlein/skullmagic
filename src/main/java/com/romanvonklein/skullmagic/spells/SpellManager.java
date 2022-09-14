@@ -1,42 +1,27 @@
 package com.romanvonklein.skullmagic.spells;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.commons.lang3.function.TriFunction;
-
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.SpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.config.Config;
-import com.romanvonklein.skullmagic.entities.EffectBall;
-import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
-import com.romanvonklein.skullmagic.tasks.DelayedTask;
+import com.romanvonklein.skullmagic.util.Parsing;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
@@ -45,339 +30,13 @@ public class SpellManager extends PersistentState {
     private int remainingCooldown = cooldownIntervall;
     public Map<UUID, Map<String, PlayerSpellData>> availableSpells = new HashMap<>();
 
-    public static Map<String, ? extends Spell> SpellDict = initSpells();
+    public Map<UUID, Map<String, BlockPos>> playerToSpellShrine = new HashMap<>();
 
-    private static Map<String, ? extends Spell> initSpells() {
+    public Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> spellShrinePools = new HashMap<>();
+    private Map<UUID, SpellShrinePool> playersToSpellPools = new HashMap<>();
+    private Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> pedestalsToSpellShrinePools = new HashMap<>();
 
-        Map<String, Spell> spellList = new HashMap<>();
-        spellList.put("fireball",
-                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        Vec3d angle = player.getRotationVector();
-                        Vec3d pos = player.getPos();
-                        World world = player.world;
-                        FireballEntity ent = new FireballEntity(world, player,
-                                angle.getX() * spellData.powerLevel / 2 + 0.5,
-                                angle.getY() * spellData.powerLevel / 2 + 0.5,
-                                angle.getZ() * spellData.powerLevel / 2 + 0.5,
-                                Math.max(1, Math.min((int) Math.round(spellData.powerLevel), 5)));
-                        ent.setPos(pos.x, pos.y + player.getHeight(), pos.z);
-                        world.spawnEntity(ent);
-                        return true;
-                    }
-                }));
-        spellList.put("selfheal",
-                new Spell(50, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        player.heal(2.0f + (float) (2 * spellData.powerLevel));
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "meteoritestorm",
-                new Spell(650, 600, 45, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int meteoriteCount = 10 + (int) Math.round(2.0 * spellData.powerLevel);
-                        int minPower = 1;
-                        int maxPower = 5;
-                        int height = 256;
-                        int radius = 7;
-                        int maxDelay = 40;
-                        // TODO: way too strong. i love it
-                        HitResult result = player.raycast(100, 1, false);
-                        if (result != null) {
-                            Vec3d center = result.getPos();
-                            Vec3f angle = Direction.DOWN.getUnitVector();
-                            Random rand = new Random();
-
-                            World world = player.world;
-                            for (int i = 0; i < meteoriteCount; i++) {
-                                DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                        rand.nextInt(0, maxDelay),
-                                        new TriFunction<Object[], Object, Object, Boolean>() {
-                                            @Override
-                                            public Boolean apply(Object[] data, Object n1, Object n2) {
-                                                FireballEntity ent = new FireballEntity(world, player, angle.getX(),
-                                                        angle.getY(), angle.getZ(),
-                                                        (int) Math.round(
-                                                                Math.max(1.0,
-                                                                        Math.min(rand.nextInt(minPower, maxPower)
-                                                                                + (spellData.powerLevel - 1) * 0.5,
-                                                                                5.0))));
-                                                ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
-                                                        height, center.z - radius + 2 * rand.nextFloat() * radius);
-                                                ent.setVelocity(0, -15, 0);
-                                                world.spawnEntity(ent);
-                                                return true;
-                                            }
-                                        }, null);
-                                SkullMagic.taskManager.queueTask(tsk);
-                            }
-                        }
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "wolfpack",
-                new Spell(250, 500, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int wolfCount = 2 + (int) Math.round((spellData.powerLevel - 1));
-                        int wolfLifeTime = 20 * 60;// ~one minute of lifetime
-                        ArrayList<WolfEntity> wolfesSpawned = new ArrayList<>();
-                        for (int i = 0; i < wolfCount; i++) {
-                            World world = player.world;
-                            WolfEntity wolf = new WolfEntity(EntityType.WOLF, world);
-
-                            world.spawnEntity(wolf);
-                            wolf.setTamed(true);
-                            wolf.setOwner(player);
-                            wolf.setPosition(player.getPos());
-                            wolfesSpawned.add(wolf);
-                        }
-                        SkullMagic.taskManager.queueTask(new DelayedTask("wolfpack_spell_kill_wolfes", wolfLifeTime,
-                                new TriFunction<Object[], Object, Object, Boolean>() {
-                                    @Override
-                                    public Boolean apply(Object[] data, Object n1, Object n2) {
-                                        ArrayList<WolfEntity> wolfes = (ArrayList<WolfEntity>) data[0];
-                                        for (WolfEntity wolf : wolfes) {
-                                            if (wolf.isAlive()) {
-                                                wolf.kill();
-                                            }
-                                        }
-                                        return true;
-                                    }
-                                },
-                                new Object[] { wolfesSpawned }));
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "firebreath",
-                new Spell(50, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int shotsPerTick = 2;
-                        int tickDuration = 30;
-                        int breathLife = 20 + (int) Math.round(spellData.powerLevel * 4);
-                        int burnDuration = 40 + (int) Math.round(spellData.powerLevel * 10);
-                        for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more
-                                                                // memory
-                                                                // efficient.
-                            SkullMagic.taskManager.queueTask(new DelayedTask("spawn_fire_breath_task", i,
-                                    new TriFunction<Object[], Object, Object, Boolean>() {
-                                        @Override
-                                        public Boolean apply(Object[] data, Object n1, Object n2) {
-                                            int shotsPerTick = ((int[]) data[0])[0];
-                                            int breathLife = ((int[]) data[0])[1];
-                                            int burnDuration = ((int[]) data[0])[2];
-
-                                            Random rand = new Random();
-                                            Vec3d dir = player.getRotationVector().normalize();
-
-                                            World world = player.world;
-                                            for (int i = 0; i < shotsPerTick; i++) {
-                                                FireBreath entity = FireBreath.createFireBreath(world, player,
-                                                        dir.x + rand.nextFloat() * 0.5,
-                                                        dir.y + rand.nextFloat() * 0.5, dir.z + rand.nextFloat() * 0.5,
-                                                        burnDuration, breathLife);
-                                                entity.setPosition(
-                                                        player.getPos().add(dir.multiply(0.5))
-                                                                .add(0, player.getEyeHeight(player.getPose()), 0));
-                                                world.spawnEntity(entity);
-                                            }
-                                            return true;
-                                        }
-                                    },
-                                    new Object[] { new int[] { shotsPerTick, breathLife, burnDuration } }));
-                        }
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "slowball",
-                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-
-                        World world = player.world;
-                        if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0);
-                            EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
-                                    velocity.z,
-                                    StatusEffects.SLOWNESS, 4.0f,
-                                    (int) Math.round(Math.max(1.0, spellData.powerLevel / 3)));
-                            ball.setPosition(
-                                    player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
-                            world.spawnEntity(ball);
-                        }
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "speedbuff",
-                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        player.addStatusEffect(
-                                new StatusEffectInstance(StatusEffects.SPEED,
-                                        500 + 500 * (int) Math.round((spellData.powerLevel - 1) * 0.25),
-                                        (int) Math.round(Math.max(1.0, spellData.powerLevel / 3))));
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "resistancebuff",
-                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500,
-                                (int) Math.round(Math.max(1.0, spellData.powerLevel / 3))));
-                        return true;
-                    }
-                }));
-        spellList.put(
-                "teleport",
-                new Spell(100, 800, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        boolean success = false;
-                        HitResult result = player.raycast(100, 1, false);
-                        if (result != null) {
-                            Vec3d center = result.getPos();
-
-                            World world = player.world;
-                            world.playSound(null, new BlockPos(center),
-                                    SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
-                            player.teleport(center.x, center.y, center.z, true);
-                            success = true;
-                        }
-                        return success;
-                    }
-                }));
-        spellList.put(
-                "poisonball",
-                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-
-                        World world = player.world;
-                        if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0);
-                            EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
-                                    velocity.z,
-                                    StatusEffects.POISON, 4.0f,
-                                    (int) Math.round(Math.max(1.0, spellData.powerLevel / 3)));
-                            ball.setPosition(
-                                    player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
-                            world.spawnEntity(ball);
-                        }
-                        return true;
-                    }
-                }));
-        spellList.put("shockwave",
-                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-
-                        World world = player.world;
-                        if (!world.isClient) {
-                            int range = 7 + (int) Math.round(spellData.powerLevel);
-                            int angle = 30;
-                            double power_min = 2.0 + spellData.powerLevel;
-                            double power_max = 5.0 + spellData.powerLevel;
-                            Vec3d playerpos = player.getPos().add(0, player.getEyeHeight(player.getPose()), 0);
-                            Box box = new Box(playerpos.x - range, playerpos.y - range, playerpos.z - range,
-                                    playerpos.x + range, playerpos.y + range, playerpos.z + range);
-                            List<Entity> targetCandidates = world.getOtherEntities(player, box);
-                            for (Entity ent : targetCandidates) {
-                                Vec3d diffabs = ent.getPos().subtract(playerpos);
-                                Vec3d diff = diffabs.normalize();
-                                double diffangle = Math.acos(diff.dotProduct(player.getRotationVector())) * Math.PI
-                                        / 180;
-                                if (diffangle < angle && diffangle > -angle) {
-                                    double power = power_min + (diffabs.length() / range) * (power_max - power_min);
-                                    Vec3d vel = diff.multiply(power);
-                                    ent.addVelocity(vel.x, vel.y + 4.0, vel.z);
-                                }
-                            }
-                            world.playSound(null, new BlockPos(playerpos),
-                                    SoundEvents.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.BLOCKS, 1f, 1f);
-                        }
-                        return true;
-                    }
-                }));
-        spellList.put("lightningstrike",
-                new Spell(150, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        HitResult result = player.raycast(100, 1, false);
-                        if (result != null) {
-                            Vec3d center = result.getPos();
-                            World world = player.world;
-                            LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
-                            bolt.setPos(center.x, center.y, center.z);
-
-                            world.spawnEntity(bolt);
-                        }
-                        return true;
-                    }
-                }));
-        spellList.put("lightningstorm",
-                new Spell(500, 450, 40, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int lightningCount = (int) Math.round(Math.min(10 + spellData.powerLevel * 3, 50));
-                        int radius = 7;
-                        int maxDelay = 40;
-                        // TODO: way too strong. i love it
-                        HitResult result = player.raycast(100, 1, false);
-                        if (result != null) {
-                            Vec3d center = result.getPos();
-                            Vec3f angle = Direction.DOWN.getUnitVector();
-                            Random rand = new Random();
-                            for (int i = 0; i < lightningCount; i++) {
-                                DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                        rand.nextInt(0, maxDelay),
-                                        new TriFunction<Object[], Object, Object, Boolean>() {
-                                            @Override
-                                            public Boolean apply(Object[] data, Object n1, Object n2) {
-
-                                                World world = player.world;
-                                                LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,
-                                                        world);
-                                                bolt.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
-                                                        center.y, center.z - radius + 2 * rand.nextFloat() * radius);
-                                                bolt.setVelocity(0, -15, 0);
-                                                world.spawnEntity(bolt);
-                                                return true;
-                                            }
-                                        }, null);
-                                SkullMagic.taskManager.queueTask(tsk);
-                            }
-                        }
-                        return true;
-                    }
-                }));
-        /*
-         * ,
-         * "invisibility",
-         * new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
-         * Boolean>() {
-         * 
-         * @Override
-         * public Boolean apply(ServerPlayerEntity player, World world, EssencePool
-         * altar) {
-         * 
-         * return false;
-         * }
-         * })
-         */
-        return spellList;
-    }
+    public static Map<String, ? extends Spell> SpellDict = SpellInitializer.initSpells();
 
     @Override
     public boolean isDirty() {
@@ -458,6 +117,7 @@ public class SpellManager extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
+        // playerSpells
         NbtCompound playerSpellsNBT = new NbtCompound();
         availableSpells.keySet().forEach((uuid) -> {
             NbtCompound playerSpellDataList = new NbtCompound();
@@ -470,6 +130,20 @@ public class SpellManager extends PersistentState {
             playerSpellsNBT.put(uuid.toString(), playerSpellDataList);
         });
         nbt.put("playerSpells", playerSpellsNBT);
+        // shrines
+        NbtCompound spellShrines = new NbtCompound();
+        spellShrinePools.keySet().forEach((worldkey) -> {
+            NbtCompound worldNbt = new NbtCompound();
+            spellShrinePools.get(worldkey).keySet().forEach((posStr) -> {
+                NbtCompound poolNbt = new NbtCompound();
+                SpellShrinePool pool = spellShrinePools.get(worldkey).get(posStr);
+                pool.writeNbt(poolNbt);
+                worldNbt.put(pool.position.toShortString(), poolNbt);
+            });
+
+            spellShrines.put(worldkey.getValue().toString(), worldNbt);
+        });
+        nbt.put("spellShrines", spellShrines);
         return nbt;
     }
 
@@ -482,6 +156,32 @@ public class SpellManager extends PersistentState {
                 playerSpells.getCompound(uuidStr).getKeys().forEach((spellname) -> {
                     spmngr.availableSpells.get(UUID.fromString(uuidStr)).put(spellname,
                             PlayerSpellData.fromNbt(playerSpells.getCompound(uuidStr)));
+                });
+            });
+        }
+        // spellshrines
+        if (tag.contains("spellShrines")) {
+            NbtCompound spellShrines = tag.getCompound("spellShrines");
+            spellShrines.getKeys().forEach((worldKey) -> {
+                RegistryKey<World> key = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
+                        Identifier.tryParse(worldKey));
+                spmngr.spellShrinePools.put(key, new HashMap<>());
+                NbtCompound worldList = spellShrines.getCompound(worldKey);
+                worldList.getKeys().forEach((spellPoolPosString) -> {
+                    SpellShrinePool pool = SpellShrinePool.fromNbt(worldList.getCompound(spellPoolPosString));
+                    spmngr.spellShrinePools.get(key).put(Parsing.shortStringToBlockPos(spellPoolPosString),
+                            pool);
+                    if (pool.linkedPlayerID != null) {
+                        spmngr.playersToSpellPools.put(pool.linkedPlayerID, pool);
+                    }
+                    for (BlockPos blockPos : pool.linkedPedestals.keySet()) {
+                        if (!spmngr.pedestalsToSpellShrinePools.containsKey(key)) {
+                            spmngr.pedestalsToSpellShrinePools.put(key, new HashMap<>());
+                        }
+                        spmngr.pedestalsToSpellShrinePools.get(key).put(blockPos, pool);
+                    }
+                    spmngr.spellShrinePools.get(key).put(Parsing.shortStringToBlockPos(spellPoolPosString), pool);
+
                 });
             });
         }
@@ -525,9 +225,107 @@ public class SpellManager extends PersistentState {
 
     public void learnAllSpellsForPlayer(ServerPlayerEntity player) {
         for (String spellname : SpellDict.keySet()) {
-
             learnSpell(player, spellname, true);
         }
+    }
 
+    public void removeSpellShrine(RegistryKey<World> registryKey, BlockPos pos) {
+        if (this.spellShrinePools.containsKey(registryKey) && this.spellShrinePools.get(registryKey).containsKey(pos)) {
+            SpellShrinePool pool = this.spellShrinePools.get(registryKey).get(pos);
+            if (pool.linkedPlayerID != null) {
+                this.resetSpellUpgradesForPlayer(pool.linkedPlayerID, pool.getSpellName());
+            }
+            this.spellShrinePools.get(registryKey).remove(pos);
+        }
+    }
+
+    public void resetSpellUpgradesForPlayer(UUID linkedPlayerID, String spellName) {
+        this.availableSpells.get(linkedPlayerID).put(spellName, new PlayerSpellData());
+    }
+
+    public void addNewSpellShrine(World world, BlockPos pos, UUID playerID, String spellname) {
+        RegistryKey<World> registryKey = world.getRegistryKey();
+        SpellShrinePool pool = new SpellShrinePool(playerID, pos, spellname,
+                world.getBlockEntity(pos, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY).get().level
+                        * Config.getConfig().shrineRangePerLevel);
+        if (!this.spellShrinePools.containsKey(registryKey)) {
+            this.spellShrinePools.put(registryKey, new HashMap<>());
+        }
+        this.spellShrinePools.get(registryKey).put(pos, pool);
+        if (!this.playerToSpellShrine.containsKey(playerID)) {
+            playerToSpellShrine.put(playerID, new HashMap<>());
+        }
+        playerToSpellShrine.get(playerID).put(spellname, pos);
+        this.addNearbySpellPedestals(world, pos, spellname);
+    }
+
+    private void addNearbySpellPedestals(World world, BlockPos pos, String spellname) {
+        RegistryKey<World> registryKey = world.getRegistryKey();
+        SpellShrinePool pool = this.spellShrinePools.get(registryKey).get(pos);
+
+        for (int x = pos.getX() - pool.range; x < pos.getX() + pool.range; x++) {
+            for (int y = pos.getY() - pool.range; y < pos.getY() + pool.range; y++) {
+                for (int z = pos.getZ() - pool.range; z < pos.getZ() + pool.range; z++) {
+                    BlockPos candidatePos = new BlockPos(x, y, z);
+                    Optional<SpellPedestalBlockEntity> opt = world.getBlockEntity(candidatePos,
+                            SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY);
+                    if (opt.isPresent()) {
+
+                        if (!this.pedestalsToSpellShrinePools.containsKey(registryKey)
+                                || !this.pedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+                            if (opt.get().spellName != null && opt.get().spellName.equals(spellname)) {
+                                addPedestalLink(registryKey, pool, candidatePos);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean tryAddSpellPedestal(RegistryKey<World> registryKey, BlockPos pos, UUID id, String spellname) {
+        boolean result = false;
+        if (!this.spellShrinePools.containsKey(registryKey)) {
+
+        } else {
+            for (Entry<BlockPos, SpellShrinePool> entry : this.spellShrinePools.get(registryKey).entrySet()) {
+                if (canConnectPedestalToPool(pos, spellname, entry.getValue(), entry.getKey(), id)) {
+                    addPedestalLink(registryKey, entry.getValue(), pos);
+                    result = true;
+                    break;
+                }
+            }
+
+        }
+        return result;
+    }
+
+    public void addPedestalLink(RegistryKey<World> registryKey, SpellShrinePool pool, BlockPos pedestalPos) {
+        if (!this.pedestalsToSpellShrinePools.containsKey(registryKey)) {
+            this.pedestalsToSpellShrinePools.put(registryKey, new HashMap<>());
+        }
+        this.pedestalsToSpellShrinePools.get(registryKey).put(pedestalPos, pool);
+        pool.addPedestal(pedestalPos, 1);// TODO: implement pedestal strength here
+    }
+
+    private boolean canConnectPedestalToPool(BlockPos pedestalPos, String pedestalSpellName, SpellShrinePool pool,
+            BlockPos pos, UUID playerID) {
+        BlockPos diff = pedestalPos.subtract(pos);
+        return Math.abs(diff.getX()) <= pool.range && Math.abs(diff.getY()) <= pool.range
+                && Math.abs(diff.getZ()) <= pool.range && pool.getSpellName().equals(pedestalSpellName)
+                && pool.linkedPlayerID.equals(playerID);
+    }
+
+    public void removeSpellPedestal(RegistryKey<World> registryKey, BlockPos pos) {
+        if (this.pedestalsToSpellShrinePools.containsKey(registryKey)
+                && this.pedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+            SpellShrinePool pool = this.pedestalsToSpellShrinePools.get(registryKey).get(pos);
+            pool.removePedestal(pos);
+            this.pedestalsToSpellShrinePools.get(registryKey).remove(pos);
+        }
+    }
+
+    public PlayerSpellData getSpellData(UUID linkedPlayerID, String spellName) {
+        return this.availableSpells.get(linkedPlayerID).get(spellName);
     }
 }

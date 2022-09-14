@@ -24,6 +24,7 @@ public class Config {
         public HashMap<String, Map<String, Float>> drops;
 
         public HashMap<String, Integer> skulls;
+        public HashMap<String, Integer> shrines;
         public int scanWidth;
         public int scanHeight;
         public int supplyWidth;
@@ -32,12 +33,14 @@ public class Config {
         public String[] defaultSpells;
 
         public int capacityCrystalStrength;
-
         public int altarCapacity;
+
+        public int shrineRangePerLevel;
 
         public ConfigData() {
             this.drops = new HashMap<String, Map<String, Float>>();
             this.skulls = new HashMap<String, Integer>();
+            this.shrines = new HashMap<>();
         }
     }
 
@@ -111,6 +114,10 @@ public class Config {
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 3);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 4);
+
+        // shrine values
+        defaultData.shrines.put(Registry.ITEM.getId(SkullMagic.SIMPLE_SPELL_SHRINE.asItem()).toString(), 3);
+
         defaultData.scanHeight = 2;
         defaultData.scanWidth = 5;
         defaultData.supplyWidth = 32;
@@ -120,6 +127,7 @@ public class Config {
         // other values
         defaultData.capacityCrystalStrength = 100;
         defaultData.altarCapacity = 100;
+        defaultData.shrineRangePerLevel = 5;
 
         return defaultData;
     }
