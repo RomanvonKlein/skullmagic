@@ -5,6 +5,7 @@ import com.romanvonklein.skullmagic.blocks.AdvancedSpellShrine;
 import com.romanvonklein.skullmagic.blocks.IntermediateSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -24,15 +25,19 @@ public class SpellShrineBlockEntity extends BlockEntity {
     @Override
     public void writeNbt(NbtCompound nbt) {
         nbt.putInt("level", level);
-        NbtCompound scrollCompound = new NbtCompound();
-        this.scroll.writeNbt(scrollCompound);
-        nbt.put("scroll", scrollCompound);
+        if (this.scroll != null) {
+            NbtCompound scrollCompound = new NbtCompound();
+            this.scroll.writeNbt(scrollCompound);
+            nbt.put("scroll", scrollCompound);
+        }
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         this.level = nbt.getInt("level");
-        this.scroll = ItemStack.fromNbt(nbt.getCompound("scroll"));
+        if (nbt.contains("scroll", NbtType.COMPOUND)) {
+            this.scroll = ItemStack.fromNbt(nbt.getCompound("scroll"));
+        }
     }
 
     public SpellShrineBlockEntity(BlockPos a, BlockState b) {

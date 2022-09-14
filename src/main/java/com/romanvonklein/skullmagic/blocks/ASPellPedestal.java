@@ -13,6 +13,9 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -84,6 +87,9 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                                 player.getGameProfile().getId(), spellname)) {
                             ent.scroll = itemStack.copy();
                             itemStack.decrement(1);
+                            world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
+                                    SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
+                                    SoundCategory.BLOCKS, 1.0f, 1.0f, true);
                         } else {
                             player.sendMessage(
                                     Text.of("Could not find a spell shrine linked to you and " + spellname

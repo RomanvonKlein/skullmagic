@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientSpellManager {
-    public HashMap<String, Integer> spellList = new HashMap<>();
+    public HashMap<String, PlayerSpellData> spellList = new HashMap<>();
     public ArrayList<String> spellnames = new ArrayList<>();
     public String selectedSpellName = "fireball";
 
@@ -14,7 +14,10 @@ public class ClientSpellManager {
         for (String valuePair : message.split(";")) {
             String[] parts = valuePair.split(":");
             if (parts.length > 1) {
-                this.spellList.put(parts[0], Integer.parseInt(parts[1]));
+                String[] valueParts = parts[1].split(",");
+                this.spellList.put(parts[0], new PlayerSpellData(Integer.parseInt(valueParts[0]),
+                        Double.parseDouble(valueParts[1]), Double.parseDouble(valueParts[2]),
+                        Double.parseDouble(valueParts[3])));
                 spellnames.add(parts[0]);
             }
         }

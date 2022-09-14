@@ -54,12 +54,13 @@ public class SpellManager extends PersistentState {
                 if (spellData.cooldownLeft <= 0) {
                     EssencePool pool = SkullMagic.essenceManager.getEssencePoolForPlayer(playerID);
                     Spell spell = SpellDict.get(spellName);
+
                     int reducedEssenceCost = (int) Math.round(
                             spell.essenceCost * (1 + spellData.powerLevel / 4)
                                     * (1 - Math.log(1 + (spellData.efficiencyLevel - 1) * 0.5)));
                     if (pool.getEssence() >= reducedEssenceCost) {
-                        spellData.cooldownLeft = (int) Math.round(SpellDict.get(spellName).cooldownTicks
-                                * (1 - Math.log(1 + (spellData.cooldownReductionLevel - 1) * 0.5)));
+                        spellData.cooldownLeft = spellData.getMaxCooldown(SpellDict.get(spellName).cooldownTicks);
+
                         success = spell.action.apply(player, spellData, pool);
                         if (success) {
                             pool.discharge(reducedEssenceCost);

@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.spells;
 
+import com.romanvonklein.skullmagic.SkullMagic;
+
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
@@ -48,5 +50,10 @@ public class PlayerSpellData extends PersistentState {
             result = new PlayerSpellData(0, 1.0, 1.0, 1.0);
         }
         return result;
+    }
+
+    public int getMaxCooldown(int defaultCooldownTicks) {
+        return (int) Math.round(defaultCooldownTicks
+                * (1 - Math.log(1 + (this.cooldownReductionLevel - 1) * 0.5)));
     }
 }

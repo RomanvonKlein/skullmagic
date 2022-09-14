@@ -77,11 +77,13 @@ public class EssenceStatus {
                         if (spellname != null && ClientInitializer.getClientSpellManager().spellList
                                         .containsKey(spellname)) {
                                 int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
-                                                .get(spellname);
+                                                .get(spellname).cooldownLeft;
                                 y += 3 * borderwidth + barheight;
 
-                                int maxCoolDown = SpellManager.SpellDict
-                                                .get(spellname).cooldownTicks;
+                                int maxCoolDown = ClientInitializer.getClientSpellManager().spellList
+                                                .get(spellname)
+                                                .getMaxCooldown(SpellManager.SpellDict
+                                                                .get(spellname).cooldownTicks);
                                 int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
                                 double pxPerTick = 1;
                                 try {

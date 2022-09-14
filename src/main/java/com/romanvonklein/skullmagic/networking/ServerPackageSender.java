@@ -15,7 +15,11 @@ public class ServerPackageSender {
         // String msg = "";
         SkullMagic.spellManager.availableSpells.get(player.getGameProfile().getId()).entrySet().forEach((entry) -> {
             PlayerSpellData spellData = entry.getValue();
-            String appendix = entry.getKey() + ":" + Integer.toString(spellData.cooldownLeft) + ";";
+            String appendix = entry.getKey() + ":" + Integer.toString(spellData.cooldownLeft) + ","
+                    + Double.toString(spellData.efficiencyLevel) + ","
+                    + Double.toString(spellData.efficiencyLevel) + ","
+                    + Double.toString(spellData.cooldownReductionLevel)
+                    + ";";
             builder.append(appendix);
         });
         String result = builder.toString();
