@@ -27,7 +27,7 @@ public class ItemHolderBlockEntityRendererShrine implements BlockEntityRenderer<
             matrices.push();
 
             // Calculate the current offset in the y value
-            double offset = Math.sin((blockEntity.getWorld().getTime() + tickDelta) / 8.0) / 4.0;
+            double offset = Math.sin((blockEntity.getWorld().getTime() + tickDelta) / 8.0) / 8.0;
             // Move the item
             matrices.translate(0.5, 1.25 + offset, 0.5);
 

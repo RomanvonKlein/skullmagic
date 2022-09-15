@@ -16,6 +16,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -83,6 +85,13 @@ public class SpellShrineBlockEntity extends BlockEntity {
     public void setScroll(ItemStack newScroll) {
         this.scroll = newScroll;
         this.markDirty();
+        if (newScroll == null) {
+            world.playSound(null, this.getPos(),
+                    SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 1f, 1f);
+        } else {
+            world.playSound(null, this.getPos(),
+                    SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1f, 1f);
+        }
         world.updateListeners(pos, this.getCachedState(), world.getBlockState(pos), Block.NOTIFY_LISTENERS);
     }
 

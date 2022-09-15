@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class ClientSpellManager {
     public HashMap<String, PlayerSpellData> spellList = new HashMap<>();
     public ArrayList<String> spellnames = new ArrayList<>();
-    public String selectedSpellName = "fireball";
+    public String selectedSpellName = null;
 
     public void loadSpells(String message) {
         this.spellnames.clear();
@@ -20,6 +20,9 @@ public class ClientSpellManager {
                         Double.parseDouble(valueParts[3])));
                 spellnames.add(parts[0]);
             }
+        }
+        if (this.selectedSpellName == null && this.spellnames.size() > 0) {
+            this.selectedSpellName = this.spellnames.get(0);
         }
     }
 
