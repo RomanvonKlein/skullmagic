@@ -17,6 +17,10 @@
                 },
                 {
                     "type": "minecraft:item",
+                    "name": "skullmagic:witherbreath_orb"
+                },
+                {
+                    "type": "minecraft:item",
                     "name": "skullmagic:lightningstorm_orb"
                 },
                 {
