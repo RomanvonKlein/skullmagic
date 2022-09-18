@@ -11,6 +11,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
+import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
@@ -186,6 +187,50 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put(
+                "witherbreath",
+                new Spell(750, 150, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        int shotsPerTick = 2;
+                        int tickDuration = 30;
+                        int breathLife = 20 + (int) Math.round(spellData.getPowerLevel() * 4);
+                        int witherDuration = 40 + (int) Math.round(spellData.getPowerLevel() * 10);
+                        int damage = 1 + (int) Math.round(spellData.getPowerLevel() * 10);
+
+                        for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more
+                                                                // memory
+                                                                // efficient.
+                            SkullMagic.taskManager.queueTask(new DelayedTask("spawn_fire_breath_task", i,
+                                    new TriFunction<Object[], Object, Object, Boolean>() {
+                                        @Override
+                                        public Boolean apply(Object[] data, Object n1, Object n2) {
+                                            int shotsPerTick = ((int[]) data[0])[0];
+                                            int breathLife = ((int[]) data[0])[1];
+                                            int witherDuration = ((int[]) data[0])[2];
+                                            int damage = ((int[]) data[0])[2];
+                                            Random rand = new Random();
+                                            Vec3d dir = player.getRotationVector().normalize();
+
+                                            World world = player.world;
+                                            for (int i = 0; i < shotsPerTick; i++) {
+                                                WitherBreath entity = WitherBreath.createWitherBreath(world, player,
+                                                        dir.x + rand.nextFloat() * 0.5,
+                                                        dir.y + rand.nextFloat() * 0.5, dir.z + rand.nextFloat() * 0.5,
+                                                        witherDuration, breathLife, damage);
+                                                entity.setPosition(
+                                                        player.getPos().add(dir.multiply(0.5))
+                                                                .add(0, player.getEyeHeight(player.getPose()), 0));
+                                                world.spawnEntity(entity);
+                                            }
+                                            return true;
+                                        }
+                                    },
+                                    new Object[] { new int[] { shotsPerTick, breathLife, witherDuration, damage } }));
+                        }
+                        return true;
+                    }
+                }));
+        spellList.put(
                 "slowball",
                 new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
@@ -193,10 +238,30 @@ public class SpellInitializer {
 
                         World world = player.world;
                         if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0);
+                            Vec3d velocity = player.getRotationVector().multiply(8.0 + spellData.getPowerLevel() * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
                                     velocity.z,
                                     StatusEffects.SLOWNESS, 4.0f,
+                                    (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3)));
+                            ball.setPosition(
+                                    player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
+                            world.spawnEntity(ball);
+                        }
+                        return true;
+                    }
+                }));
+        spellList.put(
+                "weakball",
+                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+
+                        World world = player.world;
+                        if (!world.isClient) {
+                            Vec3d velocity = player.getRotationVector().multiply(8.0 + spellData.getPowerLevel() * 2);
+                            EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
+                                    velocity.z,
+                                    StatusEffects.WEAKNESS, 4.0f,
                                     (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3)));
                             ball.setPosition(
                                     player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
@@ -222,7 +287,41 @@ public class SpellInitializer {
                 new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500,
+                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,
+                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                        return true;
+                    }
+                }));
+        spellList.put(
+                "strengthbuff",
+                new Spell(750, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH,
+                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                        return true;
+                    }
+                }));
+        spellList.put(
+                "fireresistance",
+                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE,
+                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                        return true;
+                    }
+                }));
+        spellList.put(
+                "waterbreathing",
+                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING,
+                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
                                 (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
                         return true;
                     }
@@ -254,7 +353,7 @@ public class SpellInitializer {
 
                         World world = player.world;
                         if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0);
+                            Vec3d velocity = player.getRotationVector().multiply(8.0 + spellData.getPowerLevel() * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
                                     velocity.z,
                                     StatusEffects.POISON, 4.0f,

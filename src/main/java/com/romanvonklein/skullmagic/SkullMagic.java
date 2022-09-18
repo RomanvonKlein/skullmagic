@@ -32,6 +32,7 @@ import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
+import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
@@ -57,6 +58,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.projectile.AbstractFireballEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.ScreenHandlerType;
@@ -145,6 +147,7 @@ public class SkullMagic implements ModInitializer {
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
 	public static EntityType<FireBreath> FIRE_BREATH;
+	public static EntityType<WitherBreath> WITHER_BREATH;
 
 	// screen handlers
 	public static ScreenHandlerType<BlockPlacerScreenHandler> BLOCK_PLACER_SCREEN_HANDLER;
@@ -262,6 +265,9 @@ public class SkullMagic implements ModInitializer {
 						.dimensions(EntityDimensions.fixed(0.75f, 0.75f)).build());
 		FIRE_BREATH = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "fire_breath"),
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, FireBreath::new)
+						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
+		WITHER_BREATH = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "wither_breath"),
+				FabricEntityTypeBuilder.create(SpawnGroup.MISC, WitherBreath::new)
 						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
 
 		// register screenhandler stuff

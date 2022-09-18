@@ -10,6 +10,7 @@ import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererS
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
+import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
 import com.romanvonklein.skullmagic.hud.EssenceStatus;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
@@ -108,6 +109,9 @@ public class ClientInitializer implements ClientModInitializer {
         });
         EntityRendererRegistry.register(SkullMagic.FIRE_BREATH, (context) -> {
             return new FlyingItemEntityRenderer<FireBreath>(context, 1.0f, false);
+        });
+        EntityRendererRegistry.register(SkullMagic.WITHER_BREATH, (context) -> {
+            return new FlyingItemEntityRenderer<WitherBreath>(context, 1.0f, false);
         });
 
         BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
