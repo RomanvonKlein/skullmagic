@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public class BlockUserBlockEntity extends AEssenceConsumer {
 
     private int lastTickRedstonePower = 0;
-    private static int essenceCost = 150;
+    private static int essenceCost = 1500;
 
     public BlockUserBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.BLOCK_USER_BLOCK_ENTITY, pos, state);

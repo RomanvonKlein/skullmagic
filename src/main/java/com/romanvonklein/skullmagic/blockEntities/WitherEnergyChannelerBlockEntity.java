@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 public class WitherEnergyChannelerBlockEntity extends AEssenceConsumer {
 
     private int lastTickRedstonePower = 0;
-    private static int essenceCost = 200;
+    private static int essenceCost = 1500;
     private static final int range = 5;
 
     public WitherEnergyChannelerBlockEntity(BlockPos pos, BlockState state) {

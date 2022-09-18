@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 public class FireCannonBlockEntity extends AEssenceConsumer {
 
     private int lastTickRedstonePower = 0;
-    private int essenceCost = 50;
+    private int essenceCost = 500;
 
     public FireCannonBlockEntity(BlockPos pos, BlockState state) {
         super(SkullMagic.FIRE_CANNON_BLOCK_ENTITY, pos, state);

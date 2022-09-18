@@ -38,7 +38,7 @@ public class SpellInitializer {
 
         Map<String, Spell> spellList = new HashMap<>();
         spellList.put("fireball",
-                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1000, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         Vec3d angle = player.getRotationVector().normalize()
@@ -56,7 +56,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("selfheal",
-                new Spell(50, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.heal(2.0f + (float) (2 * spellData.getPowerLevel()));
@@ -65,7 +65,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "meteoritestorm",
-                new Spell(650, 600, 45, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(6500, 600, 45, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int meteoriteCount = 10 + (int) Math.round(2.0 * spellData.getPowerLevel());
@@ -110,7 +110,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "wolfpack",
-                new Spell(250, 500, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(2500, 500, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int wolfCount = 2 + (int) Math.round((spellData.getPowerLevel() - 1));
@@ -145,7 +145,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "firebreath",
-                new Spell(50, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int shotsPerTick = 2;
@@ -187,7 +187,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "slowball",
-                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
 
@@ -207,7 +207,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "speedbuff",
-                new Spell(50, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(
@@ -219,7 +219,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "resistancebuff",
-                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500,
@@ -229,7 +229,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "teleport",
-                new Spell(100, 800, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1000, 800, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         boolean success = false;
@@ -248,7 +248,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "poisonball",
-                new Spell(50, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
 
@@ -267,7 +267,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("shockwave",
-                new Spell(100, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1000, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
 
@@ -299,7 +299,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("lightningstrike",
-                new Spell(150, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         HitResult result = player.raycast(100, 1, false);
@@ -315,7 +315,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("lightningstorm",
-                new Spell(500, 450, 40, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(5000, 450, 40, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         int lightningCount = (int) Math.round(Math.min(10 + spellData.getPowerLevel() * 3, 50));
@@ -352,7 +352,7 @@ public class SpellInitializer {
         /*
          * ,
          * "invisibility",
-         * new Spell(50, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
+         * new Spell(500, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
          * Boolean>() {
          * 
          * @Override

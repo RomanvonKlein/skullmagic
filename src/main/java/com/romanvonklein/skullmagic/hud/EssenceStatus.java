@@ -3,6 +3,8 @@ package com.romanvonklein.skullmagic.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.spells.PlayerSpellData;
+import com.romanvonklein.skullmagic.spells.Spell;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.minecraft.client.MinecraftClient;
@@ -74,78 +76,87 @@ public class EssenceStatus {
 
                         // spell cooldown bar
                         String spellname = ClientInitializer.getClientSpellManager().selectedSpellName;
-                        if (spellname != null && ClientInitializer.getClientSpellManager().spellList
-                                        .containsKey(spellname)) {
-                                int cooldownLeft = ClientInitializer.getClientSpellManager().spellList
-                                                .get(spellname).cooldownLeft;
-                                y += 3 * borderwidth + barheight;
+                        PlayerSpellData spellData = null;
+                        if (spellname != null
+                                        && ClientInitializer.getClientSpellManager().spellList.containsKey(spellname)) {
+                                if ((spellData = ClientInitializer.getClientSpellManager().spellList
+                                                .get(spellname)) != null) {
 
-                                int maxCoolDown = ClientInitializer.getClientSpellManager().spellList
-                                                .get(spellname)
-                                                .getMaxCooldown(SpellManager.SpellDict
-                                                                .get(spellname).cooldownTicks);
-                                int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
-                                double pxPerTick = 1;
-                                try {
-                                        pxPerTick = Double.valueOf(barwidth)
-                                                        / Double.valueOf(maxCoolDown);
-                                } catch (Exception e) {
-                                        SkullMagic.LOGGER.error(
-                                                        "could not calculate dimensions for hud rendering correctly");
+                                        int cooldownLeft = spellData.cooldownLeft;
+                                        y += 3 * borderwidth + barheight;
+
+                                        int maxCoolDown = spellData.getMaxCooldown(SpellManager.SpellDict
+                                                        .get(spellname).cooldownTicks);
+                                        int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
+                                        double pxPerTick = 1;
+                                        try {
+                                                pxPerTick = Double.valueOf(barwidth)
+                                                                / Double.valueOf(maxCoolDown);
+                                        } catch (Exception e) {
+                                                SkullMagic.LOGGER.error(
+                                                                "could not calculate dimensions for hud rendering correctly");
+                                        }
+
+                                        // cooldown
+                                        int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
+                                        int rechargedBarWidth = barwidth - cooldownBarWidth;
+                                        drawRect(matrixStack, x, y, cooldownBarWidth,
+                                                        barheight,
+                                                        0xff9933);
+                                        // empty
+                                        drawRect(matrixStack, x + cooldownBarWidth, y,
+                                                        rechargedBarWidth,
+                                                        barheight, 0x66ff66);
+                                        // border
+                                        drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
+                                                        barwidth + 2 * borderwidth,
+                                                        barheight + 2 * borderwidth,
+                                                        ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
+
+                                        // cooldown counter
+                                        if (cooldownLeft != 0) {
+
+                                                renderer.draw(matrixStack, Integer.toString(cooldownLeft / 20),
+                                                                x + 2 * borderwidth + barwidth,
+                                                                y - 1, color);
+                                        }
+
+                                        String selectedSpellName = ClientInitializer
+                                                        .getClientSpellManager().selectedSpellName;
+                                        String nextSpellName = ClientInitializer.getClientSpellManager()
+                                                        .getNextSpellname();
+                                        String prevSpellName = ClientInitializer.getClientSpellManager()
+                                                        .getPrevSpellname();
+
+                                        // icons
+                                        // previous
+                                        if (ClientInitializer.SPELL_ICONS.containsKey(prevSpellName)) {
+                                                drawTextureRect(matrixStack,
+                                                                x - iconWidth - borderwidth - iconWidth / 2,
+                                                                y - borderwidth - iconWidth / 2,
+                                                                iconWidth,
+                                                                iconWidth,
+                                                                ClientInitializer.SPELL_ICONS.get(prevSpellName));
+                                        }
+                                        // next
+                                        if (ClientInitializer.SPELL_ICONS.containsKey(nextSpellName)) {
+                                                drawTextureRect(matrixStack,
+                                                                x - iconWidth - borderwidth - iconWidth / 2,
+                                                                y - borderwidth + iconWidth / 2,
+                                                                iconWidth,
+                                                                iconWidth,
+                                                                ClientInitializer.SPELL_ICONS.get(nextSpellName));
+                                        }
+                                        // current
+                                        if (ClientInitializer.SPELL_ICONS.containsKey(selectedSpellName)) {
+                                                drawTextureRect(matrixStack, x - iconWidth - borderwidth,
+                                                                y - borderwidth,
+                                                                iconWidth,
+                                                                iconWidth,
+                                                                ClientInitializer.SPELL_ICONS.get(selectedSpellName));
+                                        }
+
                                 }
-
-                                // cooldown
-                                int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
-                                int rechargedBarWidth = barwidth - cooldownBarWidth;
-                                drawRect(matrixStack, x, y, cooldownBarWidth,
-                                                barheight,
-                                                0xff9933);
-                                // empty
-                                drawRect(matrixStack, x + cooldownBarWidth, y,
-                                                rechargedBarWidth,
-                                                barheight, 0x66ff66);
-                                // border
-                                drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
-                                                barwidth + 2 * borderwidth,
-                                                barheight + 2 * borderwidth,
-                                                ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
-
-                                // cooldown counter
-                                if (cooldownLeft != 0) {
-
-                                        renderer.draw(matrixStack, Integer.toString(cooldownLeft / 20),
-                                                        x + 2 * borderwidth + barwidth,
-                                                        y - 1, color);
-                                }
-
-                                String selectedSpellName = ClientInitializer.getClientSpellManager().selectedSpellName;
-                                String nextSpellName = ClientInitializer.getClientSpellManager().getNextSpellname();
-                                String prevSpellName = ClientInitializer.getClientSpellManager().getPrevSpellname();
-
-                                // icons
-                                // previous
-                                if (ClientInitializer.SPELL_ICONS.containsKey(prevSpellName)) {
-                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth - iconWidth / 2,
-                                                        y - borderwidth - iconWidth / 2,
-                                                        iconWidth,
-                                                        iconWidth, ClientInitializer.SPELL_ICONS.get(prevSpellName));
-                                }
-                                // next
-                                if (ClientInitializer.SPELL_ICONS.containsKey(nextSpellName)) {
-                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth - iconWidth / 2,
-                                                        y - borderwidth + iconWidth / 2,
-                                                        iconWidth,
-                                                        iconWidth,
-                                                        ClientInitializer.SPELL_ICONS.get(nextSpellName));
-                                }
-                                // current
-                                if (ClientInitializer.SPELL_ICONS.containsKey(selectedSpellName)) {
-                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth, y - borderwidth,
-                                                        iconWidth,
-                                                        iconWidth,
-                                                        ClientInitializer.SPELL_ICONS.get(selectedSpellName));
-                                }
-
                         }
                 }
         }

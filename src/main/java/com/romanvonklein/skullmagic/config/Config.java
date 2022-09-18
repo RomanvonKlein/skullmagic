@@ -110,7 +110,7 @@ public class Config {
         defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 2);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 25);
+        defaultData.skulls.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 15);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 3);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 4);
@@ -125,8 +125,8 @@ public class Config {
         defaultData.defaultSpells = new String[] {};
 
         // other values
-        defaultData.capacityCrystalStrength = 100;
-        defaultData.altarCapacity = 100;
+        defaultData.capacityCrystalStrength = 500;
+        defaultData.altarCapacity = 1000;
         defaultData.shrineRangePerLevel = 5;
 
         return defaultData;

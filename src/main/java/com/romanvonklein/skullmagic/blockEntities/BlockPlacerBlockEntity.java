@@ -36,7 +36,7 @@ import net.minecraft.world.World;
 public class BlockPlacerBlockEntity extends BlockEntity
         implements NamedScreenHandlerFactory, IImplementedInventory, InventoryChangedListener {
     private int lastTickRedstonePower = 0;
-    private int essenceCost = 75;
+    private int essenceCost = 750;
     // private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(3,
     // ItemStack.EMPTY);
     private static final int INVENTORY_SIZE = 9;
