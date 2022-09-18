@@ -168,6 +168,8 @@ public class SpellInitializer {
                                             Vec3d dir = player.getRotationVector().normalize();
 
                                             World world = player.world;
+                                            world.playSound(null, player.getBlockPos(),
+                                                    SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
                                             for (int i = 0; i < shotsPerTick; i++) {
                                                 FireBreath entity = FireBreath.createFireBreath(world, player,
                                                         dir.x + rand.nextFloat() * 0.5,
@@ -177,6 +179,7 @@ public class SpellInitializer {
                                                         player.getPos().add(dir.multiply(0.5))
                                                                 .add(0, player.getEyeHeight(player.getPose()), 0));
                                                 world.spawnEntity(entity);
+
                                             }
                                             return true;
                                         }
@@ -196,7 +199,6 @@ public class SpellInitializer {
                         int breathLife = 20 + (int) Math.round(spellData.getPowerLevel() * 10);
                         int witherDuration = 120 + (int) Math.round(spellData.getPowerLevel() * 80);
                         int damage = 1 + (int) Math.round(spellData.getPowerLevel() * 2);
-
                         for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more
                                                                 // memory
                                                                 // efficient.
@@ -212,6 +214,8 @@ public class SpellInitializer {
                                             Vec3d dir = player.getRotationVector().normalize();
 
                                             World world = player.world;
+                                            world.playSound(null, player.getBlockPos(),
+                                                    SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
                                             for (int i = 0; i < shotsPerTick; i++) {
                                                 WitherBreath entity = WitherBreath.createWitherBreath(world, player,
                                                         dir.x + rand.nextFloat() * 0.5,
