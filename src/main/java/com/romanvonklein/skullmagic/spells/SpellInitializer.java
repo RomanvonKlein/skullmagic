@@ -191,23 +191,23 @@ public class SpellInitializer {
                 new Spell(750, 150, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int shotsPerTick = 2;
+                        int shotsPerTick = 2 + (int) Math.floor(spellData.getPowerLevel() / 2);
                         int tickDuration = 30;
-                        int breathLife = 20 + (int) Math.round(spellData.getPowerLevel() * 4);
-                        int witherDuration = 40 + (int) Math.round(spellData.getPowerLevel() * 10);
-                        int damage = 1 + (int) Math.round(spellData.getPowerLevel() * 10);
+                        int breathLife = 20 + (int) Math.round(spellData.getPowerLevel() * 10);
+                        int witherDuration = 120 + (int) Math.round(spellData.getPowerLevel() * 80);
+                        int damage = 1 + (int) Math.round(spellData.getPowerLevel() * 2);
 
                         for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more
                                                                 // memory
                                                                 // efficient.
-                            SkullMagic.taskManager.queueTask(new DelayedTask("spawn_fire_breath_task", i,
+                            SkullMagic.taskManager.queueTask(new DelayedTask("spawn_wither_breath_task", i,
                                     new TriFunction<Object[], Object, Object, Boolean>() {
                                         @Override
                                         public Boolean apply(Object[] data, Object n1, Object n2) {
                                             int shotsPerTick = ((int[]) data[0])[0];
                                             int breathLife = ((int[]) data[0])[1];
                                             int witherDuration = ((int[]) data[0])[2];
-                                            int damage = ((int[]) data[0])[2];
+                                            int damage = ((int[]) data[0])[3];
                                             Random rand = new Random();
                                             Vec3d dir = player.getRotationVector().normalize();
 
@@ -277,8 +277,8 @@ public class SpellInitializer {
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(
                                 new StatusEffectInstance(StatusEffects.SPEED,
-                                        500 + 500 * (int) Math.round((spellData.getPowerLevel() - 1) * 0.25),
-                                        (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                                        (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
+                                        (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
                         return true;
                     }
                 }));
@@ -288,8 +288,8 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,
-                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
                         return true;
                     }
                 }));
@@ -299,8 +299,8 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH,
-                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
                         return true;
                     }
                 }));
@@ -310,8 +310,8 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE,
-                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
                         return true;
                     }
                 }));
@@ -321,7 +321,7 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING,
-                                (int) Math.round(400 + spellData.getPowerLevel() * 100),
+                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
                                 (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
                         return true;
                     }

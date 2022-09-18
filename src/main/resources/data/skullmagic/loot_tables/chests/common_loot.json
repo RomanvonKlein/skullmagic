@@ -17,6 +17,10 @@
         },
         {
           "type": "minecraft:item",
+          "name": "skullmagic:fireresistance_orb"
+        },
+        {
+          "type": "minecraft:item",
           "name": "skullmagic:selfheal_orb"
         },
         {
@@ -43,7 +47,6 @@
           "type": "minecraft:item",
           "name": "minecraft:golden_apple"
         }
-        
       ]
     },
     {

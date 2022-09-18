@@ -34,6 +34,7 @@ public class WitherBreath extends FireBreath {
         this.damage = damage;
         this.witherDuration = witherDuration;
         this.lifeTime = lifeTime;
+        this.setVelocity(x, y, z);
     }
 
     public static WitherBreath createWitherBreath(World world, LivingEntity owner, double velocityX, double velocityY,
