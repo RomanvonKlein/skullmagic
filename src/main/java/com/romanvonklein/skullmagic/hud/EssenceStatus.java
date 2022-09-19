@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.spells.PlayerSpellData;
-import com.romanvonklein.skullmagic.spells.Spell;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.minecraft.client.MinecraftClient;

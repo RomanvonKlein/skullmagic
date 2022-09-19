@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ import com.romanvonklein.skullmagic.structurefeatures.DarkTowerFeature;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -53,21 +56,35 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.projectile.AbstractFireballEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.structure.pool.StructurePool;
+import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.YOffset;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.OreFeatureConfig;
+import net.minecraft.world.gen.feature.PlacedFeature;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
+import net.minecraft.world.gen.placementmodifier.CountPlacementModifier;
+import net.minecraft.world.gen.placementmodifier.HeightRangePlacementModifier;
+import net.minecraft.world.gen.placementmodifier.SquarePlacementModifier;
 
 public class SkullMagic implements ModInitializer {
 	public static String MODID = "skullmagic";
@@ -82,19 +99,7 @@ public class SkullMagic implements ModInitializer {
 									.forGetter(StructurePoolFeatureConfig::getSize))
 					.apply(instance,
 							StructurePoolFeatureConfig::new));
-	/*
-	 * .create(instance -> instance
-	 * .group(((MapCodec) StructurePool.REGISTRY_CODEC.fieldOf("start_pool"))
-	 * .forGetter(t -> ((StructurePoolFeatureConfig) t).getStartPool()),
-	 * ((MapCodec) Codec.intRange(0, 1000).fieldOf("size"))
-	 * .forGetter(t -> {
-	 * SkullMagic.LOGGER.info("Getting size for structurePool");
-	 * return ((StructurePoolFeatureConfig) t).getSize();
-	 * }))
-	 * .apply(instance,
-	 * (t, u) -> new StructurePoolFeatureConfig(((RegistryEntry<StructurePool>) t),
-	 * ((int) u))));
-	 */
+
 	public static final StructureFeature<StructurePoolFeatureConfig> DARK_TOWER = Registry.register(
 			Registry.STRUCTURE_FEATURE,
 			MODID + ":dark_tower",
@@ -129,8 +134,12 @@ public class SkullMagic implements ModInitializer {
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.BLAZE,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
+	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.of(Material.STONE).strength(2.0f));
+	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.of(Material.AMETHYST).strength(4.0f));
 
+	// items
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
+	public static final Item SKULLIUM_SHARD = new Item(new FabricItemSettings().group(ItemGroup.MISC));
 
 	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
@@ -151,6 +160,21 @@ public class SkullMagic implements ModInitializer {
 
 	// screen handlers
 	public static ScreenHandlerType<BlockPlacerScreenHandler> BLOCK_PLACER_SCREEN_HANDLER;
+
+	// ore features
+	private static final ConfiguredFeature<?, ?> END_SKULLIUM_ORE_CONFIGURED_FEATURE = new ConfiguredFeature(
+			Feature.ORE,
+			new OreFeatureConfig(
+					new BlockMatchRuleTest(Blocks.END_STONE),
+					SKULLIUM_ORE.getDefaultState(),
+					9));
+
+	public static PlacedFeature END_SKULLIUM_ORE_PLACED_FEATURE = new PlacedFeature(
+			RegistryEntry.of(END_SKULLIUM_ORE_CONFIGURED_FEATURE),
+			Arrays.asList(
+					CountPlacementModifier.of(20),
+					SquarePlacementModifier.of(),
+					HeightRangePlacementModifier.uniform(YOffset.getBottom(), YOffset.fixed(256))));
 
 	// custom managers
 	public static EssenceManager essenceManager;
@@ -252,12 +276,19 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "blaze_head"), BLAZE_HEAD_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "blaze_head"),
 				new BlockItem(BLAZE_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "skullium_ore"), SKULLIUM_ORE);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_ore"),
+				new BlockItem(SKULLIUM_ORE, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "skullium_block"), SKULLIUM_BLOCK);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_block"),
+				new BlockItem(SKULLIUM_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
 
 		// register items
 		knowledgeOrbs = KnowledgeOrb.generateKnowledgeOrbs();
 		for (KnowledgeOrb orb : knowledgeOrbs) {
 			Registry.register(Registry.ITEM, new Identifier(MODID, orb.spellName + "_orb"), orb);
 		}
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_shard"), SKULLIUM_SHARD);
 
 		// register entities
 		EFFECT_BALL = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "effect_ball"),
@@ -313,5 +344,14 @@ public class SkullMagic implements ModInitializer {
 						});
 					}
 				});
+
+		// feature initialization
+		Registry.register(BuiltinRegistries.CONFIGURED_FEATURE,
+				new Identifier(MODID, "end_skullium_ore"), END_SKULLIUM_ORE_CONFIGURED_FEATURE);
+		Registry.register(BuiltinRegistries.PLACED_FEATURE, new Identifier(MODID, "end_skullium_ore"),
+				END_SKULLIUM_ORE_PLACED_FEATURE);
+		BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(), GenerationStep.Feature.UNDERGROUND_ORES,
+				RegistryKey.of(Registry.PLACED_FEATURE_KEY,
+						new Identifier(MODID, "end_skullium_ore")));
 	}
 }
