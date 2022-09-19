@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XGX",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "item": "skullmagic:intermediate_spell_shrine"
+    },
+    "G": {
+      "item": "minecraft:diamond_block"
+    },
+    "X": {
+      "item": "skullmagic:skullium_block"
+    }
+  },
+  "result": {
+    "item": "skullmagic:advanced_spell_shrine",
+    "count": 1
+  }
+}

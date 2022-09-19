@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    " W ",
+    "   "
+  ],
+  "key": {
+    "W": {
+      "item": "skullmagic:simple_spell_shrine"
+    },
+    "G": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "result": {
+    "item": "skullmagic:intermediate_spell_shrine",
+    "count": 1
+  }
+}
