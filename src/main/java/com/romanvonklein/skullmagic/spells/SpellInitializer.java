@@ -340,6 +340,17 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put(
+                "hastebuff",
+                new Spell(1500, 150, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE,
+                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                        return true;
+                    }
+                }));
+        spellList.put(
                 "teleport",
                 new Spell(1000, 800, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
