@@ -28,6 +28,10 @@
                 },
                 {
                     "type": "minecraft:item",
+                    "name": "skullmagic:cure_orb"
+                },
+                {
+                    "type": "minecraft:item",
                     "name": "skullmagic:hastebuff_orb"
                 },
                 {
