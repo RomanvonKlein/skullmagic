@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import org.apache.commons.lang3.function.TriFunction;
@@ -15,6 +16,7 @@ import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.mixin.ZombieVillagerEntityMixin;
 import com.romanvonklein.skullmagic.structurefeatures.SkullMagicStructurePoolBasedGenerator;
+import com.romanvonklein.skullmagic.structurefeatures.StructurePlacer;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.block.BlockState;
@@ -39,9 +41,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.structure.Structure;
+import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructurePiecesGenerator.Context;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -49,6 +54,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 
@@ -506,16 +512,36 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         HitResult result = player.raycast(100, 1, false);
+                        boolean castResult = false;
                         if (result != null) {
                             Vec3d center = result.getPos();
                             BlockPos pos = new BlockPos(center);
                             ServerWorld world = (ServerWorld) player.world;
+                            // Structure structure = StructurePlacer.place(world, false,
+                            // new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"),
+                            // pos);
+                            Optional<Structure> optional;
+                            StructureManager structureManager = world.getStructureManager();
+                            Structure structure;
+                            try {
+                                optional = structureManager.getStructure(
+                                        new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"));
+                                structure = optional.get();
+                            } catch (InvalidIdentifierException invalidIdentifierException) {
+                                return false;
+                            }
+
+                            SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos, structure);
+                            if (structure != null) {
+                                world.playSound(null, new BlockPos(center),
+                                        SoundEvents.AMBIENT_CAVE, SoundCategory.BLOCKS, 1.0f, 1f);
+                            }
                             // Context<StructurePoolFeatureConfig> context = new
                             // Context<StructurePoolFeatureConfig>(featureConfig, chunkGenerator,
                             // structureManager, chunkPos, heightLimitView, chunkRandom, l);
-                            SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos);
+                            // SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos);
                         }
-                        return true;
+                        return castResult;
                     }
                 }));
         spellList.put("lightningstrike",
