@@ -36,6 +36,10 @@
                 },
                 {
                     "type": "minecraft:item",
+                    "name": "skullmagic:waterbreathing_orb"
+                },
+                {
+                    "type": "minecraft:item",
                     "name": "minecraft:lapis_lazuli"
                 },
                 {

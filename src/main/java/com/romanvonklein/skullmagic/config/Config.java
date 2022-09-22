@@ -114,6 +114,7 @@ public class Config {
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 1);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 3);
         defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 4);
+        defaultData.skulls.put(Registry.ITEM.getId(Items.WITHER_SKELETON_SKULL.asItem()).toString(), 4);
 
         // shrine values
         defaultData.shrines.put(Registry.ITEM.getId(SkullMagic.SIMPLE_SPELL_SHRINE.asItem()).toString(), 3);

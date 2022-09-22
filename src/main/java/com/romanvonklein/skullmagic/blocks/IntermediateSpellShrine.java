@@ -5,6 +5,7 @@ import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -16,6 +17,11 @@ public class IntermediateSpellShrine extends ASpellShrine {
 
     public IntermediateSpellShrine(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+        return false;
     }
 
     @Override

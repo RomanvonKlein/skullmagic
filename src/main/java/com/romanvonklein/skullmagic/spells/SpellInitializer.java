@@ -14,6 +14,7 @@ import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.mixin.ZombieVillagerEntityMixin;
+import com.romanvonklein.skullmagic.structurefeatures.SkullMagicStructurePoolBasedGenerator;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.block.BlockState;
@@ -38,6 +39,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.structure.StructurePiecesGenerator.Context;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -46,6 +50,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 
 public class SpellInitializer {
 
@@ -186,8 +191,8 @@ public class SpellInitializer {
                                                     SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
                                             for (int i = 0; i < shotsPerTick; i++) {
                                                 FireBreath entity = FireBreath.createFireBreath(world, player,
-                                                        dir.x + rand.nextFloat() * 0.5,
-                                                        dir.y + rand.nextFloat() * 0.5, dir.z + rand.nextFloat() * 0.5,
+                                                        dir.x + rand.nextFloat() - 0.5,
+                                                        dir.y + rand.nextFloat() - 0.5, dir.z + rand.nextFloat() - 0.5,
                                                         burnDuration, breathLife);
                                                 entity.setPosition(
                                                         player.getPos().add(dir.multiply(0.5))
@@ -496,8 +501,25 @@ public class SpellInitializer {
                         return true;
                     }
                 }));
-        spellList.put("lightningstrike",
+        spellList.put("dungeonrise",
                 new Spell(1500, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        HitResult result = player.raycast(100, 1, false);
+                        if (result != null) {
+                            Vec3d center = result.getPos();
+                            BlockPos pos = new BlockPos(center);
+                            ServerWorld world = (ServerWorld) player.world;
+                            // Context<StructurePoolFeatureConfig> context = new
+                            // Context<StructurePoolFeatureConfig>(featureConfig, chunkGenerator,
+                            // structureManager, chunkPos, heightLimitView, chunkRandom, l);
+                            SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos);
+                        }
+                        return true;
+                    }
+                }));
+        spellList.put("lightningstrike",
+                new Spell(15000, 100, 55, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
                         HitResult result = player.raycast(100, 1, false);
