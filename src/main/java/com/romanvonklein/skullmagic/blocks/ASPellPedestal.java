@@ -13,6 +13,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
@@ -103,7 +104,11 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     }
                 } else {
                     // if not empty, drop the contained item.
-                    player.giveItemStack(ent.getScroll());
+                    ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                            ent.getScroll());
+                    itemEnt.setPickupDelay(0);
+                    world.spawnEntity(itemEnt);
+                    // player.giveItemStack(ent.getScroll());
                     ent.setScroll(null);
                     SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos);
                 }

@@ -57,7 +57,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
 
     public static Optional<StructurePiecesGenerator<StructurePoolFeatureConfig>> generateNew(
             StructureGeneratorFactory.Context<StructurePoolFeatureConfig> context2, PieceFactory pieceFactory,
-            BlockPos pos, boolean bl, boolean bl2) {
+            BlockPos pos, boolean modifyBoundingBox, boolean goBelowSpawnLevel) {
         ChunkRandom chunkRandom = new ChunkRandom(new AtomicSimpleRandom(0L));
         chunkRandom.setCarverSeed(context2.seed(), context2.chunkPos().x, context2.chunkPos().z);
         DynamicRegistryManager dynamicRegistryManager = context2.registryManager();
@@ -80,7 +80,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
         BlockBox blockBox = poolStructurePiece.getBoundingBox();
         int i = (blockBox.getMaxX() + blockBox.getMinX()) / 2;
         int j = (blockBox.getMaxZ() + blockBox.getMinZ()) / 2;
-        int k = bl2
+        int k = goBelowSpawnLevel
                 ? pos.getY() + chunkGenerator.getHeightOnGround(i, j, Heightmap.Type.WORLD_SURFACE_WG, heightLimitView)
                 : pos.getY();
         if (!predicate.test(chunkGenerator.getBiomeForNoiseGen(BiomeCoords.fromBlock(i), BiomeCoords.fromBlock(k),
@@ -96,7 +96,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                 return;
             }
             int boundaries = 240;
-            Box box = new Box(i - boundaries, k - 1, j - boundaries, i + boundaries + 1, k + boundaries + 1,
+            Box box = new Box(i - boundaries, k - boundaries, j - boundaries, i + boundaries + 1, k + boundaries + 1,
                     j + boundaries + 1);
             StructurePoolGenerator structurePoolGenerator = new StructurePoolGenerator(registry,
                     structurePoolFeatureConfig.getSize(), pieceFactory, chunkGenerator, structureManager, list,
@@ -109,7 +109,8 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                 ShapedPoolStructurePiece shapedPoolStructurePiece = structurePoolGenerator.structurePieces
                         .removeFirst();
                 structurePoolGenerator.generatePiece(shapedPoolStructurePiece.piece,
-                        shapedPoolStructurePiece.pieceShape, shapedPoolStructurePiece.currentSize, bl, heightLimitView);
+                        shapedPoolStructurePiece.pieceShape, shapedPoolStructurePiece.currentSize, modifyBoundingBox,
+                        heightLimitView);
             }
             list.forEach(structurePiecesCollector::addPiece);
         });
@@ -130,18 +131,22 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
         BlockBox blockBox = piece.getBoundingBox();
         int i = (blockBox.getMaxX() + blockBox.getMinX()) / 2;
         int j = (blockBox.getMaxZ() + blockBox.getMinZ()) / 2;
-        int k = pos.getY();// + chunkGenerator.getHeightOnGround(i, j, Heightmap.Type.WORLD_SURFACE_WG, world);
+        int k = pos.getY();// + chunkGenerator.getHeightOnGround(i, j, Heightmap.Type.WORLD_SURFACE_WG,
+                           // world);
         int l = blockBox.getMinY() + piece.getGroundLevelDelta();
         piece.translate(0, k - l, 0);
 
         int boundaries = 240;
 
-        Box box = new Box(i - boundaries, k - 1, j - boundaries, i + boundaries + 1, k + boundaries + 1,
+        Box box = new Box(i - boundaries, k - boundaries, j - boundaries, i + boundaries + 1, k + boundaries + 1,
                 j + boundaries + 1);
-        structurePoolGenerator.structurePieces.addLast(new ShapedPoolStructurePiece(piece,
+        ShapedPoolStructurePiece tempPiece = new ShapedPoolStructurePiece(piece,
                 new MutableObject<VoxelShape>(VoxelShapes.combineAndSimplify(VoxelShapes.cuboid(box),
                         VoxelShapes.cuboid(Box.from(blockBox)), BooleanBiFunction.ONLY_FIRST)),
-                0));
+                0);
+        structurePoolGenerator.structurePieces.addLast(tempPiece);
+        structurePoolGenerator.children.add(tempPiece.piece);
+        structurePoolGenerator.generatePiece(tempPiece.piece, tempPiece.pieceShape, 0, true, world);
         while (!structurePoolGenerator.structurePieces.isEmpty()) {
             ShapedPoolStructurePiece shapedPoolStructurePiece = structurePoolGenerator.structurePieces
                     .removeFirst();
@@ -177,9 +182,10 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
         // Structure structure = new Structure();
         // structure.saveFromWorld(world, pos, new Vec3i(1, 1, 1), false, null);
         SinglePoolElement structurePoolElement = new SinglePoolElement(structure);
-        
+
         PoolStructurePiece poolStructurePiece = new PoolStructurePiece(structureManager, structurePoolElement, pos,
-                0, BlockRotation.NONE, new BlockBox(pos));
+                0, BlockRotation.NONE,
+                structurePoolElement.getBoundingBox(structureManager, pos, BlockRotation.NONE));
         SkullMagicStructurePoolBasedGenerator.generate_1(world.getRegistryManager(), poolStructurePiece,
                 maxDepth,
                 PoolStructurePiece::new, chunkGenerator, structureManager, list, random, world);
