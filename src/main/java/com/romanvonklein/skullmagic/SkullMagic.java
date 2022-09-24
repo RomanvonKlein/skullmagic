@@ -162,7 +162,7 @@ public class SkullMagic implements ModInitializer {
 	public static ScreenHandlerType<BlockPlacerScreenHandler> BLOCK_PLACER_SCREEN_HANDLER;
 
 	// ore features
-	private static final ConfiguredFeature<?, ?> END_SKULLIUM_ORE_CONFIGURED_FEATURE = new ConfiguredFeature(
+	private static final ConfiguredFeature<?, ?> END_SKULLIUM_ORE_CONFIGURED_FEATURE = new ConfiguredFeature<>(
 			Feature.ORE,
 			new OreFeatureConfig(
 					new BlockMatchRuleTest(Blocks.END_STONE),

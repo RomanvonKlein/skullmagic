@@ -25,6 +25,10 @@
                 },
                 {
                     "type": "minecraft:item",
+                    "name": "skullmagic:dungeonrise_orb"
+                },
+                {
+                    "type": "minecraft:item",
                     "name": "skullmagic:excavation_orb"
                 },
                 {

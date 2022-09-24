@@ -16,7 +16,6 @@ import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.mixin.ZombieVillagerEntityMixin;
 import com.romanvonklein.skullmagic.structurefeatures.SkullMagicStructurePoolBasedGenerator;
-import com.romanvonklein.skullmagic.structurefeatures.StructurePlacer;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.block.BlockState;
@@ -41,13 +40,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.Structure;
-import net.minecraft.structure.StructureGeneratorFactory;
 import net.minecraft.structure.StructureManager;
-import net.minecraft.structure.StructurePiecesGenerator;
-import net.minecraft.structure.StructurePiecesGenerator.Context;
-import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.hit.EntityHitResult;
@@ -57,9 +51,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 
 public class SpellInitializer {
 
