@@ -275,6 +275,19 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put(
+                "lunge",
+                new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                        if (!player.world.isClient) {
+                            Vec3d velocity = player.getRotationVector().multiply(4.0 + spellData.getPowerLevel() * 2);
+                            player.addVelocity(velocity.x, velocity.y, velocity.z);
+                            player.velocityModified = true;
+                        }
+                        return true;
+                    }
+                }));
+        spellList.put(
                 "weakball",
                 new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
                     @Override
