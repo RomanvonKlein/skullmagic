@@ -267,9 +267,16 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier(MODID, "block_placer"),
 				new BlockItem(BlockPlacer, new FabricItemSettings().group(ItemGroup.MISC)));
 
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_pedestal"), SPELL_POWER_PEDESTAL);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_pedestal"),
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_power_pedestal"), SPELL_POWER_PEDESTAL);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_power_pedestal"),
 				new BlockItem(SPELL_POWER_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_efficiency_pedestal"),
+				SPELL_EFFICIENCY_PEDESTAL);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_efficiency_pedestal"),
+				new BlockItem(SPELL_EFFICIENCY_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
+		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_cooldown_pedestal"), SPELL_COOLDOWN_PEDESTAL);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_cooldown_pedestal"),
+				new BlockItem(SPELL_COOLDOWN_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
 
 		Registry.register(Registry.BLOCK, new Identifier(MODID, "simple_spell_shrine"), SIMPLE_SPELL_SHRINE);
 		Registry.register(Registry.ITEM, new Identifier(MODID, "simple_spell_shrine"),

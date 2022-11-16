@@ -6,7 +6,7 @@
             "entries": [
                 {
                     "type": "minecraft:item",
-                    "name": "skullmagic:spell_pedestal"
+                    "name": "skullmagic:spell_power_pedestal"
                 }
             ],
             "conditions": [

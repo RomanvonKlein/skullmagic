@@ -10,11 +10,11 @@
             "item": "minecraft:iron_block"
         },
         "D": {
-            "item": "minecraft:deepslate_bricks"
+            "item": "minecraft:stone_bricks"
         }
     },
     "result": {
-        "item": "skullmagic:spell_pedestal",
+        "item": "skullmagic:spell_efficiency_pedestal",
         "count": 1
     }
 }

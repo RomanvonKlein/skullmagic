@@ -2,8 +2,8 @@
 	"parent": "block/block",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "skullmagic:block/spell_pedestal",
-		"particle": "skullmagic:block/spell_pedestal"
+		"0": "skullmagic:block/spell_power_pedestal",
+		"particle": "skullmagic:block/spell_power_pedestal"
 	},
 	"elements": [
 		{

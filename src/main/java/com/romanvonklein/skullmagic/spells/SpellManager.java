@@ -14,6 +14,7 @@ import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
+import com.romanvonklein.skullmagic.util.MathUtil;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.minecraft.nbt.NbtCompound;
@@ -61,8 +62,8 @@ public class SpellManager extends PersistentState {
                     Spell spell = SpellDict.get(spellName);
 
                     int reducedEssenceCost = (int) Math.round(
-                            spell.essenceCost * (1 + spellData.getPowerLevel() / 4)
-                                    * (1 - Math.log(1 + (spellData.getEfficiencyLevel() - 1) * 0.5)));
+                            spell.essenceCost * (1 + (spellData.getPowerLevel() - 1) / 4)
+                                    * (1 - MathUtil.log2(1 + (spellData.getEfficiencyLevel() - 1) * 0.5)));
                     if (pool.getEssence() >= reducedEssenceCost) {
                         spellData.cooldownLeft = spellData.getMaxCooldown(SpellDict.get(spellName).cooldownTicks);
 
