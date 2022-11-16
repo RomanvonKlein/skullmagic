@@ -576,7 +576,6 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         Vec3d center = result.getPos();
                         World world = player.world;
-                        boolean placedAnything = false;
                         for (int x = (int) Math.round(center.getX() - radius); x < center.getX() + radius; x++) {
                             for (int y = (int) Math.round(center.getY() - radius); y < center.getY()
                                     + radius; y++) {

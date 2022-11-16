@@ -7,7 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.blockEntities.SpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
@@ -33,7 +36,9 @@ public class SpellManager extends PersistentState {
 
     public Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> spellShrinePools = new HashMap<>();
     private Map<UUID, SpellShrinePool> playersToSpellPools = new HashMap<>();
-    private Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> pedestalsToSpellShrinePools = new HashMap<>();
+    private Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> powerPedestalsToSpellShrinePools = new HashMap<>();
+    private Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> efficiencyPedestalsToSpellShrinePools = new HashMap<>();
+    private Map<RegistryKey<World>, Map<BlockPos, SpellShrinePool>> cooldownPedestalsToSpellShrinePools = new HashMap<>();
 
     public static Map<String, ? extends Spell> SpellDict = SpellInitializer.initSpells();
 
@@ -174,11 +179,11 @@ public class SpellManager extends PersistentState {
                     if (pool.linkedPlayerID != null) {
                         spmngr.playersToSpellPools.put(pool.linkedPlayerID, pool);
                     }
-                    for (BlockPos blockPos : pool.linkedPedestals.keySet()) {
-                        if (!spmngr.pedestalsToSpellShrinePools.containsKey(key)) {
-                            spmngr.pedestalsToSpellShrinePools.put(key, new HashMap<>());
+                    for (BlockPos blockPos : pool.linkedPowerPedestals.keySet()) {
+                        if (!spmngr.powerPedestalsToSpellShrinePools.containsKey(key)) {
+                            spmngr.powerPedestalsToSpellShrinePools.put(key, new HashMap<>());
                         }
-                        spmngr.pedestalsToSpellShrinePools.get(key).put(blockPos, pool);
+                        spmngr.powerPedestalsToSpellShrinePools.get(key).put(blockPos, pool);
                     }
                     spmngr.spellShrinePools.get(key).put(Parsing.shortStringToBlockPos(spellPoolPosString), pool);
 
@@ -274,15 +279,43 @@ public class SpellManager extends PersistentState {
             for (int y = pos.getY() - pool.range; y < pos.getY() + pool.range; y++) {
                 for (int z = pos.getZ() - pool.range; z < pos.getZ() + pool.range; z++) {
                     BlockPos candidatePos = new BlockPos(x, y, z);
-                    Optional<SpellPedestalBlockEntity> opt = world.getBlockEntity(candidatePos,
-                            SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY);
-                    if (opt.isPresent()) {
-
-                        if (!this.pedestalsToSpellShrinePools.containsKey(registryKey)
-                                || !this.pedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
-                            String spellName = opt.get().getSpellName();
+                    Optional<PowerSpellPedestalBlockEntity> powerOpt = world.getBlockEntity(candidatePos,
+                            SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY);
+                    if (powerOpt.isPresent()) {
+                        if (!this.powerPedestalsToSpellShrinePools.containsKey(registryKey)
+                                || !this.powerPedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+                            String spellName = powerOpt.get().getSpellName();
                             if (spellName != null && spellName.equals(spellname)) {
-                                addPedestalLink(registryKey, pool, candidatePos);
+                                addPedestalLink(registryKey, pool, candidatePos,
+                                        PowerSpellPedestalBlockEntity.type);
+                            }
+                        }
+                    } else {
+                        Optional<EfficiencySpellPedestalBlockEntity> efficiencyOpt = world.getBlockEntity(candidatePos,
+                                SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY);
+                        if (efficiencyOpt.isPresent()) {
+                            if (!this.efficiencyPedestalsToSpellShrinePools.containsKey(registryKey)
+                                    || !this.efficiencyPedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+                                String spellName = efficiencyOpt.get().getSpellName();
+                                if (spellName != null && spellName.equals(spellname)) {
+                                    addPedestalLink(registryKey, pool, candidatePos,
+                                            EfficiencySpellPedestalBlockEntity.type);
+                                }
+                            }
+                        } else {
+                            Optional<CooldownSpellPedestalBlockEntity> cooldownOpt = world.getBlockEntity(
+                                    candidatePos,
+                                    SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY);
+                            if (cooldownOpt.isPresent()) {
+                                if (!this.cooldownPedestalsToSpellShrinePools.containsKey(registryKey)
+                                        || !this.cooldownPedestalsToSpellShrinePools.get(registryKey)
+                                                .containsKey(pos)) {
+                                    String spellName = cooldownOpt.get().getSpellName();
+                                    if (spellName != null && spellName.equals(spellname)) {
+                                        addPedestalLink(registryKey, pool, candidatePos,
+                                                CooldownSpellPedestalBlockEntity.type);
+                                    }
+                                }
                             }
                         }
                     }
@@ -291,29 +324,46 @@ public class SpellManager extends PersistentState {
         }
     }
 
-    public boolean tryAddSpellPedestal(RegistryKey<World> registryKey, BlockPos pos, UUID id, String spellname) {
+    public boolean tryAddSpellPedestal(RegistryKey<World> registryKey, BlockPos pos, UUID id, String spellname,
+            ASPellPedestal pedestal) {
         boolean result = false;
-        if (!this.spellShrinePools.containsKey(registryKey)) {
-
-        } else {
+        if (this.spellShrinePools.containsKey(registryKey)) {
             for (Entry<BlockPos, SpellShrinePool> entry : this.spellShrinePools.get(registryKey).entrySet()) {
                 if (canConnectPedestalToPool(pos, spellname, entry.getValue(), entry.getKey(), id)) {
-                    addPedestalLink(registryKey, entry.getValue(), pos);
+                    addPedestalLink(registryKey, entry.getValue(), pos, pedestal.type);
                     result = true;
                     break;
                 }
             }
-
         }
         return result;
     }
 
-    public void addPedestalLink(RegistryKey<World> registryKey, SpellShrinePool pool, BlockPos pedestalPos) {
-        if (!this.pedestalsToSpellShrinePools.containsKey(registryKey)) {
-            this.pedestalsToSpellShrinePools.put(registryKey, new HashMap<>());
+    public void addPedestalLink(RegistryKey<World> registryKey, SpellShrinePool pool, BlockPos pedestalPos,
+            String type) {
+        if (type.equals("power")) {
+            if (!this.powerPedestalsToSpellShrinePools.containsKey(registryKey)) {
+                this.powerPedestalsToSpellShrinePools.put(registryKey, new HashMap<>());
+            }
+            this.powerPedestalsToSpellShrinePools.get(registryKey).put(pedestalPos, pool);
+            pool.addPowerPedestal(pedestalPos, 1);// TODO: implement pedestal strength here
+        } else if (type.equals("efficiency")) {
+            if (!this.efficiencyPedestalsToSpellShrinePools.containsKey(registryKey)) {
+                this.efficiencyPedestalsToSpellShrinePools.put(registryKey, new HashMap<>());
+            }
+            this.efficiencyPedestalsToSpellShrinePools.get(registryKey).put(pedestalPos, pool);
+            pool.addEfficiencyPedestal(pedestalPos, 1);// TODO: implement pedestal strength here
+
+        } else if (type.equals("cooldown")) {
+            if (!this.cooldownPedestalsToSpellShrinePools.containsKey(registryKey)) {
+                this.cooldownPedestalsToSpellShrinePools.put(registryKey, new HashMap<>());
+            }
+            this.cooldownPedestalsToSpellShrinePools.get(registryKey).put(pedestalPos, pool);
+            pool.addCooldownPedestal(pedestalPos, 1);// TODO: implement pedestal strength here
+
+        } else {
+            SkullMagic.LOGGER.warn("unknown type of spellpedestal: '" + type + "'");
         }
-        this.pedestalsToSpellShrinePools.get(registryKey).put(pedestalPos, pool);
-        pool.addPedestal(pedestalPos, 1);// TODO: implement pedestal strength here
     }
 
     private boolean canConnectPedestalToPool(BlockPos pedestalPos, String pedestalSpellName, SpellShrinePool pool,
@@ -324,12 +374,32 @@ public class SpellManager extends PersistentState {
                 && pool.linkedPlayerID.equals(playerID);
     }
 
-    public void removeSpellPedestal(RegistryKey<World> registryKey, BlockPos pos) {
-        if (this.pedestalsToSpellShrinePools.containsKey(registryKey)
-                && this.pedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
-            SpellShrinePool pool = this.pedestalsToSpellShrinePools.get(registryKey).get(pos);
-            pool.removePedestal(pos);
-            this.pedestalsToSpellShrinePools.get(registryKey).remove(pos);
+    public void removeSpellPedestal(RegistryKey<World> registryKey, BlockPos pos, String type) {
+
+        if (type.equals("power")) {
+
+            if (this.powerPedestalsToSpellShrinePools.containsKey(registryKey)
+                    && this.powerPedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+                SpellShrinePool pool = this.powerPedestalsToSpellShrinePools.get(registryKey).get(pos);
+                pool.removePedestal(pos, type);
+                this.powerPedestalsToSpellShrinePools.get(registryKey).remove(pos);
+            }
+        } else if (type.equals("efficiency")) {
+            if (this.efficiencyPedestalsToSpellShrinePools.containsKey(registryKey)
+                    && this.efficiencyPedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+                SpellShrinePool pool = this.efficiencyPedestalsToSpellShrinePools.get(registryKey).get(pos);
+                pool.removePedestal(pos, type);
+                this.efficiencyPedestalsToSpellShrinePools.get(registryKey).remove(pos);
+            }
+        } else if (type.equals("cooldown")) {
+            if (this.cooldownPedestalsToSpellShrinePools.containsKey(registryKey)
+                    && this.cooldownPedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
+                SpellShrinePool pool = this.cooldownPedestalsToSpellShrinePools.get(registryKey).get(pos);
+                pool.removePedestal(pos, type);
+                this.cooldownPedestalsToSpellShrinePools.get(registryKey).remove(pos);
+            }
+        } else {
+            SkullMagic.LOGGER.warn("unknown type of spellpedestal: '" + type + "'");
         }
     }
 

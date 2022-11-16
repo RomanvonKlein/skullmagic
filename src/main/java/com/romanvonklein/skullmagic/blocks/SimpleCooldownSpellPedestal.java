@@ -5,10 +5,10 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-public class SimpleSpellPedestal extends ASPellPedestal {
+public class SimpleCooldownSpellPedestal extends ASPellPedestal {
 
-    public SimpleSpellPedestal(Settings settings) {
-        super(settings);
+    public SimpleCooldownSpellPedestal(Settings settings) {
+        super(settings, "cooldown");
     }
 
     @Override

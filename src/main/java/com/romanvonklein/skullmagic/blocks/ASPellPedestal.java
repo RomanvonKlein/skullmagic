@@ -3,7 +3,7 @@ package com.romanvonklein.skullmagic.blocks;
 import java.util.Optional;
 
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.blockEntities.SpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 
 import net.minecraft.block.BlockRenderType;
@@ -30,8 +30,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
 public abstract class ASPellPedestal extends BlockWithEntity {
-    public ASPellPedestal(Settings settings) {
+    public String type = "power";
+
+    public ASPellPedestal(Settings settings, String type) {
         super(settings);
+        this.type = type;
     }
 
     @Override
@@ -51,21 +54,21 @@ public abstract class ASPellPedestal extends BlockWithEntity {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new SpellPedestalBlockEntity(pos, state);
+        return new PowerSpellPedestalBlockEntity(pos, state);
     }
 
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos);
+            SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos, this.type);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos);
+            SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos, this.type);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }
@@ -75,9 +78,10 @@ public abstract class ASPellPedestal extends BlockWithEntity {
             BlockHitResult hit) {
         ActionResult result = ActionResult.SUCCESS;
         if (!world.isClient) {
-            Optional<SpellPedestalBlockEntity> opt = world.getBlockEntity(pos, SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY);
+            Optional<PowerSpellPedestalBlockEntity> opt = world.getBlockEntity(pos,
+                    SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY);
             if (opt.isPresent()) {
-                SpellPedestalBlockEntity ent = opt.get();
+                PowerSpellPedestalBlockEntity ent = opt.get();
 
                 // check if the socket is empty
                 if (ent.getScroll() == null) {
@@ -86,7 +90,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     if (itemStack.getItem() instanceof KnowledgeOrb) {
                         String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
                         if (SkullMagic.spellManager.tryAddSpellPedestal(world.getRegistryKey(), pos,
-                                player.getGameProfile().getId(), spellname)) {
+                                player.getGameProfile().getId(), spellname, this)) {
                             ent.setScroll(itemStack.copy());
                             itemStack.decrement(1);
                             world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
@@ -110,7 +114,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     world.spawnEntity(itemEnt);
                     // player.giveItemStack(ent.getScroll());
                     ent.setScroll(null);
-                    SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos);
+                    SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos, this.type);
                 }
             }
         }
@@ -121,7 +125,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return checkType(type, SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY,
-                (world1, pos, state1, be) -> SpellPedestalBlockEntity.tick(world1, pos, state1, be));
+        return checkType(type, SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
+                (world1, pos, state1, be) -> PowerSpellPedestalBlockEntity.tick(world1, pos, state1, be));
     }
 }

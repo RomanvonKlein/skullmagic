@@ -70,4 +70,10 @@ public class PlayerSpellData extends PersistentState {
     public void setPowerLevel(double newPowerLevel) {
         this.powerLevel = newPowerLevel;
     }
+    public void setEfficiencyLevel(double newPowerLevel) {
+        this.efficiencyLevel = newPowerLevel;
+    }
+    public void setCooldownLevel(double newPowerLevel) {
+        this.cooldownReductionLevel = newPowerLevel;
+    }
 }

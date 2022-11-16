@@ -15,7 +15,9 @@ public class SpellShrinePool extends PersistentState {
 
     BlockPos position;
     public UUID linkedPlayerID;
-    HashMap<BlockPos, Integer> linkedPedestals = new HashMap<>();
+    HashMap<BlockPos, Integer> linkedPowerPedestals = new HashMap<>();
+    HashMap<BlockPos, Integer> linkedEfficiencyPedestals = new HashMap<>();
+    HashMap<BlockPos, Integer> linkedCooldownPedestals = new HashMap<>();
     private String spellName = "";
     int range = 5;
     public int strength = 0;
@@ -46,11 +48,24 @@ public class SpellShrinePool extends PersistentState {
         altarPosition.putInt("y", this.position.getY());
         altarPosition.putInt("z", this.position.getZ());
         tag.put("altarPosition", altarPosition);
-        NbtCompound linkedPedestalsNBT = new NbtCompound();
-        for (Entry<BlockPos, Integer> entry : this.linkedPedestals.entrySet()) {
-            linkedPedestalsNBT.putInt(entry.getKey().toShortString(), entry.getValue());
+
+        NbtCompound linkedPowerPedestalsNBT = new NbtCompound();
+        for (Entry<BlockPos, Integer> entry : this.linkedPowerPedestals.entrySet()) {
+            linkedPowerPedestalsNBT.putInt(entry.getKey().toShortString(), entry.getValue());
         }
-        tag.put("linkedPedestals", linkedPedestalsNBT);
+        tag.put("linkedPowerPedestals", linkedPowerPedestalsNBT);
+
+        NbtCompound linkedEfficiencyPedestalsNBT = new NbtCompound();
+        for (Entry<BlockPos, Integer> entry : this.linkedEfficiencyPedestals.entrySet()) {
+            linkedEfficiencyPedestalsNBT.putInt(entry.getKey().toShortString(), entry.getValue());
+        }
+        tag.put("linkedEfficiencyPedestals", linkedEfficiencyPedestalsNBT);
+
+        NbtCompound linkedCooldownPedestalsNBT = new NbtCompound();
+        for (Entry<BlockPos, Integer> entry : this.linkedCooldownPedestals.entrySet()) {
+            linkedCooldownPedestalsNBT.putInt(entry.getKey().toShortString(), entry.getValue());
+        }
+        tag.put("linkedCooldownPedestals", linkedCooldownPedestalsNBT);
         return tag;
     }
 
@@ -67,21 +82,48 @@ public class SpellShrinePool extends PersistentState {
         int y = altarPosition.getInt("y");
         int z = altarPosition.getInt("z");
         pool.position = new BlockPos(x, y, z);
-        NbtCompound pedestalList = tag.getCompound("linkedPedestals");
-        pedestalList.getKeys().forEach((shortString) -> {
-            pool.linkedPedestals.put(Parsing.shortStringToBlockPos(shortString), pedestalList.getInt(shortString));
+
+        NbtCompound powerPedestalList = tag.getCompound("linkedPowerPedestals");
+        powerPedestalList.getKeys().forEach((shortString) -> {
+            pool.linkedPowerPedestals.put(Parsing.shortStringToBlockPos(shortString),
+                    powerPedestalList.getInt(shortString));
         });
+
+        NbtCompound efficiencyPedestalList = tag.getCompound("linkedEfficiencyPedestals");
+        efficiencyPedestalList.getKeys().forEach((shortString) -> {
+            pool.linkedEfficiencyPedestals.put(Parsing.shortStringToBlockPos(shortString),
+                    efficiencyPedestalList.getInt(shortString));
+        });
+
+        NbtCompound cooldownPedestalList = tag.getCompound("linkedCooldownPedestals");
+        cooldownPedestalList.getKeys().forEach((shortString) -> {
+            pool.linkedCooldownPedestals.put(Parsing.shortStringToBlockPos(shortString),
+                    cooldownPedestalList.getInt(shortString));
+        });
+
         return pool;
     }
 
-    public void removePedestal(BlockPos pos) {
-        int lostStrength = this.linkedPedestals.get(pos);
-        this.removeStrength(lostStrength);
-        this.linkedPedestals.remove(pos);
+    public void removePedestal(BlockPos pos, String type) {
+        if (type.equals("power")) {
+            int lostStrength = this.linkedPowerPedestals.get(pos);
+            this.removePower(lostStrength);
+            this.linkedPowerPedestals.remove(pos);
+        } else if (type.equals("efficiency")) {
+            int lostStrength = this.linkedEfficiencyPedestals.get(pos);
+            this.removeEfficiency(lostStrength);
+            this.linkedEfficiencyPedestals.remove(pos);
+        } else if (type.equals("cooldown")) {
+            int lostStrength = this.linkedCooldownPedestals.get(pos);
+            this.removeCooldown(lostStrength);
+            this.linkedCooldownPedestals.remove(pos);
+        } else {
+            SkullMagic.LOGGER.warn("Unknown spell pedestal type: '" + type + "'");
+        }
     }
 
     public void linkPedestal(BlockPos pedestalPos, int strength) {
-        this.linkedPedestals.put(pedestalPos, strength);
+        this.linkedPowerPedestals.put(pedestalPos, strength);
     }
 
     public boolean setSpellName(String spellname) {
@@ -99,12 +141,22 @@ public class SpellShrinePool extends PersistentState {
     // public JsonObject toJsonElement() {
     // JsonObject elem = new JsonObject();
 
-    public void addPedestal(BlockPos candidatePos, int strength) {
-        this.linkedPedestals.put(candidatePos, strength);
-        addStrength(strength);
+    public void addPowerPedestal(BlockPos candidatePos, int strength) {
+        this.linkedPowerPedestals.put(candidatePos, strength);
+        addPower(strength);
     }
 
-    private void addStrength(int strengthWon) {
+    public void addEfficiencyPedestal(BlockPos candidatePos, int strength) {
+        this.linkedEfficiencyPedestals.put(candidatePos, strength);
+        addEfficiency(strength);
+    }
+
+    public void addCooldownPedestal(BlockPos candidatePos, int strength) {
+        this.linkedCooldownPedestals.put(candidatePos, strength);
+        addCooldown(strength);
+    }
+
+    private void addPower(int strengthWon) {
         this.strength += strengthWon;
         if (this.linkedPlayerID != null) {
             PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
@@ -116,7 +168,7 @@ public class SpellShrinePool extends PersistentState {
 
     }
 
-    private void removeStrength(int strengthLost) {
+    private void removePower(int strengthLost) {
         this.strength -= strengthLost;
         if (this.linkedPlayerID != null) {
             PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
@@ -127,12 +179,49 @@ public class SpellShrinePool extends PersistentState {
         }
     }
 
-    // elem.addProperty("position", this.position.toShortString());
-    // JsonArray consumerList = new JsonArray();
-    // for (BlockPos pos : this.Consumers) {
-    // consumerList.add(pos.toShortString());
-    // }
-    // elem.add("consumers", consumerList);
-    // return elem;
-    // }
+    private void addEfficiency(int strengthWon) {
+        this.strength += strengthWon;
+        if (this.linkedPlayerID != null) {
+            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
+            if (data != null) {
+                data.setEfficiencyLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
+            }
+        }
+
+    }
+
+    private void removeEfficiency(int strengthLost) {
+        this.strength -= strengthLost;
+        if (this.linkedPlayerID != null) {
+            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
+            if (data != null) {
+                data.setPowerLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
+            }
+        }
+    }
+
+    private void addCooldown(int strengthWon) {
+        this.strength += strengthWon;
+        if (this.linkedPlayerID != null) {
+            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
+            if (data != null) {
+                data.setCooldownLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
+            }
+        }
+
+    }
+
+    private void removeCooldown(int strengthLost) {
+        this.strength -= strengthLost;
+        if (this.linkedPlayerID != null) {
+            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
+            if (data != null) {
+                data.setCooldownLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
+            }
+        }
+    }
 }

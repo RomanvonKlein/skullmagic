@@ -19,12 +19,13 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SpellPedestalBlockEntity extends BlockEntity {
+public class CooldownSpellPedestalBlockEntity extends BlockEntity {
 
     private ItemStack scroll;
+    public static String type = "cooldown";
 
-    public SpellPedestalBlockEntity(BlockPos pos, BlockState state) {
-        super(SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY, pos, state);
+    public CooldownSpellPedestalBlockEntity(BlockPos pos, BlockState state) {
+        super(SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY, pos, state);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class SpellPedestalBlockEntity extends BlockEntity {
         return this.scroll;
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, SpellPedestalBlockEntity be) {
+    public static void tick(World world, BlockPos pos, BlockState state, CooldownSpellPedestalBlockEntity be) {
 
     }
 }

@@ -116,7 +116,7 @@ public class ClientInitializer implements ClientModInitializer {
 
         BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
-        BlockEntityRendererRegistry.register(SkullMagic.SPELL_PEDESTAL_BLOCK_ENTITY,
+        BlockEntityRendererRegistry.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
                 ItemHolderBlockEntityRenderer::new);
         BlockEntityRendererRegistry.register(SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
                 ItemHolderBlockEntityRendererShrine::new);
