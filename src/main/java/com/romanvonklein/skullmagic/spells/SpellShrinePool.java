@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.minecraft.nbt.NbtCompound;
@@ -122,10 +123,6 @@ public class SpellShrinePool extends PersistentState {
         }
     }
 
-    public void linkPedestal(BlockPos pedestalPos, int strength) {
-        this.linkedPowerPedestals.put(pedestalPos, strength);
-    }
-
     public boolean setSpellName(String spellname) {
         boolean result = false;
         if (this.spellName.equals("")) {
@@ -165,7 +162,6 @@ public class SpellShrinePool extends PersistentState {
                         + Math.floor(Math.sqrt(this.strength)));
             }
         }
-
     }
 
     private void removePower(int strengthLost) {
@@ -196,7 +192,7 @@ public class SpellShrinePool extends PersistentState {
         if (this.linkedPlayerID != null) {
             PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
             if (data != null) {
-                data.setPowerLevel(1
+                data.setEfficiencyLevel(1
                         + Math.floor(Math.sqrt(this.strength)));
             }
         }

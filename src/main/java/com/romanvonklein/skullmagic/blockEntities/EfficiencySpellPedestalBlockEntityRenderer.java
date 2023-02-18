@@ -13,12 +13,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3f;
 
 @Environment(EnvType.CLIENT)
-public class ItemHolderBlockEntityRenderer implements BlockEntityRenderer<PowerSpellPedestalBlockEntity> {
-    public ItemHolderBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
+public class EfficiencySpellPedestalBlockEntityRenderer
+        implements BlockEntityRenderer<EfficiencySpellPedestalBlockEntity> {
+    public EfficiencySpellPedestalBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
 
     }
 
-    public void render(PowerSpellPedestalBlockEntity blockEntity, float tickDelta, MatrixStack matrices,
+    public void render(EfficiencySpellPedestalBlockEntity blockEntity, float tickDelta, MatrixStack matrices,
             VertexConsumerProvider vertexConsumers, int light, int overlay) {
 
         if (blockEntity.getScroll() != null) {

@@ -5,7 +5,9 @@ import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntityRenderer;
 import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererShrine;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.entities.EffectBall;
@@ -116,10 +118,19 @@ public class ClientInitializer implements ClientModInitializer {
 
         BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
+        
         BlockEntityRendererRegistry.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
-                ItemHolderBlockEntityRenderer::new);
+                PowerSpellPedestalBlockEntityRenderer::new);
+
+        BlockEntityRendererRegistry.register(SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
+                CooldownSpellPedestalBlockEntityRenderer::new);
+
+        BlockEntityRendererRegistry.register(SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
+                EfficiencySpellPedestalBlockEntityRenderer::new);
+
         BlockEntityRendererRegistry.register(SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
                 ItemHolderBlockEntityRendererShrine::new);
+
         // register textures
         ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/essencebar.png");
         COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/cooldownbar.png");

@@ -378,7 +378,6 @@ public class SpellManager extends PersistentState {
     public void removeSpellPedestal(RegistryKey<World> registryKey, BlockPos pos, String type) {
 
         if (type.equals("power")) {
-
             if (this.powerPedestalsToSpellShrinePools.containsKey(registryKey)
                     && this.powerPedestalsToSpellShrinePools.get(registryKey).containsKey(pos)) {
                 SpellShrinePool pool = this.powerPedestalsToSpellShrinePools.get(registryKey).get(pos);

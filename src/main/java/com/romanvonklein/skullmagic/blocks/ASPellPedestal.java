@@ -3,8 +3,11 @@ package com.romanvonklein.skullmagic.blocks;
 import java.util.Optional;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
+import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -16,6 +19,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -30,7 +34,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
 public abstract class ASPellPedestal extends BlockWithEntity {
-    public String type = "power";
+    public String type = "none";
 
     public ASPellPedestal(Settings settings, String type) {
         super(settings);
@@ -39,8 +43,6 @@ public abstract class ASPellPedestal extends BlockWithEntity {
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need
-        // to change that!
         return BlockRenderType.MODEL;
     }
 
@@ -54,7 +56,13 @@ public abstract class ASPellPedestal extends BlockWithEntity {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new PowerSpellPedestalBlockEntity(pos, state);
+        if (this.type.equals("power")) {
+            return new PowerSpellPedestalBlockEntity(pos, state);
+        } else if (this.type.equals("efficiency")) {
+            return new EfficiencySpellPedestalBlockEntity(pos, state);
+        } else {
+            return new CooldownSpellPedestalBlockEntity(pos, state);
+        }
     }
 
     @Override
@@ -77,11 +85,18 @@ public abstract class ASPellPedestal extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
             BlockHitResult hit) {
         ActionResult result = ActionResult.SUCCESS;
+        // TODO: terrible code. absolutely horrendous. fix later
         if (!world.isClient) {
-            Optional<PowerSpellPedestalBlockEntity> opt = world.getBlockEntity(pos,
+            // all of these should propably use an interface to save all this redundancy...
+            Optional<PowerSpellPedestalBlockEntity> power_opt = world.getBlockEntity(pos,
                     SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY);
-            if (opt.isPresent()) {
-                PowerSpellPedestalBlockEntity ent = opt.get();
+            Optional<CooldownSpellPedestalBlockEntity> cooldown_opt = world.getBlockEntity(pos,
+                    SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY);
+            Optional<EfficiencySpellPedestalBlockEntity> efficiency_opt = world.getBlockEntity(pos,
+                    SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY);
+            boolean any = true;
+            if (power_opt.isPresent()) {
+                PowerSpellPedestalBlockEntity ent = power_opt.get();
 
                 // check if the socket is empty
                 if (ent.getScroll() == null) {
@@ -116,6 +131,82 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     ent.setScroll(null);
                     SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos, this.type);
                 }
+            } else if (efficiency_opt.isPresent()) {
+                EfficiencySpellPedestalBlockEntity ent = efficiency_opt.get();
+
+                // check if the socket is empty
+                if (ent.getScroll() == null) {
+                    // if empty, check wether the player holds a valid scroll.
+                    ItemStack itemStack = player.getMainHandStack();
+                    if (itemStack.getItem() instanceof KnowledgeOrb) {
+                        String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+                        if (SkullMagic.spellManager.tryAddSpellPedestal(world.getRegistryKey(), pos,
+                                player.getGameProfile().getId(), spellname, this)) {
+                            ent.setScroll(itemStack.copy());
+                            itemStack.decrement(1);
+                            world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
+                                    SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
+                                    SoundCategory.BLOCKS, 1.0f, 1.0f, true);
+                        } else {
+                            player.sendMessage(
+                                    Text.of("Could not find a spell shrine linked to you and " + spellname
+                                            + " in range."),
+                                    true);
+                            result = ActionResult.FAIL;
+                        }
+                    } else {
+                        player.sendMessage(Text.of("Not a valid scroll!"), true);
+                    }
+                } else {
+                    // if not empty, drop the contained item.
+                    ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                            ent.getScroll());
+                    itemEnt.setPickupDelay(0);
+                    world.spawnEntity(itemEnt);
+                    ent.setScroll(null);
+                    SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos, this.type);
+                }
+            } else if (cooldown_opt.isPresent()) {
+                CooldownSpellPedestalBlockEntity ent = cooldown_opt.get();
+
+                // check if the socket is empty
+                if (ent.getScroll() == null) {
+                    // if empty, check wether the player holds a valid scroll.
+                    ItemStack itemStack = player.getMainHandStack();
+                    if (itemStack.getItem() instanceof KnowledgeOrb) {
+                        String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+                        if (SkullMagic.spellManager.tryAddSpellPedestal(world.getRegistryKey(), pos,
+                                player.getGameProfile().getId(), spellname, this)) {
+                            ent.setScroll(itemStack.copy());
+                            itemStack.decrement(1);
+                            world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
+                                    SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
+                                    SoundCategory.BLOCKS, 1.0f, 1.0f, true);
+                        } else {
+                            player.sendMessage(
+                                    Text.of("Could not find a spell shrine linked to you and " + spellname
+                                            + " in range."),
+                                    true);
+                            result = ActionResult.FAIL;
+                        }
+                    } else {
+                        player.sendMessage(Text.of("Not a valid scroll!"), true);
+                    }
+                } else {
+                    // if not empty, drop the contained item.
+                    ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                            ent.getScroll());
+                    itemEnt.setPickupDelay(0);
+                    world.spawnEntity(itemEnt);
+                    ent.setScroll(null);
+                    SkullMagic.spellManager.removeSpellPedestal(world.getRegistryKey(), pos, this.type);
+
+                }
+            } else {
+                any = false;
+            }
+            if (any) {
+                ServerPackageSender.sendUpdateSpellListPackage((ServerPlayerEntity)player);
             }
         }
         return result;
@@ -125,7 +216,17 @@ public abstract class ASPellPedestal extends BlockWithEntity {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return checkType(type, SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
-                (world1, pos, state1, be) -> PowerSpellPedestalBlockEntity.tick(world1, pos, state1, be));
+        if (this.type.equals("power")) {
+            return checkType(type, SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
+                    (world1, pos, state1, be) -> PowerSpellPedestalBlockEntity.tick(world1, pos, state1, be));
+
+        } else if (this.type.equals("efficiency")) {
+            return checkType(type, SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
+                    (world1, pos, state1, be) -> EfficiencySpellPedestalBlockEntity.tick(world1, pos, state1, be));
+
+        } else {
+            return checkType(type, SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
+                    (world1, pos, state1, be) -> CooldownSpellPedestalBlockEntity.tick(world1, pos, state1, be));
+        }
     }
 }
