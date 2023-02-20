@@ -3,7 +3,15 @@ package com.romanvonklein.skullmagic.spells;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.BlockPos;
+
 public class ClientSpellManager {
+
+    // mostly for visualizations
+    private HashMap<BlockPos, ArrayList<BlockPos>> SkullShrinesToAltars;
+    private HashMap<BlockPos, ArrayList<BlockPos>> SpellShrinesToAltars;
+
     public HashMap<String, PlayerSpellData> spellList = new HashMap<>();
     public ArrayList<String> spellnames = new ArrayList<>();
     public String selectedSpellName = null;
@@ -56,5 +64,57 @@ public class ClientSpellManager {
 
     private int adjustForListsize(int index) {
         return index >= spellnames.size() ? 0 : index < 0 ? spellnames.size() - 1 : index;
+    }
+
+    // Creates and moves particles to visualize links
+    public void tickParticles(MinecraftClient client) {
+       
+    }
+
+    private static BlockPos parseBlockPos(String posString) {
+        String[] intstrings = posString.split(",");
+        int x = Integer.parseInt(intstrings[0]);
+        int y = Integer.parseInt(intstrings[1]);
+        int z = Integer.parseInt(intstrings[2]);
+        return new BlockPos(x, y, z);
+    }
+
+    // 212,121,122:123,123,123.111,111,111|212,121,122:123,123,123.111,111,111;1231,123123,12311:123,1231,1231.12311,1231,121|
+    public void updateLinks(String msgString) {
+        SkullShrinesToAltars = new HashMap<>();
+        SpellShrinesToAltars = new HashMap<>();
+        String[] parts = msgString.split(";");
+        String skullAltarLinks = parts[0];
+        if (!skullAltarLinks.equals("")) {
+            if (skullAltarLinks.contains("|")) {
+                String[] skullAltars = skullAltarLinks.split("|");
+                for (String singleSkullAltarLinks : skullAltars) {
+                    String[] singleSkullAltarParts = singleSkullAltarLinks.split(":");
+                    String skullAltarPosStr = singleSkullAltarParts[0];
+                    BlockPos altarPos = parseBlockPos(skullAltarPosStr);
+                    SkullShrinesToAltars.put(altarPos, new ArrayList<BlockPos>());
+                    String skullPedestalPositions = singleSkullAltarParts[1];
+                    for (String pedestalPosString : skullPedestalPositions.split(".")) {
+                        SkullShrinesToAltars.get(altarPos).add(parseBlockPos(pedestalPosString));
+                    }
+                }
+            }
+        }
+        String spellAltarLinks = parts[1];
+        if (!spellAltarLinks.equals("")) {
+            if (spellAltarLinks.contains("|")) {
+                String[] spellAltars = spellAltarLinks.split("|");
+                for (String singlespellAltarLinks : spellAltars) {
+                    String[] singleSpellAltarParts = singlespellAltarLinks.split(":");
+                    String spellAltarPosStr = singleSpellAltarParts[0];
+                    BlockPos altarPos = parseBlockPos(spellAltarPosStr);
+                    SpellShrinesToAltars.put(altarPos, new ArrayList<BlockPos>());
+                    String spellPedestalPositions = singleSpellAltarParts[1];
+                    for (String pedestalPosString : spellPedestalPositions.split(".")) {
+                        SpellShrinesToAltars.get(altarPos).add(parseBlockPos(pedestalPosString));
+                    }
+                }
+            }
+        }
     }
 }

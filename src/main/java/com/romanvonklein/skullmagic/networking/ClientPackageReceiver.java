@@ -30,6 +30,14 @@ public class ClientPackageReceiver {
         }
     }
 
+    public static void receiveLinkUpdate(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf,
+            PacketSender responseSender) {
+        if (buf.isReadable(1)) {
+            String msgString = buf.readString();
+            ClientInitializer.getClientSpellManager().updateLinks(msgString);
+        }
+    }
+
     public static void receiveUnlinkEssencePoolPacket(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
         ClientInitializer.unsetClientEssenceManager();
@@ -41,7 +49,7 @@ public class ClientPackageReceiver {
         if (buf.isReadable(1)) {
             String msgString = buf.readString();
             ClientInitializer.getClientSpellManager().loadSpells(msgString);
-            
+
         }
     }
 }

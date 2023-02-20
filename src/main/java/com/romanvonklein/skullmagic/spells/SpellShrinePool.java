@@ -9,6 +9,8 @@ import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 
@@ -105,7 +107,8 @@ public class SpellShrinePool extends PersistentState {
         return pool;
     }
 
-    public void removePedestal(BlockPos pos, String type) {
+    public void removePedestal(ServerWorld world, BlockPos pos, String type) {
+        boolean changed = true;
         if (type.equals("power")) {
             int lostStrength = this.linkedPowerPedestals.get(pos);
             this.removePower(lostStrength);
@@ -119,8 +122,17 @@ public class SpellShrinePool extends PersistentState {
             this.removeCooldown(lostStrength);
             this.linkedCooldownPedestals.remove(pos);
         } else {
+            changed = false;
             SkullMagic.LOGGER.warn("Unknown spell pedestal type: '" + type + "'");
         }
+
+        if (changed) {
+            ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(this.linkedPlayerID);
+            if (player != null) {
+                ServerPackageSender.sendUpdateLinksPackage(player);
+            }
+        }
+
     }
 
     public boolean setSpellName(String spellname) {
@@ -135,37 +147,38 @@ public class SpellShrinePool extends PersistentState {
     public String getSpellName() {
         return this.spellName;
     }
+
     // public JsonObject toJsonElement() {
     // JsonObject elem = new JsonObject();
-
-    public void addPowerPedestal(BlockPos candidatePos, int strength) {
+    public void addPowerPedestal(ServerWorld world, BlockPos candidatePos, int strength) {
         this.linkedPowerPedestals.put(candidatePos, strength);
         addPower(strength);
+        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(this.linkedPlayerID);
+        if (player != null) {
+            ServerPackageSender.sendUpdateLinksPackage(player);
+        }
     }
 
-    public void addEfficiencyPedestal(BlockPos candidatePos, int strength) {
+    public void addEfficiencyPedestal(ServerWorld world, BlockPos candidatePos, int strength) {
         this.linkedEfficiencyPedestals.put(candidatePos, strength);
         addEfficiency(strength);
+        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(this.linkedPlayerID);
+        if (player != null) {
+            ServerPackageSender.sendUpdateLinksPackage(player);
+        }
     }
 
-    public void addCooldownPedestal(BlockPos candidatePos, int strength) {
+    public void addCooldownPedestal(ServerWorld world, BlockPos candidatePos, int strength) {
         this.linkedCooldownPedestals.put(candidatePos, strength);
         addCooldown(strength);
+        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(this.linkedPlayerID);
+        if (player != null) {
+            ServerPackageSender.sendUpdateLinksPackage(player);
+        }
     }
 
     private void addPower(int strengthWon) {
         this.strength += strengthWon;
-        if (this.linkedPlayerID != null) {
-            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
-            if (data != null) {
-                data.setPowerLevel(1
-                        + Math.floor(Math.sqrt(this.strength)));
-            }
-        }
-    }
-
-    private void removePower(int strengthLost) {
-        this.strength -= strengthLost;
         if (this.linkedPlayerID != null) {
             PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
             if (data != null) {
@@ -187,17 +200,6 @@ public class SpellShrinePool extends PersistentState {
 
     }
 
-    private void removeEfficiency(int strengthLost) {
-        this.strength -= strengthLost;
-        if (this.linkedPlayerID != null) {
-            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
-            if (data != null) {
-                data.setEfficiencyLevel(1
-                        + Math.floor(Math.sqrt(this.strength)));
-            }
-        }
-    }
-
     private void addCooldown(int strengthWon) {
         this.strength += strengthWon;
         if (this.linkedPlayerID != null) {
@@ -208,6 +210,28 @@ public class SpellShrinePool extends PersistentState {
             }
         }
 
+    }
+
+    private void removePower(int strengthLost) {
+        this.strength -= strengthLost;
+        if (this.linkedPlayerID != null) {
+            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
+            if (data != null) {
+                data.setPowerLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
+            }
+        }
+    }
+
+    private void removeEfficiency(int strengthLost) {
+        this.strength -= strengthLost;
+        if (this.linkedPlayerID != null) {
+            PlayerSpellData data = SkullMagic.spellManager.getSpellData(this.linkedPlayerID, this.spellName);
+            if (data != null) {
+                data.setEfficiencyLevel(1
+                        + Math.floor(Math.sqrt(this.strength)));
+            }
+        }
     }
 
     private void removeCooldown(int strengthLost) {

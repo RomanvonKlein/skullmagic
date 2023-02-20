@@ -14,10 +14,10 @@ import com.romanvonklein.skullmagic.blockEntities.CapacityCrystalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
-import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.WitherEnergyChannelerBlockEntity;
 import com.romanvonklein.skullmagic.blocks.AdvancedSpellShrine;
@@ -58,6 +58,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -69,6 +70,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.rule.BlockMatchRuleTest;
@@ -185,6 +187,9 @@ public class SkullMagic implements ModInitializer {
 					CountPlacementModifier.of(20),
 					SquarePlacementModifier.of(),
 					HeightRangePlacementModifier.uniform(YOffset.getBottom(), YOffset.fixed(256))));
+
+	// particles
+	public static final DefaultParticleType LINK_PARTICLE = FabricParticleTypes.simple();
 
 	// custom managers
 	public static EssenceManager essenceManager;
@@ -327,6 +332,9 @@ public class SkullMagic implements ModInitializer {
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, WitherBreath::new)
 						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
 
+		// register particles
+		Registry.register(Registry.PARTICLE_TYPE, new Identifier(MODID, "link_particle"), LINK_PARTICLE);
+
 		// register screenhandler stuff
 		BLOCK_PLACER_SCREEN_HANDLER = Registry.register(
 				Registry.SCREEN_HANDLER, new Identifier(MODID, "block_placer_screen_handler"),
@@ -347,7 +355,9 @@ public class SkullMagic implements ModInitializer {
 			spellManager.tick(server);
 			taskManager.tick();
 		});
-		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) -> {
+		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) ->
+
+		{
 			spellManager.playerJoined(serverPlayNetworkHandler.player);
 		});
 
@@ -372,12 +382,11 @@ public class SkullMagic implements ModInitializer {
 				});
 
 		// feature initialization
-		Registry.register(BuiltinRegistries.CONFIGURED_FEATURE,
-				new Identifier(MODID, "end_skullium_ore"), END_SKULLIUM_ORE_CONFIGURED_FEATURE);
+		Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, new Identifier(MODID, "end_skullium_ore"),
+				END_SKULLIUM_ORE_CONFIGURED_FEATURE);
 		Registry.register(BuiltinRegistries.PLACED_FEATURE, new Identifier(MODID, "end_skullium_ore"),
 				END_SKULLIUM_ORE_PLACED_FEATURE);
 		BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(), GenerationStep.Feature.UNDERGROUND_ORES,
-				RegistryKey.of(Registry.PLACED_FEATURE_KEY,
-						new Identifier(MODID, "end_skullium_ore")));
+				RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier(MODID, "end_skullium_ore")));
 	}
 }

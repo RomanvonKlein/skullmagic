@@ -15,6 +15,8 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -33,14 +35,14 @@ public abstract class ASpellShrine extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
+            SkullMagic.spellManager.removeSpellShrine((ServerWorld) world, pos);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
+            SkullMagic.spellManager.removeSpellShrine((ServerWorld) world, pos);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }
@@ -79,7 +81,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
                                                     .toShortString()),
                                     true);
                         } else {
-                            SkullMagic.spellManager.addNewSpellShrine(world, pos,
+                            SkullMagic.spellManager.addNewSpellShrine((ServerWorld) world, pos,
                                     player.getGameProfile().getId(), spellname);
                             blockEnt.setScroll(itemStack.copy());
                             itemStack.decrement(1);
@@ -89,7 +91,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
                     // if not empty, drop the contained item.
                     player.giveItemStack(blockEnt.getScroll());
                     blockEnt.setScroll(null);
-                    SkullMagic.spellManager.removeSpellShrine(world.getRegistryKey(), pos);
+                    SkullMagic.spellManager.removeSpellShrine((ServerWorld) world, pos, (ServerPlayerEntity) player);
                 }
 
             }

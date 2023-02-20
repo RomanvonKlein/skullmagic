@@ -189,4 +189,14 @@ public class EssencePool extends PersistentState {
         elem.add("consumers", consumerList);
         return elem;
     }
+
+    public ArrayList<BlockPos> getLinkedPedestals() {
+        ArrayList<BlockPos> result = new ArrayList<BlockPos>();
+        result.addAll(this.linkedPedestals.keySet());
+        return result;
+    }
+
+    public BlockPos getAltarPos() {
+        return this.position;
+    }
 }

@@ -20,4 +20,13 @@ public class Parsing {
         ;
         return arr;
     }
+
+    public static BlockPos stringToBlockpos(String posStr) {
+        String[] parts = posStr.split(",");
+        return new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+    }
+
+    public static String blockPosToString(BlockPos pos) {
+        return pos.getX() + "," + pos.getY() + "," + pos.getZ();
+    }
 }

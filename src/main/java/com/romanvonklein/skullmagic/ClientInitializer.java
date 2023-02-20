@@ -29,15 +29,19 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -100,6 +104,10 @@ public class ClientInitializer implements ClientModInitializer {
                     ClientPackageSender.sendCastSpellPackage(spellEntry.getKey());
                 }
             }
+            // Draw particles for visualization TODO: check for item held or toggle key
+            // pressed
+            ClientInitializer.getClientSpellManager().tickParticles(client);
+            
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             clientEssenceManager = null;
@@ -118,7 +126,7 @@ public class ClientInitializer implements ClientModInitializer {
 
         BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
-        
+
         BlockEntityRendererRegistry.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
                 PowerSpellPedestalBlockEntityRenderer::new);
 
@@ -142,6 +150,13 @@ public class ClientInitializer implements ClientModInitializer {
                     new Identifier(SkullMagic.MODID, "textures/gui/" + orb.spellName + "_icon.png"));
         }
 
+        // register particles
+        ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE)
+                .register(((atlasTexture, registry) -> {
+                    registry.register(new Identifier(SkullMagic.MODID, "particle/link_particle"));
+                }));
+
+        ParticleFactoryRegistry.getInstance().register(SkullMagic.LINK_PARTICLE, FlameParticle.Factory::new);
         // screenstuff
         HandledScreens.register(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, BlockPlacerScreen::new);
         // clientside hud render stuff
