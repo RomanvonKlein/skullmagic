@@ -13,6 +13,7 @@ import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.config.Config.ConfigData;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
+import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -22,6 +23,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -51,12 +53,14 @@ public class EssenceManager extends PersistentState {
         return true;
     }
 
-    public EssencePool getEssencePool(RegistryKey<World> dimension, BlockPos pos) {
+    public EssencePool getEssencePool(RegistryKey<World> dimension, BlockPos pos, UUID playerID) {
         if (!EssencePools.containsKey(dimension)) {
             EssencePools.put(dimension, new HashMap<>());
         }
         if (!EssencePools.get(dimension).containsKey(pos)) {
-            EssencePools.get(dimension).put(pos, new EssencePool(pos));
+            EssencePool pool = new EssencePool(pos, playerID);
+            EssencePools.get(dimension).put(pos, pool);
+            playersToEssencePools.put(playerID, pool);
         }
         return EssencePools.get(dimension).get(pos);
     }
@@ -234,7 +238,7 @@ public class EssenceManager extends PersistentState {
             RegistryKey<World> key = player.getWorld().getRegistryKey();
             if (!(this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos))) {
                 SkullMagic.LOGGER.debug("no valid mana pool was found for skullaltar. Creating one.");
-                createNewEssencePool(player.getWorld(), pos);
+                createNewEssencePool(player.getWorld(), pos, playerID);
             }
 
             EssencePool pool = this.EssencePools.get(key).get(pos);
@@ -253,7 +257,10 @@ public class EssenceManager extends PersistentState {
             } else if (pool.linkedPlayerID == playerID) {
                 pool.linkedPlayerID = null;
                 this.playersToEssencePools.remove(playerID);
+                ServerPackageSender.sendUpdateLinksPackage((ServerPlayerEntity)player);
+                ServerPackageSender.sendUpdateSpellListPackage((ServerPlayerEntity)player);
                 player.sendMessage(Text.of("Unlinked you from this altar."), true);
+
                 ServerPlayNetworking.send((ServerPlayerEntity) (player), NetworkingConstants.UNLINK_ESSENCEPOOL_ID,
                         PacketByteBufs.create());
             } else {
@@ -309,12 +316,14 @@ public class EssenceManager extends PersistentState {
         }
     }
 
-    public void removePedestal(RegistryKey<World> registryKey, BlockPos pos) {
+    public void removePedestal(ServerWorld world, BlockPos pos) {
+        RegistryKey<World> registryKey = world.getRegistryKey();
         if (pedestalsToEssencePools.containsKey(registryKey)
                 && pedestalsToEssencePools.get(registryKey).containsKey(pos)) {
             EssencePool pool = pedestalsToEssencePools.get(registryKey).get(pos);
-            pool.removePedestal(pos);
+            pool.removePedestal(world, pos);
             pedestalsToEssencePools.get(registryKey).remove(pos);
+
         }
     }
 
@@ -328,35 +337,37 @@ public class EssenceManager extends PersistentState {
                 && this.pedestalsToEssencePools.get(key).containsKey(foundPedestalPos);
     }
 
-    public void linkPedestalToEssencePool(RegistryKey<World> key, BlockPos pedestalPos, BlockPos altarPos,
+    public void linkPedestalToEssencePool(ServerWorld world, BlockPos pedestalPos, BlockPos altarPos,
             String skullIdentifier) {
-        EssencePool pool = EssencePools.get(key).get(altarPos);
-        linkPedestalToEssencePool(key, pedestalPos, pool, skullIdentifier);
+        EssencePool pool = EssencePools.get(world.getRegistryKey()).get(altarPos);
+        linkPedestalToEssencePool(world, pedestalPos, pool, skullIdentifier);
 
     }
 
-    public void linkPedestalToEssencePool(RegistryKey<World> key, BlockPos pedestalPos, EssencePool pool,
+    public void linkPedestalToEssencePool(ServerWorld world, BlockPos pedestalPos, EssencePool pool,
             String skullIdentifier) {
-        pool.linkPedestal(pedestalPos, skullIdentifier);
+        RegistryKey<World> key = world.getRegistryKey();
+        pool.linkPedestal(world, pedestalPos, skullIdentifier);
         if (!this.pedestalsToEssencePools.containsKey(key)) {
             this.pedestalsToEssencePools.put(key, new HashMap<>());
         }
         this.pedestalsToEssencePools.get(key).put(pedestalPos, pool);
     }
 
-    public void createNewEssencePool(World world, BlockPos pos) {
+    public void createNewEssencePool(World world, BlockPos pos, UUID playerID) {
         SkullMagic.LOGGER.info("creating new essencepool.");
         RegistryKey<World> registryKey = world.getRegistryKey();
         if (!EssencePools.containsKey(registryKey)) {
             EssencePools.put(registryKey, new HashMap<>());
         }
-        EssencePool pool = new EssencePool(pos);
+        EssencePool pool = new EssencePool(pos, playerID);
+        playersToEssencePools.put(playerID, pool);
         EssencePools.get(registryKey).put(pos, pool);
 
-        tryLinkNearbyUnlinkedPedestals(world.getServer().getWorld(registryKey), pos);
+        tryLinkNearbyUnlinkedPedestals(world.getServer().getWorld(registryKey), pos, playerID);
     }
 
-    public void tryLinkNearbyUnlinkedPedestals(World world, BlockPos altarPos) {
+    public void tryLinkNearbyUnlinkedPedestals(ServerWorld world, BlockPos altarPos, UUID playerID) {
         int height = Config.getConfig().scanHeight;
         int width = Config.getConfig().scanWidth;
         ArrayList<BlockPos> foundPedestals = new ArrayList<>();
@@ -376,12 +387,15 @@ public class EssenceManager extends PersistentState {
                 String skullCandidate = Registry.BLOCK.getId(world.getBlockState(foundPedestalPos.up()).getBlock())
                         .toString();
                 if (Config.getConfig().skulls.containsKey(skullCandidate)) {
-                    SkullMagic.essenceManager.linkPedestalToEssencePool(key, foundPedestalPos, altarPos,
+                    SkullMagic.essenceManager.linkPedestalToEssencePool(world, foundPedestalPos, altarPos,
                             skullCandidate);
                 }
             }
         }
-
+        ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(playerID);
+        if (player != null) {
+            ServerPackageSender.sendUpdateLinksPackage(player);
+        }
     }
 
     public static boolean isValidSkullPedestalCombo(World world, BlockPos pedestalPos) {
@@ -399,7 +413,7 @@ public class EssenceManager extends PersistentState {
         return this.EssencePools.containsKey(key) && this.EssencePools.get(key).containsKey(pos);
     }
 
-    public void tryLinkSkullPedestalToNearbyAltar(World world, BlockPos pedestalpos) {
+    public void tryLinkSkullPedestalToNearbyAltar(ServerWorld world, BlockPos pedestalpos) {
         if (EssenceManager.isValidSkullPedestalCombo(world, pedestalpos)) {
             String skullCandidate = Registry.BLOCK
                     .getId(world.getBlockState(pedestalpos.up()).getBlock())
@@ -411,7 +425,7 @@ public class EssenceManager extends PersistentState {
                     for (int z = pedestalpos.getZ() - width; z <= pedestalpos.getZ() + width; z++) {
                         BlockPos pos = new BlockPos(x, y, z);
                         if (SkullMagic.essenceManager.hasEssencePoolAt(world.getRegistryKey(), pos)) {
-                            SkullMagic.essenceManager.linkPedestalToEssencePool(world.getRegistryKey(), pedestalpos,
+                            SkullMagic.essenceManager.linkPedestalToEssencePool(world, pedestalpos,
                                     pos,
                                     skullCandidate);
                             return;

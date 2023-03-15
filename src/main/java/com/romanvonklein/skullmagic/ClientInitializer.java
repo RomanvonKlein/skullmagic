@@ -107,7 +107,7 @@ public class ClientInitializer implements ClientModInitializer {
             // Draw particles for visualization TODO: check for item held or toggle key
             // pressed
             ClientInitializer.getClientSpellManager().tickParticles(client);
-            
+
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             clientEssenceManager = null;
@@ -171,6 +171,9 @@ public class ClientInitializer implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_SPELL_LIST,
                 ClientPackageReceiver::receiveUpdateSpellListPackage);
+
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_LINK_LIST,
+                ClientPackageReceiver::receiveLinkUpdate);
     }
 
     public static ClientSpellManager getClientSpellManager() {

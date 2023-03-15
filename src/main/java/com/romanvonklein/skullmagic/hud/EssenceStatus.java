@@ -7,7 +7,6 @@ import com.romanvonklein.skullmagic.spells.PlayerSpellData;
 import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
@@ -65,9 +64,10 @@ public class EssenceStatus {
 
                         // essence in numbers
 
-                        TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-                        renderer.draw(matrixStack,
-                                        Double.valueOf(ClientInitializer.getClientEssenceManager().essence) + "/"
+                        MinecraftClient client = MinecraftClient.getInstance();
+                        client.textRenderer.draw(matrixStack,
+                                        Double.valueOf(ClientInitializer.getClientEssenceManager().essence)
+                                                        + "/"
                                                         + Double.valueOf(ClientInitializer
                                                                         .getClientEssenceManager().maxEssence),
                                         x + 2 * borderwidth + barwidth,
@@ -114,8 +114,8 @@ public class EssenceStatus {
 
                                         // cooldown counter
                                         if (cooldownLeft != 0) {
-
-                                                renderer.draw(matrixStack, Integer.toString(cooldownLeft / 20),
+                                                client.textRenderer.draw(matrixStack,
+                                                                Integer.toString(cooldownLeft / 20),
                                                                 x + 2 * borderwidth + barwidth,
                                                                 y - 1, color);
                                         }

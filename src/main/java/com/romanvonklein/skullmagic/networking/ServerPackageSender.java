@@ -57,8 +57,14 @@ public class ServerPackageSender {
             HashMap<BlockPos, ArrayList<BlockPos>> spellAltars = SkullMagic.spellManager.getAllShrinePools(
                     player.getUuid(),
                     player.getEntityWorld().getRegistryKey());
+            boolean first = true;
             for (BlockPos spellAltarPos : spellAltars.keySet()) {
-                builder.append("|" + Parsing.blockPosToString(spellAltarPos));
+                if (first) {
+                    first = false;
+                    builder.append(Parsing.blockPosToString(spellAltarPos));
+                } else {
+                    builder.append("|" + Parsing.blockPosToString(spellAltarPos));
+                }
                 for (BlockPos pos : spellAltars.get(spellAltarPos)) {
                     builder.append(Parsing.blockPosToString(pos) + ".");
                 }
@@ -66,7 +72,7 @@ public class ServerPackageSender {
 
             String result = builder.toString();
             buf.writeString(result);
-            ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_SPELL_LIST, buf);
+            ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_LINK_LIST, buf);
         }
     }
 }

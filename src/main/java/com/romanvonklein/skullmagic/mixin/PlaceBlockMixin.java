@@ -15,31 +15,37 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(Block.class)
 public class PlaceBlockMixin {
-//onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack)
-@Inject(method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;)V",at = @At("HEAD") )
+    // onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity
+    // placer, ItemStack itemStack)
+    @Inject(method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;)V", at = @At("HEAD"))
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
-                //TODO: overwrite onPlaced instead for custom bocks/blockEntities
+        // TODO: overwrite onPlaced instead for custom bocks/blockEntities
         if (!world.isClient()) {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
             // cases:
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 // skull placed on pedestal?
-                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar(world, pos.down());
+                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos.down());
             } else if (blockIdentifier
                     .equals(BlockEntityType.getId(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY).toString())) {
                 // pedestal placed under skull?
-                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar(world, pos);
+                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos);
             } else if (blockIdentifier.equals(BlockEntityType.getId(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).toString())) {
                 // altar places around valid pedestal - skull combination?
-                SkullMagic.essenceManager.createNewEssencePool(world, pos);
-                SkullMagic.essenceManager.tryLinkNearbyUnlinkedPedestals(world, pos);
+                if (placer instanceof ServerPlayerEntity) {
+                    SkullMagic.essenceManager.createNewEssencePool(world, pos, placer.getUuid());
+                    SkullMagic.essenceManager.tryLinkNearbyUnlinkedPedestals((ServerWorld) world, pos,
+                            placer.getUuid());
+                }
             }
         }
     }
@@ -48,7 +54,7 @@ public class PlaceBlockMixin {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
         if (!world.isClient) {
             if (EssenceManager.isValidSkullPedestalCombo(world, pos.down())) {
-                SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos.down());
+                SkullMagic.essenceManager.removePedestal((ServerWorld) world, pos.down());
             }
         }
     }

@@ -11,6 +11,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
@@ -64,14 +65,14 @@ public class SkullPedestal extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos);
+            SkullMagic.essenceManager.removePedestal((ServerWorld) world, pos);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.essenceManager.removePedestal(world.getRegistryKey(), pos);
+            SkullMagic.essenceManager.removePedestal((ServerWorld) world, pos);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }

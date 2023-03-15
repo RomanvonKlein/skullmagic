@@ -72,6 +72,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.Identifier;
@@ -367,7 +368,7 @@ public class SkullMagic implements ModInitializer {
 				essenceManager.removeSkullAltar(world, pos);
 			} else if (entity != null && entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
 				// broke a skullpedestal
-				essenceManager.removePedestal(world.getRegistryKey(), pos);
+				essenceManager.removePedestal((ServerWorld) world, pos);
 			}
 		}));
 

@@ -149,14 +149,16 @@ public class SpellInitializer {
                         }
                         SkullMagic.taskManager.queueTask(new DelayedTask("wolfpack_spell_kill_wolfes", wolfLifeTime,
                                 new TriFunction<Object[], Object, Object, Boolean>() {
-                                    @Override
+                                    @Override 
                                     public Boolean apply(Object[] data, Object n1, Object n2) {
+                                        @SuppressWarnings("unchecked")
                                         ArrayList<WolfEntity> wolfes = (ArrayList<WolfEntity>) data[0];
                                         for (WolfEntity wolf : wolfes) {
                                             if (wolf.isAlive()) {
                                                 wolf.kill();
                                             }
                                         }
+
                                         return true;
                                     }
                                 },

@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
+import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -17,6 +18,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -38,8 +40,9 @@ public class EssencePool extends PersistentState {
         this.maxEssence = Config.getConfig().altarCapacity;
     }
 
-    public EssencePool(BlockPos pos) {
+    public EssencePool(BlockPos pos, UUID playerID) {
         this.position = pos;
+        this.linkedPlayerID = playerID;
         this.essence = 0;
         this.essenceChargeRate = 0;
         this.maxEssence = Config.getConfig().altarCapacity;
@@ -155,17 +158,31 @@ public class EssencePool extends PersistentState {
         return pool;
     }
 
-    public void removePedestal(BlockPos pos) {
-        int lostChargeRate = Config.getConfig().skulls.get(this.linkedPedestals.get(pos));
-        SkullMagic.LOGGER.info("Removing " + lostChargeRate + "from essence pool.");
-        this.essenceChargeRate -= lostChargeRate;
-        this.linkedPedestals.remove(pos);
+    public void removePedestal(ServerWorld world, BlockPos pos) {
+        if (this.linkedPedestals.containsKey(pos)) {
+            int lostChargeRate = Config.getConfig().skulls.get(this.linkedPedestals.get(pos));
+            SkullMagic.LOGGER.info("Removing " + lostChargeRate + " from essence pool.");
+            this.essenceChargeRate -= lostChargeRate;
+            this.linkedPedestals.remove(pos);
+            if (this.linkedPlayerID != null) {
+                ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(this.linkedPlayerID);
+                if (player != null) {
+                    ServerPackageSender.sendUpdateLinksPackage(player);
+                }
+            }
+        }
     }
 
-    public void linkPedestal(BlockPos pedestalPos, String skullIdentifier) {
+    public void linkPedestal(ServerWorld world, BlockPos pedestalPos, String skullIdentifier) {
         int addChargeRate = Config.getConfig().skulls.get(skullIdentifier);
         this.essenceChargeRate += addChargeRate;
         this.linkedPedestals.put(pedestalPos, skullIdentifier);
+        if (this.linkedPlayerID != null) {
+            ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(this.linkedPlayerID);
+            if (player != null) {
+                ServerPackageSender.sendUpdateLinksPackage(player);
+            }
+        }
     }
 
     public void addConsumer(BlockPos pos) {

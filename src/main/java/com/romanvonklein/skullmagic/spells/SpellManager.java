@@ -51,34 +51,41 @@ public class SpellManager extends PersistentState {
 
     public HashMap<BlockPos, ArrayList<BlockPos>> getAllShrinePools(UUID playerID, RegistryKey<World> currentWorld) {
         HashMap<BlockPos, ArrayList<BlockPos>> result = new HashMap<>();
-        for (BlockPos spellShrinePos : playerToSpellShrine.get(playerID).values()) {
-            ArrayList<BlockPos> altarConnections = new ArrayList<BlockPos>();
-            // add power pedestals
-            for (BlockPos pedestalPos : powerPedestalsToSpellShrinePools.get(currentWorld).keySet()) {
-                if (powerPedestalsToSpellShrinePools.get(currentWorld).get(pedestalPos).position
-                        .equals(spellShrinePos)) {
-                    // if the spell shrine is connected to the spell altar, add it to its list
-                    altarConnections.add(pedestalPos);
+        if (playerToSpellShrine.containsKey(playerID)) {
+            for (BlockPos spellShrinePos : playerToSpellShrine.get(playerID).values()) {
+                ArrayList<BlockPos> altarConnections = new ArrayList<BlockPos>();
+                // add power pedestals
+                if (powerPedestalsToSpellShrinePools.containsKey(currentWorld)) {
+                    for (BlockPos pedestalPos : powerPedestalsToSpellShrinePools.get(currentWorld).keySet()) {
+                        if (powerPedestalsToSpellShrinePools.get(currentWorld).get(pedestalPos).position
+                                .equals(spellShrinePos)) {
+                            // if the spell shrine is connected to the spell altar, add it to its list
+                            altarConnections.add(pedestalPos);
+                        }
+                    }
                 }
-            }
-
-            // add efficiency pedestals
-            for (BlockPos pedestalPos : efficiencyPedestalsToSpellShrinePools.get(currentWorld).keySet()) {
-                if (efficiencyPedestalsToSpellShrinePools.get(currentWorld).get(pedestalPos).position
-                        .equals(spellShrinePos)) {
-                    // if the spell shrine is connected to the spell altar, add it to its list
-                    altarConnections.add(pedestalPos);
+                if (efficiencyPedestalsToSpellShrinePools.containsKey(currentWorld)) {
+                    // add efficiency pedestals
+                    for (BlockPos pedestalPos : efficiencyPedestalsToSpellShrinePools.get(currentWorld).keySet()) {
+                        if (efficiencyPedestalsToSpellShrinePools.get(currentWorld).get(pedestalPos).position
+                                .equals(spellShrinePos)) {
+                            // if the spell shrine is connected to the spell altar, add it to its list
+                            altarConnections.add(pedestalPos);
+                        }
+                    }
                 }
-            }
-            // add cooldown pedestals
-            for (BlockPos pedestalPos : cooldownPedestalsToSpellShrinePools.get(currentWorld).keySet()) {
-                if (cooldownPedestalsToSpellShrinePools.get(currentWorld).get(pedestalPos).position
-                        .equals(spellShrinePos)) {
-                    // if the spell shrine is connected to the spell altar, add it to its list
-                    altarConnections.add(pedestalPos);
+                // add cooldown pedestals
+                if (cooldownPedestalsToSpellShrinePools.containsKey(currentWorld)) {
+                    for (BlockPos pedestalPos : cooldownPedestalsToSpellShrinePools.get(currentWorld).keySet()) {
+                        if (cooldownPedestalsToSpellShrinePools.get(currentWorld).get(pedestalPos).position
+                                .equals(spellShrinePos)) {
+                            // if the spell shrine is connected to the spell altar, add it to its list
+                            altarConnections.add(pedestalPos);
+                        }
+                    }
                 }
+                result.put(spellShrinePos, altarConnections);
             }
-            result.put(spellShrinePos, altarConnections);
         }
         return result;
     }

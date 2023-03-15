@@ -13,7 +13,6 @@ import com.romanvonklein.skullmagic.spells.SpellManager;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -72,8 +71,7 @@ public class KnowledgeOrb extends Item {
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spelldata_cooldownreductionlevel")
                         .append(Text.of(Double.toString(cooldownLevel))).formatted(Formatting.GRAY));
             } else {
-                ClientPlayerEntity player = MinecraftClient.getInstance().player;
-                if (SpellManager.getLevelCost(this.spellName) > player.experienceLevel) {
+                if (SpellManager.getLevelCost(this.spellName) > MinecraftClient.getInstance().player.experienceLevel) {
 
                     tooltip.add(new TranslatableText("tooltip.skullmagic.level_cost")
                             .append(Integer.toString(SpellManager.getLevelCost(this.spellName)))
