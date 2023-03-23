@@ -21,19 +21,18 @@ public class EffectController {
             // spawn a particle for each pedestal, flying towards the linked altar
             // SkullAltars
             if (client.world != null) {
-                for (WorldBlockPos altarPos : ClientInitializer.getClientData().getActiveAltarsWorldBlockPos()) {
-                    if (client.world.getRegistryKey().toString().equals(altarPos.worldKey.toString())) {
-                        for (BlockPos pedPos : ClientInitializer.getClientData()
-                                .getSkullPedestalsForAltarPos(altarPos)) {
-                            Vec3f velocity = new Vec3f(altarPos.getX() - pedPos.getX(), altarPos.getY() - pedPos.getY(),
-                                    altarPos.getZ() - pedPos.getZ());
-                            velocity.scale(0.1f);
-                            client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
-                                    pedPos.getY() + 0.5,
-                                    pedPos.getZ() + 0.5, velocity.getX(),
-                                    velocity.getY(), velocity.getZ());
-                            skullparticles++;
-                        }
+                WorldBlockPos altarPos = ClientInitializer.getClientData().getActiveAltarWorldBlockPos();
+                if (client.world.getRegistryKey().toString().equals(altarPos.worldKey.toString())) {
+                    for (BlockPos pedPos : ClientInitializer.getClientData()
+                            .getConnectedSkullPedestals()) {
+                        Vec3f velocity = new Vec3f(altarPos.getX() - pedPos.getX(), altarPos.getY() - pedPos.getY(),
+                                altarPos.getZ() - pedPos.getZ());
+                        velocity.scale(0.1f);
+                        client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
+                                pedPos.getY() + 0.5,
+                                pedPos.getZ() + 0.5, velocity.getX(),
+                                velocity.getY(), velocity.getZ());
+                        skullparticles++;
                     }
                 }
 

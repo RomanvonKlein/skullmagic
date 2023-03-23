@@ -6,7 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
 
 class SpellData extends PersistentState {
-    private SpellShrineData spellShrine;
+     SpellShrineData spellShrine;
     private int cooldownLeft;
     private int maxCoolDown;
     private double powerLevel;

@@ -3,10 +3,10 @@ package com.romanvonklein.skullmagic.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class ClientData extends PlayerData {
 
@@ -117,19 +117,54 @@ public class ClientData extends PlayerData {
         return this.selectedSpell;
     }
 
-    public WorldBlockPos[] getActiveAltarsWorldBlockPos() {
-        throw new NotImplementedException();
+    public ArrayList<WorldBlockPos> getActiveAltarsWorldBlockPos() {
+        ArrayList<WorldBlockPos> results = new ArrayList<>();
+        if (this.essencePool.altarPos != null && this.essencePool.worldKey != null) {
+            results.add(new WorldBlockPos(this.essencePool.altarPos, this.essencePool.worldKey));
+        }
+        return results;
     }
 
-    public BlockPos[] getSkullPedestalsForAltarPos(WorldBlockPos altarPos) {
-        throw new NotImplementedException();
+    public ArrayList<BlockPos> getConnectedSkullPedestals() {
+        ArrayList<BlockPos> results = new ArrayList<>();
+        for (BlockPos pos : this.essencePool.pedestals.keySet()) {
+            results.add(pos);
+        }
+        return results;
     }
 
-    public WorldBlockPos[] getActiveSpellShrinesWorldBlockPos() {
-        return null;
+    public RegistryKey<World> getSkullAltarWorldKey() {
+        return this.essencePool.worldKey;
     }
 
-    public BlockPos[] getSpellPedestalsForSpellAltar(WorldBlockPos shrinePos) {
-        return null;
+    public ArrayList<WorldBlockPos> getActiveSpellShrinesWorldBlockPos() {
+        ArrayList<WorldBlockPos> results = new ArrayList<>();
+        for (String learnedSpellname : this.spells.keySet()) {
+            SpellShrineData spellShrineData = this.spells.get(learnedSpellname).spellShrine;
+            results.add(new WorldBlockPos(spellShrineData.shrinePos, spellShrineData.worldKey));
+        }
+        return results;
+    }
+
+    public ArrayList<BlockPos> getSpellPedestalsForSpellAltar(WorldBlockPos shrinePos) {
+        ArrayList<BlockPos> results = new ArrayList<>();
+        for (String learnedSpellname : this.spells.keySet()) {
+            SpellShrineData spellShrineData = this.spells.get(learnedSpellname).spellShrine;
+            // get all the different pedestals
+            for (BlockPos pedestalPos : spellShrineData.cooldownPedestals.keySet()) {
+                results.add(pedestalPos);
+            }
+            for (BlockPos pedestalPos : spellShrineData.efficiencyPedestals.keySet()) {
+                results.add(pedestalPos);
+            }
+            for (BlockPos pedestalPos : spellShrineData.powerPedestals.keySet()) {
+                results.add(pedestalPos);
+            }
+        }
+        return results;
+    }
+
+    public WorldBlockPos getActiveAltarWorldBlockPos() {
+        return new WorldBlockPos(this.essencePool.altarPos, this.essencePool.worldKey);
     }
 }
