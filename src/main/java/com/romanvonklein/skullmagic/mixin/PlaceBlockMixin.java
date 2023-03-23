@@ -7,15 +7,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
-import com.romanvonklein.skullmagic.essence.EssenceManager;
+import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -34,18 +32,7 @@ public class PlaceBlockMixin {
             // cases:
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 // skull placed on pedestal?
-                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos.down());
-            } else if (blockIdentifier
-                    .equals(BlockEntityType.getId(SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY).toString())) {
-                // pedestal placed under skull?
-                SkullMagic.essenceManager.tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos);
-            } else if (blockIdentifier.equals(BlockEntityType.getId(SkullMagic.SKULL_ALTAR_BLOCK_ENTITY).toString())) {
-                // altar places around valid pedestal - skull combination?
-                if (placer instanceof ServerPlayerEntity) {
-                    SkullMagic.essenceManager.createNewEssencePool(world, pos, placer.getUuid());
-                    SkullMagic.essenceManager.tryLinkNearbyUnlinkedPedestals((ServerWorld) world, pos,
-                            placer.getUuid());
-                }
+                SkullMagic.getServerData().tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos.down());
             }
         }
     }
@@ -53,8 +40,8 @@ public class PlaceBlockMixin {
     @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable = true)
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
         if (!world.isClient) {
-            if (EssenceManager.isValidSkullPedestalCombo(world, pos.down())) {
-                SkullMagic.essenceManager.removePedestal((ServerWorld) world, pos.down());
+            if (Util.isValidSkullPedestalCombo(world, pos.down())) {
+                SkullMagic.getServerData().removePedestal((ServerWorld) world, pos.down());
             }
         }
     }

@@ -65,14 +65,14 @@ public class SkullPedestal extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.essenceManager.removePedestal((ServerWorld) world, pos);
+            SkullMagic.getServerData().removePedestal((ServerWorld) world, pos);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.essenceManager.removePedestal((ServerWorld) world, pos);
+            SkullMagic.getServerData().removePedestal((ServerWorld) world, pos);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }

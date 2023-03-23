@@ -35,14 +35,14 @@ public abstract class ASpellShrine extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellShrine((ServerWorld) world, pos);
+            SkullMagic.getServerData().removeSpellShrine((ServerWorld) world, pos);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellShrine((ServerWorld) world, pos);
+            SkullMagic.getServerData().removeSpellShrine((ServerWorld) world, pos);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }
@@ -72,16 +72,15 @@ public abstract class ASpellShrine extends BlockWithEntity {
                         String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
                         // dont do anything if the player already has a shrine for that spell assigned
                         // to him
-                        if (SkullMagic.spellManager.playerToSpellShrine.containsKey(playerid)
-                                && SkullMagic.spellManager.playerToSpellShrine.get(playerid).containsKey(spellname)) {
+                        if (SkullMagic.getServerData().playerHasSpellShrine(playerid, spellname)) {
                             player.sendMessage(
                                     Text.of("You already have a shrine for the spell " + spellname
                                             + " assigned to you at "
-                                            + SkullMagic.spellManager.playerToSpellShrine.get(playerid).get(spellname)
+                                            + SkullMagic.getServerData().getSpellShrineForPlayer(playerid, spellname)
                                                     .toShortString()),
                                     true);
                         } else {
-                            SkullMagic.spellManager.addNewSpellShrine((ServerWorld) world, pos,
+                            SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, pos,
                                     player.getGameProfile().getId(), spellname);
                             blockEnt.setScroll(itemStack.copy());
                             itemStack.decrement(1);
@@ -91,7 +90,8 @@ public abstract class ASpellShrine extends BlockWithEntity {
                     // if not empty, drop the contained item.
                     player.giveItemStack(blockEnt.getScroll());
                     blockEnt.setScroll(null);
-                    SkullMagic.spellManager.removeSpellShrine((ServerWorld) world, pos, (ServerPlayerEntity) player);
+                    SkullMagic.getServerData().removeSpellShrineForPlayer((ServerWorld) world, pos,
+                            (ServerPlayerEntity) player);
                 }
 
             }

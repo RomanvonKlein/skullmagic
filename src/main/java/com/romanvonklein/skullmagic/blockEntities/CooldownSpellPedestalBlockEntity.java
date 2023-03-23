@@ -1,5 +1,6 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
+
 import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.SkullMagic;

@@ -1,8 +1,6 @@
 package com.romanvonklein.skullmagic.spells;
 
-import org.apache.commons.lang3.function.TriFunction;
-
-import com.romanvonklein.skullmagic.essence.EssencePool;
+import java.util.function.BiFunction;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -11,10 +9,10 @@ public class Spell {
     public int essenceCost;
     public int cooldownTicks;
     public int learnLevelCost;
-    public TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean> action;
+    public BiFunction<ServerPlayerEntity, Double, Boolean> action;
 
     public Spell(int essenceCost, int cooldownTicks, int learnLevelCost,
-            TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean> action) {
+            BiFunction<ServerPlayerEntity, Double, Boolean> action) {
         this.essenceCost = essenceCost;
         this.cooldownTicks = cooldownTicks;
         this.learnLevelCost = learnLevelCost;

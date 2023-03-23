@@ -17,7 +17,6 @@ public class Parsing {
             arr[counter] = entry;
             counter++;
         }
-        ;
         return arr;
     }
 

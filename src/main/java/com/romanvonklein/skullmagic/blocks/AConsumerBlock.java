@@ -25,7 +25,7 @@ public abstract class AConsumerBlock extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.essenceManager.removeConsumer(world.getRegistryKey(), pos);
+            SkullMagic.getServerData().removeConsumer(world.getRegistryKey(), pos);
         }
     }
 
@@ -33,7 +33,7 @@ public abstract class AConsumerBlock extends BlockWithEntity {
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
         if (!world.isClient) {
-            if ((placer instanceof ServerPlayerEntity) && SkullMagic.essenceManager.addConsumer(world.getRegistryKey(),
+            if ((placer instanceof ServerPlayerEntity) && SkullMagic.getServerData().addConsumer(world.getRegistryKey(),
                     pos, ((ServerPlayerEntity) placer).getGameProfile().getId())) {
                 world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE,
                         SoundCategory.BLOCKS, 1.0f, 1.0f, true);
@@ -48,7 +48,7 @@ public abstract class AConsumerBlock extends BlockWithEntity {
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         super.onDestroyedByExplosion(world, pos, explosion);
         if (!world.isClient) {
-            SkullMagic.essenceManager.removeConsumer(world.getRegistryKey(), pos);
+            SkullMagic.getServerData().removeConsumer(world.getRegistryKey(), pos);
         }
     }
 }

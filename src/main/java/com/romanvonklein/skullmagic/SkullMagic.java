@@ -35,14 +35,14 @@ import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
+import com.romanvonklein.skullmagic.data.ServerData;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
-import com.romanvonklein.skullmagic.essence.EssenceManager;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
+import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
-import com.romanvonklein.skullmagic.spells.SpellManager;
 import com.romanvonklein.skullmagic.structurefeatures.DarkTowerFeature;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
 
@@ -193,8 +193,7 @@ public class SkullMagic implements ModInitializer {
 	public static final DefaultParticleType LINK_PARTICLE = FabricParticleTypes.simple();
 
 	// custom managers
-	public static EssenceManager essenceManager;
-	public static SpellManager spellManager;
+	private static ServerData serverData;
 	public static TaskManager taskManager;
 
 	@Override
@@ -315,6 +314,9 @@ public class SkullMagic implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_block"),
 				new BlockItem(SKULLIUM_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
 
+		// register spells
+		ServerData.initSpells();
+
 		// register items
 		knowledgeOrbs = KnowledgeOrb.generateKnowledgeOrbs();
 		for (KnowledgeOrb orb : knowledgeOrbs) {
@@ -343,41 +345,52 @@ public class SkullMagic implements ModInitializer {
 
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			LOGGER.info("Initializing Essence Manager");
-			essenceManager = (EssenceManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(EssenceManager::fromNbt, EssenceManager::new, MODID + "_essenceManager");
-			spellManager = (SpellManager) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(SpellManager::fromNbt, SpellManager::new, MODID + "_spellManager");
-			taskManager = new TaskManager();
+			LOGGER.info("Initializing Server side data");
+			serverData = (ServerData) server.getWorld(World.OVERWORLD).getPersistentStateManager()
+					.getOrCreate(ServerData::fromNbt, ServerData::new, MODID + "_serverData");
 		});
 
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
-			essenceManager.tick(server);
-			spellManager.tick(server);
-			taskManager.tick();
+			serverData.tick(server);
+			getTaskManager().tick();
 		});
-		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) ->
-
-		{
-			spellManager.playerJoined(serverPlayNetworkHandler.player);
+		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) -> {
+			getServerData().createPlayerEntryIfNotExists(serverPlayNetworkHandler.player);
+			ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(serverPlayNetworkHandler.player);
 		});
 
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
-			if (entity != null && entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
-				// broke a skullAltar
-				essenceManager.removeSkullAltar(world, pos);
-			} else if (entity != null && entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
-				// broke a skullpedestal
-				essenceManager.removePedestal((ServerWorld) world, pos);
+			if (entity != null) {
+
+				if (entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
+					// broke a skullAltar
+					serverData.removeSkullAltar((ServerWorld) world, pos);// essenceManager.removeSkullAltar((ServerWorld)world,
+																			// pos);
+				} else if (entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
+					// broke a skullpedestal
+					serverData.removePedestal((ServerWorld) (ServerWorld) world, pos);
+				} else if (entity.getType().equals(SPELL_SHRINE_BLOCK_ENTITY)) {
+					// broke a spell altar
+					serverData.removeSpellAltar((ServerWorld) world, pos);
+				} else if (entity.getType().equals(COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+					// broke a cooldown pedestal
+					serverData.removeSpellCooldownPedestal((ServerWorld) world, pos);
+				} else if (entity.getType().equals(EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+					// broke a efficiency pedestal
+					serverData.removeSpellEfficiencyPedestal((ServerWorld) world, pos);
+				} else if (entity.getType().equals(POWER_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+					// broke a power pedestal
+					serverData.removeSpellPowerPedestal((ServerWorld) world, pos);
+				}
 			}
 		}));
 
 		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.SPELL_CAST_ID,
 				(server, serverPlayerEntity, handler, buf, packetSender) -> {
 					String spellname = buf.readString(100);
-					if (essenceManager.playerHasEssencePool(serverPlayerEntity.getGameProfile().getId())) {
+					if (serverData.hasPlayerEssencePool(serverPlayerEntity)) {
 						server.execute(() -> {
-							spellManager.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
+							serverData.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
 						});
 					}
 				});
@@ -389,5 +402,16 @@ public class SkullMagic implements ModInitializer {
 				END_SKULLIUM_ORE_PLACED_FEATURE);
 		BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(), GenerationStep.Feature.UNDERGROUND_ORES,
 				RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier(MODID, "end_skullium_ore")));
+	}
+
+	public TaskManager getTaskManager() {
+		if (taskManager == null) {
+			taskManager = new TaskManager();
+		}
+		return taskManager;
+	}
+
+	public static ServerData getServerData() {
+		return serverData;
 	}
 }

@@ -1,6 +1,5 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
-import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 
@@ -29,7 +28,6 @@ public class SkullAltarBlockEntity extends BlockEntity {
         super.readNbt(tag);
     }
 
-    @Nullable
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);

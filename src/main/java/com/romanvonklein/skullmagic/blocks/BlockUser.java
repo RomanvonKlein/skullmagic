@@ -69,7 +69,7 @@ public class BlockUser extends AConsumerBlock {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.essenceManager.removeConsumer(world.getRegistryKey(), pos);
+            SkullMagic.getServerData().removeConsumer(world.getRegistryKey(), pos);
         }
     }
 }

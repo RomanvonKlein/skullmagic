@@ -12,6 +12,5 @@ public class NetworkingConstants {
         public static final Identifier UNLINK_ESSENCEPOOL_ID = new Identifier(
                         SkullMagic.MODID + ":unlink_essencepool_id");
         public static final Identifier SPELL_CAST_FEEDBACK = new Identifier(SkullMagic.MODID + "spell_cast_feedback");
-        public static final Identifier UPDATE_SPELL_LIST = new Identifier(SkullMagic.MODID + "update_spell_list");
-        public static final Identifier UPDATE_LINK_LIST = new Identifier(SkullMagic.MODID + "update_link_list");
+        public static final Identifier UPDATE_PLAYER_DATA = new Identifier(SkullMagic.MODID + "update_player_data");
 }

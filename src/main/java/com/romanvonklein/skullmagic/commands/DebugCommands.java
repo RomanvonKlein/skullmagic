@@ -9,8 +9,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.spells.SpellManager;
-import com.romanvonklein.skullmagic.util.Parsing;
+import com.romanvonklein.skullmagic.data.ServerData;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager;
@@ -43,9 +42,8 @@ public class DebugCommands {
                                                 .then((ArgumentBuilder<ServerCommandSource, ?>) CommandManager
                                                                 .argument("spellname", StringArgumentType.word())
                                                                 .suggests((context, builder) -> CommandSource
-                                                                                .suggestMatching(Parsing.setToStringArr(
-                                                                                                SpellManager.SpellDict
-                                                                                                                .keySet()),
+                                                                                .suggestMatching(
+                                                                                                ServerData.getSpellNames(),
                                                                                                 builder))
                                                                 .executes(
                                                                                 (context) -> DebugCommands.learnSpell(
@@ -79,15 +77,14 @@ public class DebugCommands {
 
         private static int learnAllSpellsForPlayer(CommandContext<ServerCommandSource> context, String playername) {
                 ServerCommandSource src = context.getSource();
-                SkullMagic.spellManager
-                                .learnAllSpellsForPlayer(src.getServer().getPlayerManager().getPlayer(playername));
+                SkullMagic.getServerData().learnAllSpellsForPlayer(src.getServer().getPlayerManager().getPlayer(playername));
                 return 1;
         }
 
         private static int output(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-                //TODO: also output spellManager data
+                // TODO: also output spellManager data
                 SkullMagic.LOGGER.info("debugging command executed");
-                String jsonString = SkullMagic.essenceManager.toJsonString();
+                String jsonString = SkullMagic.getServerData().toJsonString();
                 String dir = "./debug/";
                 String fileName = "output.json";
                 String path = dir + fileName;
@@ -109,7 +106,7 @@ public class DebugCommands {
         }
 
         private static int clear(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-                SkullMagic.essenceManager.clear();
+                SkullMagic.getServerData().clear();
                 return 1;
         }
 
@@ -117,7 +114,7 @@ public class DebugCommands {
         private static int learnSpell(CommandContext<ServerCommandSource> context, String playername, String spellName)
                         throws CommandSyntaxException {
                 ServerCommandSource src = context.getSource();
-                SkullMagic.spellManager.learnSpell(src.getServer().getPlayerManager().getPlayer(playername), spellName,
+                SkullMagic.getServerData().learnSpell(src.getServer().getPlayerManager().getPlayer(playername), spellName,
                                 true);
                 return 1;
         }

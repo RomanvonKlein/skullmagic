@@ -1,7 +1,5 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 
@@ -53,7 +51,6 @@ public class EfficiencySpellPedestalBlockEntity extends BlockEntity {
         return result;
     }
 
-    @Nullable
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);

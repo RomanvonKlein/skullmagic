@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.function.TriFunction;
 
@@ -13,7 +14,6 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
-import com.romanvonklein.skullmagic.essence.EssencePool;
 import com.romanvonklein.skullmagic.mixin.ZombieVillagerEntityMixin;
 import com.romanvonklein.skullmagic.structurefeatures.SkullMagicStructurePoolBasedGenerator;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
@@ -59,37 +59,37 @@ public class SpellInitializer {
 
         Map<String, Spell> spellList = new HashMap<>();
         spellList.put("fireball",
-                new Spell(1000, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1000, 100, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         Vec3d angle = player.getRotationVector().normalize()
-                                .multiply(spellData.getPowerLevel() / 2 + 1.5);
+                                .multiply(powerlevel / 2 + 1.5);
                         Vec3d pos = player.getPos();
                         World world = player.world;
                         FireballEntity ent = new FireballEntity(world, player,
                                 angle.getX(),
                                 angle.getY(),
                                 angle.getZ(),
-                                Math.max(1, Math.min((int) Math.round(spellData.getPowerLevel()), 5)));
+                                Math.max(1, Math.min((int) Math.round(powerlevel), 5)));
                         ent.setPos(pos.x, pos.y + player.getHeight(), pos.z);
                         world.spawnEntity(ent);
                         return true;
                     }
                 }));
         spellList.put("selfheal",
-                new Spell(500, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 100, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        player.heal(2.0f + (float) (2 * spellData.getPowerLevel()));
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        player.heal(2.0f + (float) (2 * powerlevel));
                         return true;
                     }
                 }));
         spellList.put(
                 "meteoritestorm",
-                new Spell(6500, 600, 45, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(6500, 600, 45, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int meteoriteCount = 10 + (int) Math.round(2.0 * spellData.getPowerLevel());
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        int meteoriteCount = 10 + (int) Math.round(2.0 * powerlevel);
                         int minPower = 1;
                         int maxPower = 5;
                         int height = 256;
@@ -114,7 +114,7 @@ public class SpellInitializer {
                                                         (int) Math.round(
                                                                 Math.max(1.0,
                                                                         Math.min(rand.nextInt(minPower, maxPower)
-                                                                                + (spellData.getPowerLevel() - 1) * 0.5,
+                                                                                + (powerlevel - 1) * 0.5,
                                                                                 5.0))));
                                                 ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
                                                         height, center.z - radius + 2 * rand.nextFloat() * radius);
@@ -131,10 +131,10 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "wolfpack",
-                new Spell(2500, 500, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(2500, 500, 25, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int wolfCount = 2 + (int) Math.round((spellData.getPowerLevel() - 1));
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        int wolfCount = 2 + (int) Math.round((powerlevel - 1));
                         int wolfLifeTime = 20 * 60;// ~one minute of lifetime
                         ArrayList<WolfEntity> wolfesSpawned = new ArrayList<>();
                         for (int i = 0; i < wolfCount; i++) {
@@ -149,7 +149,7 @@ public class SpellInitializer {
                         }
                         SkullMagic.taskManager.queueTask(new DelayedTask("wolfpack_spell_kill_wolfes", wolfLifeTime,
                                 new TriFunction<Object[], Object, Object, Boolean>() {
-                                    @Override 
+                                    @Override
                                     public Boolean apply(Object[] data, Object n1, Object n2) {
                                         @SuppressWarnings("unchecked")
                                         ArrayList<WolfEntity> wolfes = (ArrayList<WolfEntity>) data[0];
@@ -168,13 +168,13 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "firebreath",
-                new Spell(500, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int shotsPerTick = 2;
                         int tickDuration = 30;
-                        int breathLife = 20 + (int) Math.round(spellData.getPowerLevel() * 4);
-                        int burnDuration = 40 + (int) Math.round(spellData.getPowerLevel() * 10);
+                        int breathLife = 20 + (int) Math.round(powerlevel * 4);
+                        int burnDuration = 40 + (int) Math.round(powerlevel * 10);
                         for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more
                                                                 // memory
                                                                 // efficient.
@@ -213,14 +213,14 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "witherbreath",
-                new Spell(750, 150, 25, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(750, 150, 25, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int shotsPerTick = 2 + (int) Math.floor(spellData.getPowerLevel() / 2);
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        int shotsPerTick = 2 + (int) Math.floor(powerlevel / 2);
                         int tickDuration = 30;
-                        int breathLife = 20 + (int) Math.round(spellData.getPowerLevel() * 10);
-                        int witherDuration = 120 + (int) Math.round(spellData.getPowerLevel() * 80);
-                        int damage = 1 + (int) Math.round(spellData.getPowerLevel() * 2);
+                        int breathLife = 20 + (int) Math.round(powerlevel * 10);
+                        int witherDuration = 120 + (int) Math.round(powerlevel * 80);
+                        int damage = 1 + (int) Math.round(powerlevel * 2);
                         for (int i = 0; i < tickDuration; i++) {// TODO: making this one single task may make it more
                                                                 // memory
                                                                 // efficient.
@@ -258,17 +258,17 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "slowball",
-                new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
                         World world = player.world;
                         if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0 + spellData.getPowerLevel() * 2);
+                            Vec3d velocity = player.getRotationVector().multiply(8.0 + powerlevel * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
                                     velocity.z,
                                     StatusEffects.SLOWNESS, 4.0f,
-                                    (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3)));
+                                    (int) Math.round(Math.max(1.0, powerlevel / 3)));
                             ball.setPosition(
                                     player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
                             world.spawnEntity(ball);
@@ -278,11 +278,11 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "lunge",
-                new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         if (!player.world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(4.0 + spellData.getPowerLevel() * 2);
+                            Vec3d velocity = player.getRotationVector().multiply(4.0 + powerlevel * 2);
                             player.addVelocity(velocity.x, velocity.y, velocity.z);
                             player.velocityModified = true;
                         }
@@ -291,17 +291,17 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "weakball",
-                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
                         World world = player.world;
                         if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0 + spellData.getPowerLevel() * 2);
+                            Vec3d velocity = player.getRotationVector().multiply(8.0 + powerlevel * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
                                     velocity.z,
                                     StatusEffects.WEAKNESS, 4.0f,
-                                    (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3)));
+                                    (int) Math.round(Math.max(1.0, powerlevel / 3)));
                             ball.setPosition(
                                     player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
                             world.spawnEntity(ball);
@@ -311,76 +311,76 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "speedbuff",
-                new Spell(500, 150, 5, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(
                                 new StatusEffectInstance(StatusEffects.SPEED,
-                                        (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
-                                        (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
+                                        (int) Math.round(500 * (1 + (powerlevel - 1) * 0.25)),
+                                        (int) Math.round(Math.max(1.0, powerlevel / 2))));
                         return true;
                     }
                 }));
         spellList.put(
                 "resistancebuff",
-                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,
-                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
+                                (int) Math.round(500 * (1 + (powerlevel - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, powerlevel / 2))));
                         return true;
                     }
                 }));
         spellList.put(
                 "strengthbuff",
-                new Spell(750, 150, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(750, 150, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH,
-                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
+                                (int) Math.round(500 * (1 + (powerlevel - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, powerlevel / 2))));
                         return true;
                     }
                 }));
         spellList.put(
                 "fireresistance",
-                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE,
-                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 2))));
+                                (int) Math.round(500 * (1 + (powerlevel - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, powerlevel / 2))));
                         return true;
                     }
                 }));
         spellList.put(
                 "waterbreathing",
-                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING,
-                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                                (int) Math.round(500 * (1 + (powerlevel - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, powerlevel / 3))));
                         return true;
                     }
                 }));
         spellList.put(
                 "hastebuff",
-                new Spell(1500, 150, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 150, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE,
-                                (int) Math.round(500 * (1 + (spellData.getPowerLevel() - 1) * 0.25)),
-                                (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3))));
+                                (int) Math.round(500 * (1 + (powerlevel - 1) * 0.25)),
+                                (int) Math.round(Math.max(1.0, powerlevel / 3))));
                         return true;
                     }
                 }));
         spellList.put(
                 "teleport",
-                new Spell(1000, 800, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1000, 800, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
@@ -397,9 +397,9 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "infect",
-                new Spell(1500, 2400, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 2400, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
                         double reachDistance = 5.0;
                         Box box = player
@@ -437,9 +437,9 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "cure",
-                new Spell(1500, 2400, 30, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 2400, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
                         double reachDistance = 5.0;
                         Box box = player
@@ -467,17 +467,17 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "poisonball",
-                new Spell(500, 150, 10, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
                         World world = player.world;
                         if (!world.isClient) {
-                            Vec3d velocity = player.getRotationVector().multiply(8.0 + spellData.getPowerLevel() * 2);
+                            Vec3d velocity = player.getRotationVector().multiply(8.0 + powerlevel * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
                                     velocity.z,
                                     StatusEffects.POISON, 4.0f,
-                                    (int) Math.round(Math.max(1.0, spellData.getPowerLevel() / 3)));
+                                    (int) Math.round(Math.max(1.0, powerlevel / 3)));
                             ball.setPosition(
                                     player.getCameraEntity().getPos().add(player.getRotationVector().normalize()));
                             world.spawnEntity(ball);
@@ -486,16 +486,16 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("shockwave",
-                new Spell(1000, 100, 15, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1000, 100, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
                         World world = player.world;
                         if (!world.isClient) {
-                            int range = 7 + (int) Math.round(spellData.getPowerLevel());
+                            int range = 7 + (int) Math.round(powerlevel);
                             int angle = 30;
-                            double power_min = 2.0 + spellData.getPowerLevel();
-                            double power_max = 5.0 + spellData.getPowerLevel();
+                            double power_min = 2.0 + powerlevel;
+                            double power_max = 5.0 + powerlevel;
                             Vec3d playerpos = player.getPos().add(0, player.getEyeHeight(player.getPose()), 0);
                             Box box = new Box(playerpos.x - range, playerpos.y - range, playerpos.z - range,
                                     playerpos.x + range, playerpos.y + range, playerpos.z + range);
@@ -518,9 +518,9 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("dungeonrise",
-                new Spell(1500, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         HitResult result = player.raycast(100, 1, false);
                         boolean castResult = false;
                         if (result != null) {
@@ -555,9 +555,9 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("lightningstrike",
-                new Spell(15000, 100, 55, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(15000, 100, 55, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
@@ -571,10 +571,10 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("excavation",
-                new Spell(1500, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int radius = (int) (1 + spellData.getPowerLevel() * 2);
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        int radius = (int) (1 + powerlevel * 2);
                         HitResult result = player.raycast(100, 1, false);
                         Vec3d center = result.getPos();
                         World world = player.world;
@@ -624,13 +624,13 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("moundsummon",
-                new Spell(1500, 100, 20, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
 
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
-                            int radius = (int) (1 + spellData.getPowerLevel() * 2);
+                            int radius = (int) (1 + powerlevel * 2);
                             Vec3d center = result.getPos();
                             World world = player.world;
                             boolean placedAnything = false;
@@ -663,10 +663,10 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("lightningstorm",
-                new Spell(5000, 450, 40, new TriFunction<ServerPlayerEntity, PlayerSpellData, EssencePool, Boolean>() {
+                new Spell(5000, 450, 40, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
-                    public Boolean apply(ServerPlayerEntity player, PlayerSpellData spellData, EssencePool altar) {
-                        int lightningCount = (int) Math.round(Math.min(10 + spellData.getPowerLevel() * 3, 50));
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        int lightningCount = (int) Math.round(Math.min(10 + powerlevel * 3, 50));
                         int radius = 7;
                         int maxDelay = 40;
                         // TODO: way too strong. i love it

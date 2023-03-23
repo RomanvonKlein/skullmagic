@@ -5,23 +5,23 @@ import java.util.Map.Entry;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
-import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntityRenderer;
 import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntityRenderer;
 import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererShrine;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
+import com.romanvonklein.skullmagic.data.ClientData;
+import com.romanvonklein.skullmagic.data.ServerData;
+import com.romanvonklein.skullmagic.effects.particles.EffectController;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
-import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
 import com.romanvonklein.skullmagic.hud.EssenceStatus;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
-import com.romanvonklein.skullmagic.spells.ClientSpellManager;
-import com.romanvonklein.skullmagic.spells.SpellManager;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -52,8 +52,8 @@ public class ClientInitializer implements ClientModInitializer {
 
     private static HashMap<String, KeyBinding> spellKeyBindings = new HashMap<String, KeyBinding>();
 
-    private static ClientEssenceManager clientEssenceManager;
-    private static ClientSpellManager clientSpellManager;
+    private static ClientData clientData;
+    private static EffectController effectController;
 
     // entity renderers
     public static final EntityModelLayer MODEL_EFFECT_BALL_LAYER = new EntityModelLayer(
@@ -68,6 +68,9 @@ public class ClientInitializer implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
+        //effectcontroller
+        effectController = new EffectController();
         // keybinds
         primarySpellKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.skullmagic.primary",
@@ -80,7 +83,7 @@ public class ClientInitializer implements ClientModInitializer {
                 GLFW.GLFW_KEY_G,
                 "category.skullmagic.spells"));
         // register all spell keybinds (set to none by default)
-        for (String spellName : SpellManager.SpellDict.keySet()) {
+        for (String spellName : ServerData.getSpellNames()) {
             spellKeyBindings.put(spellName, KeyBindingHelper.registerKeyBinding(new KeyBinding(
                     "key.skullmagic." + spellName,
                     InputUtil.Type.KEYSYM,
@@ -91,12 +94,12 @@ public class ClientInitializer implements ClientModInitializer {
         // register action for keybind
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (primarySpellKeyBinding.wasPressed()) {
-                ClientPackageSender.sendCastSpellPackage(clientSpellManager.selectedSpellName);
+                ClientPackageSender.sendCastSpellPackage(clientData.getSelectedSpellName());
             }
             while (cycleSpellKeyBinding.wasPressed()) {
-                if (ClientInitializer.getClientEssenceManager() != null) {
-                    clientSpellManager.cycleSpell();
-                    client.player.sendMessage(Text.of(clientSpellManager.selectedSpellName), true);
+                if (ClientInitializer.getClientData() != null) {
+                    clientData.cycleSpell();
+                    client.player.sendMessage(Text.of(clientData.getSelectedSpellName()), true);
                 }
             }
             for (Entry<String, KeyBinding> spellEntry : spellKeyBindings.entrySet()) {
@@ -106,11 +109,11 @@ public class ClientInitializer implements ClientModInitializer {
             }
             // Draw particles for visualization TODO: check for item held or toggle key
             // pressed
-            ClientInitializer.getClientSpellManager().tickParticles(client);
+            ClientInitializer.getEffectController().tickParticles(client);
 
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-            clientEssenceManager = null;
+            clientData = null;
         });
 
         // register entity renderers
@@ -169,33 +172,25 @@ public class ClientInitializer implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UNLINK_ESSENCEPOOL_ID,
                 ClientPackageReceiver::receiveUnlinkEssencePoolPacket);
 
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_SPELL_LIST,
-                ClientPackageReceiver::receiveUpdateSpellListPackage);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_PLAYER_DATA,
+                ClientPackageReceiver::receiveUpdatePlayerDataPackage);
 
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.UPDATE_LINK_LIST,
-                ClientPackageReceiver::receiveLinkUpdate);
     }
 
-    public static ClientSpellManager getClientSpellManager() {
-        if (clientSpellManager == null) {
-            clientSpellManager = new ClientSpellManager();
-        }
-        return clientSpellManager;
+    private static EffectController getEffectController() {
+        return effectController;
     }
 
-    public static ClientEssenceManager getClientEssenceManager() {
-        return clientEssenceManager;
+    public static void unsetClientData() {
+        clientData = null;
     }
 
-    public static void unsetClientEssenceManager() {
-        clientEssenceManager = null;
+    public static ClientData getClientData() {
+        return clientData;
     }
 
-    public static void createClientEssenceManager(int essence, int maxEssence, int essenceChargeRate) {
-        clientEssenceManager = new ClientEssenceManager();
-        clientEssenceManager.essence = essence;
-        clientEssenceManager.maxEssence = maxEssence;
-        clientEssenceManager.essenceChargeRate = essenceChargeRate;
+    public static void setClientData(ClientData newData) {
+        clientData = newData;
     }
 
 }

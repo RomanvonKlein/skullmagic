@@ -64,7 +64,7 @@ public class SkullAltar extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
             BlockHitResult hit) {
         if (!world.isClient) {
-            SkullMagic.essenceManager.trySetLinkedPlayer(player, pos);
+            SkullMagic.getServerData().trySetLinkedPlayer(player, pos);
         }
         return ActionResult.SUCCESS;
     }
@@ -73,13 +73,13 @@ public class SkullAltar extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.essenceManager.removeSkullAltar(world, pos);
+            SkullMagic.getServerData().removeSkullAltar(world, pos);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-        SkullMagic.essenceManager.removeSkullAltar(world, pos);
+        SkullMagic.getServerData().removeSkullAltar(world, pos);
         super.onDestroyedByExplosion(world, pos, explosion);
     }
 }

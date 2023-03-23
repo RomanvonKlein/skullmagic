@@ -1,7 +1,5 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.block.BlockState;
@@ -19,7 +17,6 @@ public class CapacityCrystalBlockEntity extends BlockEntity {
     }
 
 
-    @Nullable
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);

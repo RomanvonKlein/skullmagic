@@ -1,13 +1,12 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.essence.EssencePool;
+import com.romanvonklein.skullmagic.data.WorldBlockPos;
 import com.romanvonklein.skullmagic.inventory.IImplementedInventory;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -33,10 +32,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class BlockPlacerBlockEntity extends BlockEntity
+public class BlockPlacerBlockEntity extends AConsumerBlockEntity
         implements NamedScreenHandlerFactory, IImplementedInventory, InventoryChangedListener {
     private int lastTickRedstonePower = 0;
-    private int essenceCost = 750;
+    private static int essenceCost = 750;
     // private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(3,
     // ItemStack.EMPTY);
     private static final int INVENTORY_SIZE = 9;
@@ -51,27 +50,25 @@ public class BlockPlacerBlockEntity extends BlockEntity
         if (!world.isClient) {
             int power = world.getReceivedRedstonePower(pos);
             if (power > 0 && be.lastTickRedstonePower == 0) {
-                EssencePool pool = SkullMagic.essenceManager.getEssencePoolForConsumer(world.getRegistryKey(), pos);
-                if (pool != null && pool.linkedPlayerID != null) {
-                    PlayerEntity player = world.getPlayerByUuid(pool.linkedPlayerID);
-                    if (pool.getEssence() >= be.essenceCost && player != null) {
-                        Direction target = Direction.UP;
-                        if (state.contains(Properties.FACING)) {
-                            target = state.get(Properties.FACING);
-                        }
-                        BlockPos targetPos = pos.add(target.getVector());
-                        for (ItemStack stack : be.getItems()) {
-                            if (world.getBlockState(targetPos).equals(Blocks.AIR.getDefaultState())) {
-                                if (stack.getItem().getClass().isAssignableFrom(BlockItem.class)) {
-                                    if (((BlockItem) stack.getItem()).place(
-                                            new AutomaticItemPlacementContext(world, targetPos, target, stack, target))
-                                            .isAccepted()) {
-                                        pool.discharge(be.essenceCost);
-                                        break;
-                                    }
+                WorldBlockPos worldPos = new WorldBlockPos(pos, world.getRegistryKey());
+                if (SkullMagic.getServerData().canConsumerApply(worldPos, power)) {
+                    Direction target = Direction.UP;
+                    if (state.contains(Properties.FACING)) {
+                        target = state.get(Properties.FACING);
+                    }
+                    BlockPos targetPos = pos.add(target.getVector());
+                    for (ItemStack stack : be.getItems()) {
+                        if (world.getBlockState(targetPos).equals(Blocks.AIR.getDefaultState())) {
+                            if (stack.getItem().getClass().isAssignableFrom(BlockItem.class)) {
+                                if (((BlockItem) stack.getItem()).place(
+                                        new AutomaticItemPlacementContext(world, targetPos, target, stack, target))
+                                        .isAccepted()) {
+                                    SkullMagic.getServerData().applyConsumer(worldPos, essenceCost);
+                                    break;
                                 }
                             }
                         }
+
                     }
                 } else {
                     world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE,

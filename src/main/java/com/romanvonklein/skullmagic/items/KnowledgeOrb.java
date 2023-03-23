@@ -7,8 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.spells.PlayerSpellData;
-import com.romanvonklein.skullmagic.spells.SpellManager;
+import com.romanvonklein.skullmagic.data.ServerData;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.MinecraftClient;
@@ -43,7 +42,7 @@ public class KnowledgeOrb extends Item {
         TypedActionResult<ItemStack> result = super.use(world, user, hand);
         // should the itemstack be checked first??
         if (!world.isClient) {
-            if (SkullMagic.spellManager.learnSpell((ServerPlayerEntity) user, this.spellName, false)) {
+            if (SkullMagic.getServerData().learnSpell((ServerPlayerEntity) user, this.spellName, false)) {
                 result = new TypedActionResult<ItemStack>(ActionResult.SUCCESS, ItemStack.EMPTY);
 
                 world.playSound(null, new BlockPos(user.getBlockX(), user.getBlockY(), user.getBlockZ()),
@@ -56,13 +55,13 @@ public class KnowledgeOrb extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         if (world != null && world.isClient) {
-            if (ClientInitializer.getClientSpellManager().spellList.containsKey(this.spellName)) {
-                PlayerSpellData spellData = ClientInitializer.getClientSpellManager().spellList.get(this.spellName);
+            if (ClientInitializer.getClientData().hasSpell(this.spellName)) {
+
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spell_learned").formatted(Formatting.GREEN));
                 // current spell levels
-                double powerlevel = spellData.getPowerLevel();
-                double efficiencylevel = spellData.getEfficiencyLevel();
-                double cooldownLevel = spellData.getCooldownReductionLevel();
+                double powerlevel = ClientInitializer.getClientData().getPowerLevel(this.spellName);
+                double efficiencylevel = ClientInitializer.getClientData().getEfficiencyLevel(this.spellName);
+                double cooldownLevel = ClientInitializer.getClientData().getCooldownLevel(this.spellName);
 
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spelldata_powerlevel")
                         .append(Text.of(Double.toString(powerlevel))).formatted(Formatting.GRAY));
@@ -71,14 +70,14 @@ public class KnowledgeOrb extends Item {
                 tooltip.add(new TranslatableText("tooltip.skullmagic.spelldata_cooldownreductionlevel")
                         .append(Text.of(Double.toString(cooldownLevel))).formatted(Formatting.GRAY));
             } else {
-                if (SpellManager.getLevelCost(this.spellName) > MinecraftClient.getInstance().player.experienceLevel) {
+                if (ServerData.getLevelCost(this.spellName) > MinecraftClient.getInstance().player.experienceLevel) {
 
                     tooltip.add(new TranslatableText("tooltip.skullmagic.level_cost")
-                            .append(Integer.toString(SpellManager.getLevelCost(this.spellName)))
+                            .append(Integer.toString(ServerData.getLevelCost(this.spellName)))
                             .formatted(Formatting.RED));
                 } else {
                     tooltip.add(new TranslatableText("tooltip.skullmagic.level_cost")
-                            .append(Integer.toString(SpellManager.getLevelCost(this.spellName)))
+                            .append(Integer.toString(ServerData.getLevelCost(this.spellName)))
                             .formatted(Formatting.GREEN));
 
                 }
@@ -90,7 +89,7 @@ public class KnowledgeOrb extends Item {
 
     public static ArrayList<KnowledgeOrb> generateKnowledgeOrbs() {
         ArrayList<KnowledgeOrb> orbs = new ArrayList<>();
-        for (String spellName : SpellManager.SpellDict.keySet()) {
+        for (String spellName : ServerData.getSpellNames()) {
             orbs.add(new KnowledgeOrb(new FabricItemSettings().group(ItemGroup.MISC), spellName));
         }
         return orbs;

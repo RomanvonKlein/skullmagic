@@ -70,14 +70,14 @@ public abstract class ASPellPedestal extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellPedestal((ServerWorld) world, pos, this.type);
+            SkullMagic.getServerData().removeSpellPedestal((ServerWorld) world, pos, this.type);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.spellManager.removeSpellPedestal((ServerWorld) world, pos, this.type);
+            SkullMagic.getServerData().removeSpellPedestal((ServerWorld) world, pos, this.type);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }
@@ -95,7 +95,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY);
             Optional<EfficiencySpellPedestalBlockEntity> efficiency_opt = world.getBlockEntity(pos,
                     SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY);
-            boolean any = true;
+            boolean updateNeeded = true;
             if (power_opt.isPresent()) {
                 PowerSpellPedestalBlockEntity ent = power_opt.get();
 
@@ -105,7 +105,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     ItemStack itemStack = player.getMainHandStack();
                     if (itemStack.getItem() instanceof KnowledgeOrb) {
                         String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                        if (SkullMagic.spellManager.tryAddSpellPedestal((ServerWorld) world, pos,
+                        if (SkullMagic.getServerData().tryAddSpellPedestal((ServerWorld) world, pos,
                                 player.getGameProfile().getId(), spellname, this)) {
                             ent.setScroll(itemStack.copy());
                             itemStack.decrement(1);
@@ -130,7 +130,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     world.spawnEntity(itemEnt);
                     // player.giveItemStack(ent.getScroll());
                     ent.setScroll(null);
-                    SkullMagic.spellManager.removeSpellPedestal((ServerWorld) world, pos, this.type);
+                    SkullMagic.getServerData().removeSpellPedestal((ServerWorld) world, pos, this.type);
                 }
             } else if (efficiency_opt.isPresent()) {
                 EfficiencySpellPedestalBlockEntity ent = efficiency_opt.get();
@@ -141,7 +141,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     ItemStack itemStack = player.getMainHandStack();
                     if (itemStack.getItem() instanceof KnowledgeOrb) {
                         String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                        if (SkullMagic.spellManager.tryAddSpellPedestal((ServerWorld) world, pos,
+                        if (SkullMagic.getServerData().tryAddSpellPedestal((ServerWorld) world, pos,
                                 player.getGameProfile().getId(), spellname, this)) {
                             ent.setScroll(itemStack.copy());
                             itemStack.decrement(1);
@@ -165,7 +165,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     itemEnt.setPickupDelay(0);
                     world.spawnEntity(itemEnt);
                     ent.setScroll(null);
-                    SkullMagic.spellManager.removeSpellPedestal((ServerWorld) world, pos, this.type);
+                    SkullMagic.getServerData().removeSpellPedestal((ServerWorld) world, pos, this.type);
                 }
             } else if (cooldown_opt.isPresent()) {
                 CooldownSpellPedestalBlockEntity ent = cooldown_opt.get();
@@ -176,7 +176,7 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     ItemStack itemStack = player.getMainHandStack();
                     if (itemStack.getItem() instanceof KnowledgeOrb) {
                         String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                        if (SkullMagic.spellManager.tryAddSpellPedestal((ServerWorld) world, pos,
+                        if (SkullMagic.getServerData().tryAddSpellPedestal((ServerWorld) world, pos,
                                 player.getGameProfile().getId(), spellname, this)) {
                             ent.setScroll(itemStack.copy());
                             itemStack.decrement(1);
@@ -200,14 +200,14 @@ public abstract class ASPellPedestal extends BlockWithEntity {
                     itemEnt.setPickupDelay(0);
                     world.spawnEntity(itemEnt);
                     ent.setScroll(null);
-                    SkullMagic.spellManager.removeSpellPedestal((ServerWorld) world, pos, this.type);
+                    SkullMagic.getServerData().removeSpellPedestal((ServerWorld) world, pos, this.type);
 
                 }
             } else {
-                any = false;
+                updateNeeded = false;
             }
-            if (any) {
-                ServerPackageSender.sendUpdateSpellListPackage((ServerPlayerEntity) player);
+            if (updateNeeded) {
+                ServerPackageSender.sendUpdatePlayerDataPackageForPlayer((ServerPlayerEntity) player);
             }
         }
         return result;

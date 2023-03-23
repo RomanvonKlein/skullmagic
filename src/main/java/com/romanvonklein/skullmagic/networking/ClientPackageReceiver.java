@@ -2,7 +2,7 @@ package com.romanvonklein.skullmagic.networking;
 
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
-import com.romanvonklein.skullmagic.essence.ClientEssenceManager;
+import com.romanvonklein.skullmagic.data.ClientData;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -10,6 +10,9 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 
 public class ClientPackageReceiver {
+
+    // TODO: maybe keep this package, as its going to be send ALOT and is better for
+    // performance than creating the full playerdata thing every time...
     public static void receiveEssenceChargeUpdate(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
         int[] arr = buf.readIntArray(3);
@@ -18,38 +21,21 @@ public class ClientPackageReceiver {
                     + " had wrong number of int parameters: " + arr.length);
         } else {
             client.execute(() -> {
-                ClientEssenceManager manager = ClientInitializer.getClientEssenceManager();
-                if (manager == null) {
-                    ClientInitializer.createClientEssenceManager(arr[0], arr[0], arr[0]);
-                } else {
-                    ClientInitializer.getClientEssenceManager().essence = arr[0];
-                    ClientInitializer.getClientEssenceManager().maxEssence = arr[1];
-                    ClientInitializer.getClientEssenceManager().essenceChargeRate = arr[2];
-                }
+                ClientData clientData = ClientInitializer.getClientData();
+                clientData.setEssence(arr[0]);
+                clientData.setMaxEssence(arr[1]);
+                clientData.setEssenceChargeRate(arr[2]);
             });
-        }
-    }
-
-    public static void receiveLinkUpdate(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf,
-            PacketSender responseSender) {
-        if (buf.isReadable(1)) {
-            String msgString = buf.readString();
-            ClientInitializer.getClientSpellManager().updateLinks(msgString);
         }
     }
 
     public static void receiveUnlinkEssencePoolPacket(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
-        ClientInitializer.unsetClientEssenceManager();
+        ClientInitializer.unsetClientData();
     }
 
-    public static void receiveUpdateSpellListPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
+    public static void receiveUpdatePlayerDataPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
-        ClientInitializer.getClientSpellManager().spellList.clear();
-        if (buf.isReadable(1)) {
-            String msgString = buf.readString();
-            ClientInitializer.getClientSpellManager().loadSpells(msgString);
-
-        }
+        ClientInitializer.setClientData(ClientData.fromNbt(buf.readNbt()));
     }
 }
