@@ -165,6 +165,9 @@ public class ClientData extends PlayerData {
     }
 
     public WorldBlockPos getActiveAltarWorldBlockPos() {
+        if(this.essencePool.altarPos==null){
+            return null;
+        }
         return new WorldBlockPos(this.essencePool.altarPos, this.essencePool.worldKey);
     }
 }

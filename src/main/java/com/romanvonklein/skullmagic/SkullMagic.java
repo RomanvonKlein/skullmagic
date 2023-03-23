@@ -388,7 +388,7 @@ public class SkullMagic implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.SPELL_CAST_ID,
 				(server, serverPlayerEntity, handler, buf, packetSender) -> {
 					String spellname = buf.readString(100);
-					if (serverData.hasPlayerEssencePool(serverPlayerEntity)) {
+					if (serverData.playerHasAltar(serverPlayerEntity)) {
 						server.execute(() -> {
 							serverData.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
 						});

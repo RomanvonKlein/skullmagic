@@ -1,24 +1,37 @@
 package com.romanvonklein.skullmagic.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.AConsumerBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
+import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.spells.Spell;
 import com.romanvonklein.skullmagic.spells.SpellInitializer;
 import com.romanvonklein.skullmagic.util.Parsing;
+import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.predicate.StatePredicate;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -106,8 +119,94 @@ public class ServerData extends PersistentState {
         throw new NotImplementedException();
     }
 
-    public void trySetLinkedPlayer(PlayerEntity player, BlockPos pos) {
-        throw new NotImplementedException();
+    public WorldBlockPos getAltarWorldPosForPlayer(ServerPlayerEntity player) {
+        return new WorldBlockPos(this.players.get(player.getUuid()).essencePool.altarPos,
+                this.players.get(player.getUuid()).essencePool.worldKey);
+    }
+
+    /**
+     * Checks wether the altar can be linked or unlinked from player. Accordingly
+     * proceeds to create a new link, remove an existing one, or tell the player why
+     * no actioncan be performed.
+     * 
+     * @param player
+     * @param pos
+     */
+    public void trySetLinkedPlayer(ServerPlayerEntity player, WorldBlockPos pos) {
+        if (!playerHasAltar(player)) {
+            // player has no altar
+            if (altarIsBound(pos)) {
+                // altar is bound => tell player
+                player.sendMessage(new TranslatableText("skullmagic.message.altar_linked_to_other_player"), true);
+
+            } else {
+                // altar is unlinked => bind the altar
+                linkAltar(player, pos);
+                player.sendMessage(new TranslatableText("skullmagic.message.unlinked_altar_from_player"), true);
+
+            }
+        } else {
+            // player already has an altar
+            if (pos.equals(getAltarWorldPosForPlayer(player))) {
+                // the clicked altar is the player's => unbind the altar
+                unlinkAltar(player);
+                player.sendMessage(new TranslatableText("skullmagic.message.unlinked_altar_from_player"), true);
+
+            } else if (altarIsBound(pos)) {
+                // the player clicked someone elses altar => tell player
+                player.sendMessage(new TranslatableText("skullmagic.message.already_linked_to_altar_at")
+                        .append(pos.toShortString()), true);
+            } else {
+                // the player clickes an unlinked altar => tell player
+                player.sendMessage(new TranslatableText("skullmagic.message.already_linked_to_altar_at")
+                        .append(pos.toShortString()), true);
+            }
+        }
+    }
+
+    public void linkAltar(ServerPlayerEntity player, WorldBlockPos pos) {
+        ServerWorld world = player.getServer().getWorld(pos.worldKey);
+        HashMap<BlockPos, String> pedestals = getUnlinkedSkullPedestalsInBox(new Box());
+        ArrayList<BlockPos> consumers = getUnlinkedConsumersInBox(world,
+                new Box(pos.subtract(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                        Config.getConfig().scanWidth)),
+                        pos.add(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                                Config.getConfig().scanWidth))));
+        this.players.get(player.getUuid()).essencePool = new EssencePool(pos, pos.worldKey, pedestals, consumers);
+        ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(player);
+    }
+
+    private ArrayList<BlockPos> getUnlinkedConsumersInBox(ServerWorld world, Box box) {
+        ArrayList<BlockPos> results = new ArrayList<>();
+
+        ArrayList<? extends AConsumerBlockEntity> candidates = new ArrayList<>();
+        candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.FIRE_CANNON_BLOCK_ENTITY));
+
+        for (AConsumerBlockEntity entity : candidates) {
+            if (!consumerIsLinked(new WorldBlockPos(entity.getPos(),
+                    world.getRegistryKey())))
+                results.add(entity.getPos());
+        }
+        return results;
+    }
+
+    public void unlinkAltar(ServerPlayerEntity player) {
+        this.players.get(player.getUuid()).essencePool = new EssencePool();
+        ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(player);
+    }
+
+    public boolean altarIsBound(WorldBlockPos pos) {
+        boolean result = false;
+        for (PlayerData data : this.players.values()) {
+            EssencePool pool = data.getEssencePool();
+            if (pool != null && pool.worldKey.equals(pos.worldKey)
+                    && pool.altarPos.toShortString().equals(pos.toShortString())) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     public void removeCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos) {
@@ -138,7 +237,7 @@ public class ServerData extends PersistentState {
         return this.toString();
     }
 
-    public boolean hasPlayerEssencePool(ServerPlayerEntity serverPlayerEntity) {
+    public boolean playerHasAltar(ServerPlayerEntity serverPlayerEntity) {
         UUID id = serverPlayerEntity.getGameProfile().getId();
         return this.players.containsKey(id) && this.players.get(id).getEssencePool() != null;
     }

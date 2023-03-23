@@ -22,7 +22,7 @@ public class EffectController {
             // SkullAltars
             if (client.world != null) {
                 WorldBlockPos altarPos = ClientInitializer.getClientData().getActiveAltarWorldBlockPos();
-                if (client.world.getRegistryKey().toString().equals(altarPos.worldKey.toString())) {
+                if (altarPos != null && client.world.getRegistryKey().toString().equals(altarPos.worldKey.toString())) {
                     for (BlockPos pedPos : ClientInitializer.getClientData()
                             .getConnectedSkullPedestals()) {
                         Vec3f velocity = new Vec3f(altarPos.getX() - pedPos.getX(), altarPos.getY() - pedPos.getY(),

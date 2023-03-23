@@ -2,6 +2,7 @@ package com.romanvonklein.skullmagic.blocks;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
+import com.romanvonklein.skullmagic.data.WorldBlockPos;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -12,6 +13,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -64,7 +66,8 @@ public class SkullAltar extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
             BlockHitResult hit) {
         if (!world.isClient) {
-            SkullMagic.getServerData().trySetLinkedPlayer(player, pos);
+            SkullMagic.getServerData().trySetLinkedPlayer((ServerPlayerEntity) player,
+                    new WorldBlockPos(pos, world.getRegistryKey()));
         }
         return ActionResult.SUCCESS;
     }
