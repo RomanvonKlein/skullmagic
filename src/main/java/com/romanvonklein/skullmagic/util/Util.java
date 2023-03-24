@@ -29,15 +29,15 @@ public class Util {
         return false;
     }
 
-    public List<? extends BlockEntity> getBlockEntitiesOfTypeInBox(
+    public static <T extends BlockEntity> List<T> getBlockEntitiesOfTypeInBox(
             ServerWorld world,
-            Box box, BlockEntityType<? extends BlockEntity> bet) {
-        ArrayList<? extends BlockEntity> results = new ArrayList<>();
+            Box box, BlockEntityType<T> bet) {
+        ArrayList<T> results = new ArrayList<>();
         for (double x = box.minX; x <= box.maxX; x++) {
             for (double y = box.minY; y <= box.maxY; y++) {
                 for (double z = box.minZ; z <= box.maxZ; z++) {
                     BlockPos candidatePos = new BlockPos(x, y, z);
-                    Optional<? extends BlockEntity> opt = world.getBlockEntity(candidatePos, bet);
+                    Optional<T> opt = world.getBlockEntity(candidatePos, bet);
                     if (opt.isPresent()) {
                         results.add(opt.get());
                     }

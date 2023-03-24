@@ -2,13 +2,11 @@ package com.romanvonklein.skullmagic.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import com.google.common.eventbus.AllowConcurrentEvents;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.AConsumerBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
@@ -19,15 +17,12 @@ import com.romanvonklein.skullmagic.spells.SpellInitializer;
 import com.romanvonklein.skullmagic.util.Parsing;
 import com.romanvonklein.skullmagic.util.Util;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.predicate.StatePredicate;
-import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
@@ -166,7 +161,9 @@ public class ServerData extends PersistentState {
 
     public void linkAltar(ServerPlayerEntity player, WorldBlockPos pos) {
         ServerWorld world = player.getServer().getWorld(pos.worldKey);
-        HashMap<BlockPos, String> pedestals = getUnlinkedSkullPedestalsInBox(new Box());
+        HashMap<BlockPos, String> pedestals = getUnlinkedSkullPedestalsInBox(world,
+                new Box(pos.subtract(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                        Config.getConfig().scanWidth))));
         ArrayList<BlockPos> consumers = getUnlinkedConsumersInBox(world,
                 new Box(pos.subtract(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
                         Config.getConfig().scanWidth)),
@@ -179,7 +176,7 @@ public class ServerData extends PersistentState {
     private ArrayList<BlockPos> getUnlinkedConsumersInBox(ServerWorld world, Box box) {
         ArrayList<BlockPos> results = new ArrayList<>();
 
-        ArrayList<? extends AConsumerBlockEntity> candidates = new ArrayList<>();
+        ArrayList<AConsumerBlockEntity> candidates = new ArrayList<>();
         candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
                 SkullMagic.FIRE_CANNON_BLOCK_ENTITY));
 
@@ -189,6 +186,56 @@ public class ServerData extends PersistentState {
                 results.add(entity.getPos());
         }
         return results;
+    }
+
+    private boolean consumerIsLinked(WorldBlockPos worldBlockPos) {
+        // TODO: this could be alot more efficient if we were to use data shortcuts
+        // consumersToEssencePools.
+        boolean result = false;
+        outer: for (PlayerData data : this.players.values()) {
+            for (BlockPos pos : data.getEssencePool().consumers) {
+                if (worldBlockPos.getX() == pos.getX() && worldBlockPos.getY() == pos.getY()
+                        && worldBlockPos.getZ() == pos.getZ()
+                        && data.getEssencePool().worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+                    result = true;
+                    break outer;
+                }
+            }
+        }
+        return result;
+    }
+
+    private HashMap<BlockPos, String> getUnlinkedSkullPedestalsInBox(ServerWorld world, Box box) {
+        HashMap<BlockPos, String> results = new HashMap<BlockPos, String>();
+
+        for (BlockEntity ent : Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY)) {
+            BlockPos pos = ent.getPos();
+            if (Util.isValidSkullPedestalCombo(world, pos)
+                    && !pedestalIsLinked(new WorldBlockPos(pos, world.getRegistryKey()))) {
+                results.put(pos, Registry.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString());
+            }
+        }
+
+        return results;
+    }
+
+    private boolean pedestalIsLinked(WorldBlockPos worldBlockPos) {
+        boolean result = false;
+
+        outer: for (PlayerData data : this.players.values()) {
+            if (data.getEssencePool().worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+                for (BlockPos pedestalPos : data.getEssencePool().pedestals.keySet()) {
+                    if (pedestalPos.getX() == worldBlockPos.getX() && pedestalPos.getY() == worldBlockPos.getY()
+                            && pedestalPos.getZ() == worldBlockPos.getZ()) {
+                        result = true;
+                        break outer;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public void unlinkAltar(ServerPlayerEntity player) {
