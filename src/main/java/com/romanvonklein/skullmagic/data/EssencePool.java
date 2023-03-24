@@ -2,7 +2,11 @@ package com.romanvonklein.skullmagic.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 
+import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.minecraft.nbt.NbtCompound;
@@ -14,10 +18,10 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
 class EssencePool extends PersistentState {
-    BlockPos altarPos;
-    RegistryKey<World> worldKey;
-    HashMap<BlockPos, String> pedestals;
-    ArrayList<BlockPos> consumers;
+    private BlockPos altarPos;
+    private RegistryKey<World> worldKey;
+    private HashMap<BlockPos, String> pedestals;
+    private ArrayList<BlockPos> consumers;
     private int essence;
 
     public EssencePool() {
@@ -32,7 +36,7 @@ class EssencePool extends PersistentState {
         return essence;
     }
 
-    void setEssence(int essence) {
+    void setEssence(int essence, UUID playerToUpdate) {
         this.essence = essence;
     }
 
@@ -42,7 +46,7 @@ class EssencePool extends PersistentState {
         return essenceChargeRate;
     }
 
-    void setEssenceChargeRate(int currentChargeRate) {
+    void setEssenceChargeRate(int currentChargeRate, UUID playerToUpdate) {
         this.essenceChargeRate = currentChargeRate;
     }
 
@@ -52,7 +56,7 @@ class EssencePool extends PersistentState {
         return maxEssence;
     }
 
-    void setMaxEssence(int maxEssence) {
+    void setMaxEssence(int maxEssence, UUID playerToUpdate) {
         this.maxEssence = maxEssence;
     }
 
@@ -135,7 +139,7 @@ class EssencePool extends PersistentState {
 
     }
 
-    boolean dischargeEssence(int reducedEssenceCost) {
+    boolean dischargeEssence(int reducedEssenceCost, UUID playerToUpdate) {
         boolean success = false;
         if (this.essence >= reducedEssenceCost) {
             this.essence -= reducedEssenceCost;
@@ -144,7 +148,7 @@ class EssencePool extends PersistentState {
         return success;
     }
 
-    void tick(MinecraftServer server) {
+    void tick(MinecraftServer server, UUID playerToUpdate) {
         this.essence += this.essenceChargeRate;
         if (this.essence > this.maxEssence) {
             this.essence = this.maxEssence;
@@ -158,6 +162,33 @@ class EssencePool extends PersistentState {
          * consumerEntity.tick(server);
          * }
          */
+    }
+
+    public void addPedestal(BlockPos pedPos, String skullIdentifier, UUID playerToUpdate) {
+        this.pedestals.put(pedPos, skullIdentifier);
+        this.essenceChargeRate += Config.getConfig().skulls.get(skullIdentifier);
+    }
+
+    public void removePedestal(BlockPos pedPos, UUID playerToUpdate) {
+        this.essenceChargeRate -= Config.getConfig().skulls.get(this.pedestals.get(pedPos));
+        this.pedestals.remove(pedPos);
+        SkullMagic.updatePlayer(playerToUpdate);
+    }
+
+    public BlockPos getAltarPos() {
+        return this.altarPos;
+    }
+
+    public RegistryKey<World> getWorldKey() {
+        return this.worldKey;
+    }
+
+    public Set<BlockPos> getPedestalPositions() {
+        return this.pedestals.keySet();
+    }
+
+    public ArrayList<BlockPos> getConsumerPositions() {
+        return this.consumers;
     }
 
 }

@@ -2,6 +2,7 @@ package com.romanvonklein.skullmagic.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.AConsumerBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
@@ -22,6 +24,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -33,6 +37,7 @@ import net.minecraft.world.World;
 
 public class ServerData extends PersistentState {
 
+    private ArrayList<UUID> playersToUpdate = new ArrayList<>();
     HashMap<UUID, PlayerData> players;
     static private Map<String, ? extends Spell> spells;
 
@@ -46,13 +51,17 @@ public class ServerData extends PersistentState {
         this.GenerateBufferedData();
     }
 
+    public void setChangedForPlayer(UUID playerID) {
+        this.playersToUpdate.add(playerID);
+    }
+
     /**
      * This function generates all buffered values as read from the current state of
      * the ServerData instance.
      * That data includes spell details( cost, efficiency, power... )
      */
     private void GenerateBufferedData() {
-        throw new NotImplementedException();
+        SkullMagic.LOGGER.warn("Buffer gerneration not implemented yet.");
     }
 
     /**
@@ -61,7 +70,8 @@ public class ServerData extends PersistentState {
      * instance.
      */
     private void generateDataShortcuts() {
-        throw new NotImplementedException();
+        SkullMagic.LOGGER.warn("Data shortcuts not yet implemented!");
+        // throw new NotImplementedException();
     }
 
     @Override
@@ -74,11 +84,16 @@ public class ServerData extends PersistentState {
     }
 
     public void tick(MinecraftServer server) {
-        for (PlayerData data : this.players.values()) {
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
             if (data.getEssencePool() != null) {
-                data.getEssencePool().tick(server);
+                data.getEssencePool().tick(server, playerID);
             }
         }
+        for (UUID playerID : this.playersToUpdate) {
+            ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(server.getPlayerManager().getPlayer(playerID));
+        }
+        this.playersToUpdate.clear();
     }
 
     public void removeSkullAltar(World world, BlockPos pos) {
@@ -86,8 +101,35 @@ public class ServerData extends PersistentState {
     }
 
     public void removePedestal(ServerWorld world, BlockPos pos) {
-        throw new NotImplementedException();
-
+        // TODO:: with data shortcuts, this might be more efficient.
+        boolean result = false;
+        UUID playerid = null;
+        for (UUID candidateID : this.players.keySet()) {
+            PlayerData data = this.players.get(candidateID);
+            if (data.getEssencePool().getWorldKey() != null && data.getEssencePool().getAltarPos() != null
+                    && data.getEssencePool().getWorldKey().toString().equals(world.getRegistryKey().toString())) {
+                BlockPos remPos = null;
+                for (BlockPos pedPos : data.essencePool.getPedestalPositions()) {
+                    if (pos.equals(pedPos)) {
+                        remPos = pedPos;
+                        result = true;
+                        break;
+                    }
+                }
+                if (remPos != null) {
+                    data.essencePool.removePedestal(remPos, candidateID);
+                    playerid = candidateID;
+                    break;
+                }
+            }
+        }
+        if (result) {
+            world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE,
+                    SoundCategory.BLOCKS,
+                    1.0f, 1.0f, true);
+            ServerPackageSender
+                    .sendUpdatePlayerDataPackageForPlayer(world.getServer().getPlayerManager().getPlayer(playerid));
+        }
     }
 
     public void removeSpellAltar(ServerWorld world, BlockPos pos) {
@@ -115,8 +157,12 @@ public class ServerData extends PersistentState {
     }
 
     public WorldBlockPos getAltarWorldPosForPlayer(ServerPlayerEntity player) {
-        return new WorldBlockPos(this.players.get(player.getUuid()).essencePool.altarPos,
-                this.players.get(player.getUuid()).essencePool.worldKey);
+        WorldBlockPos result = null;
+        if (playerHasAltar(player)) {
+            result = new WorldBlockPos(this.players.get(player.getUuid()).essencePool.getAltarPos(),
+                    this.players.get(player.getUuid()).essencePool.getWorldKey());
+        }
+        return result;
     }
 
     /**
@@ -137,7 +183,7 @@ public class ServerData extends PersistentState {
             } else {
                 // altar is unlinked => bind the altar
                 linkAltar(player, pos);
-                player.sendMessage(new TranslatableText("skullmagic.message.unlinked_altar_from_player"), true);
+                player.sendMessage(new TranslatableText("skullmagic.message.linked_altar_to_player"), true);
 
             }
         } else {
@@ -193,10 +239,10 @@ public class ServerData extends PersistentState {
         // consumersToEssencePools.
         boolean result = false;
         outer: for (PlayerData data : this.players.values()) {
-            for (BlockPos pos : data.getEssencePool().consumers) {
+            for (BlockPos pos : data.getEssencePool().getConsumerPositions()) {
                 if (worldBlockPos.getX() == pos.getX() && worldBlockPos.getY() == pos.getY()
                         && worldBlockPos.getZ() == pos.getZ()
-                        && data.getEssencePool().worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+                        && data.getEssencePool().getWorldKey().toString().equals(worldBlockPos.worldKey.toString())) {
                     result = true;
                     break outer;
                 }
@@ -211,7 +257,7 @@ public class ServerData extends PersistentState {
         for (BlockEntity ent : Util.getBlockEntitiesOfTypeInBox(world, box,
                 SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY)) {
             BlockPos pos = ent.getPos();
-            if (Util.isValidSkullPedestalCombo(world, pos)
+            if (Util.getPedestalSkullIdentifier(world, pos) != null
                     && !pedestalIsLinked(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.put(pos, Registry.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString());
             }
@@ -224,8 +270,9 @@ public class ServerData extends PersistentState {
         boolean result = false;
 
         outer: for (PlayerData data : this.players.values()) {
-            if (data.getEssencePool().worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
-                for (BlockPos pedestalPos : data.getEssencePool().pedestals.keySet()) {
+            if (data.getEssencePool().getWorldKey() != null
+                    && data.getEssencePool().getWorldKey().toString().equals(worldBlockPos.worldKey.toString())) {
+                for (BlockPos pedestalPos : data.getEssencePool().getPedestalPositions()) {
                     if (pedestalPos.getX() == worldBlockPos.getX() && pedestalPos.getY() == worldBlockPos.getY()
                             && pedestalPos.getZ() == worldBlockPos.getZ()) {
                         result = true;
@@ -247,8 +294,9 @@ public class ServerData extends PersistentState {
         boolean result = false;
         for (PlayerData data : this.players.values()) {
             EssencePool pool = data.getEssencePool();
-            if (pool != null && pool.worldKey.equals(pos.worldKey)
-                    && pool.altarPos.toShortString().equals(pos.toShortString())) {
+            if (pool != null && pool.getWorldKey() != null
+                    && pool.getWorldKey().toString().equals(pos.worldKey.toString())
+                    && pool.getAltarPos().toShortString().equals(pos.toShortString())) {
                 result = true;
                 break;
             }
@@ -276,7 +324,52 @@ public class ServerData extends PersistentState {
         return null;
     }
 
-    public void tryLinkSkullPedestalToNearbyAltar(ServerWorld world, BlockPos down) {
+    public void tryLinkSkullPedestalToNearbyAltar(ServerWorld world, BlockPos pedPos) {
+        String skullIdentifier = Util.getPedestalSkullIdentifier(world, pedPos);
+        if (skullIdentifier != null
+                && !pedestalIsLinked(new WorldBlockPos(pedPos, world.getRegistryKey()))) {
+            HashMap<WorldBlockPos, UUID> activeAltars = getActiveAltarsInBox(world,
+                    new Box(pedPos.subtract((new Vec3i(0, 0, 0))), pedPos.add(new Vec3i(0, 0, 0))));
+            for (WorldBlockPos altarPos : activeAltars.keySet()) {
+                linkSkullPedestalToPlayerAltar(world, activeAltars.get(altarPos), pedPos, skullIdentifier);
+                break;
+            }
+
+        }
+    }
+
+    private void linkSkullPedestalToPlayerAltar(ServerWorld world, UUID playerID, BlockPos pedPos,
+            String skullIdentifier) {
+        this.players.get(playerID).getEssencePool().addPedestal(pedPos, skullIdentifier, playerID);
+        world.playSound(pedPos.getX(), pedPos.getY(), pedPos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE,
+                SoundCategory.BLOCKS,
+                1.0f, 1.0f, true);
+    }
+
+    private HashMap<WorldBlockPos, UUID> getActiveAltarsInBox(ServerWorld world, Box box) {
+        List<SkullAltarBlockEntity> altars = Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.SKULL_ALTAR_BLOCK_ENTITY);
+        HashMap<WorldBlockPos, UUID> resultAltars = new HashMap<>();
+        for (SkullAltarBlockEntity candidate : altars) {
+            WorldBlockPos candidatePos = new WorldBlockPos(candidate.getPos(), world.getRegistryKey());
+            UUID playerID = getPlayerConnectedToAltar(candidatePos);
+            if (playerID != null) {
+                resultAltars.put(candidatePos, playerID);
+            }
+        }
+        return resultAltars;
+    }
+
+    private UUID getPlayerConnectedToAltar(WorldBlockPos candidatePos) {
+        // TODO: this could be more efficient by using data shortcuts.
+        UUID foundPlayer = null;
+        for (UUID candidateID : this.players.keySet()) {
+            if (candidatePos.isEqualTo(this.players.get(candidateID).getEssencePool().getAltarPos())) {
+                foundPlayer = candidateID;
+                break;
+            }
+        }
+        return foundPlayer;
     }
 
     public String toJsonString() {
@@ -286,7 +379,8 @@ public class ServerData extends PersistentState {
 
     public boolean playerHasAltar(ServerPlayerEntity serverPlayerEntity) {
         UUID id = serverPlayerEntity.getGameProfile().getId();
-        return this.players.containsKey(id) && this.players.get(id).getEssencePool() != null;
+        return this.players.containsKey(id) && this.players.get(id).getEssencePool() != null
+                && this.players.get(id).getEssencePool().getAltarPos() != null;
     }
 
     // Deep Access Functions
@@ -407,7 +501,7 @@ public class ServerData extends PersistentState {
     }
 
     public ServerPlayerEntity getPlayerForConsumerWorldPos(WorldBlockPos worldPos) {
-        return null;
+        throw new NotImplementedException();
     }
 
     public static void initSpells() {
@@ -422,6 +516,12 @@ public class ServerData extends PersistentState {
         UUID playerID = player.getUuid();
         if (!players.containsKey(playerID)) {
             players.put(playerID, new PlayerData());
+        }
+    }
+
+    public void updatePlayer(UUID playerToUpdate) {
+        if (!this.playersToUpdate.contains(playerToUpdate)) {
+            this.playersToUpdate.add(playerToUpdate);
         }
     }
 }

@@ -69,7 +69,7 @@ public class ClientInitializer implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        //effectcontroller
+        // effectcontroller
         effectController = new EffectController();
         // keybinds
         primarySpellKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -188,6 +188,7 @@ public class ClientInitializer implements ClientModInitializer {
     public static ClientData getClientData() {
         return clientData;
     }
+
 
     public static void setClientData(ClientData newData) {
         clientData = newData;

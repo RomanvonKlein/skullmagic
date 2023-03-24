@@ -21,4 +21,13 @@ public class WorldBlockPos extends BlockPos {
         }
         return false;
     }
+
+    public boolean isEqualTo(WorldBlockPos pos2) {
+        return pos2.getX() == this.getX() && pos2.getY() == this.getY() && pos2.getZ() == this.getZ()
+                && this.worldKey.toString().equals(pos2.worldKey.toString());
+    }
+
+    public boolean isEqualTo(BlockPos pos2) {
+        return pos2.getX() == this.getX() && pos2.getY() == this.getY() && pos2.getZ() == this.getZ();
+    }
 }

@@ -46,15 +46,15 @@ public class ClientData extends PlayerData {
     }
 
     public void setEssence(int amount) {
-        this.getEssencePool().setEssence(amount);
+        this.getEssencePool().setEssence(amount, null);
     }
 
     public void setMaxEssence(int amount) {
-        this.getEssencePool().setMaxEssence(amount);
+        this.getEssencePool().setMaxEssence(amount, null);
     }
 
     public void setEssenceChargeRate(int amount) {
-        this.getEssencePool().setEssenceChargeRate(amount);
+        this.getEssencePool().setEssenceChargeRate(amount, null);
     }
 
     public boolean hasSpell(String spellname) {
@@ -119,22 +119,22 @@ public class ClientData extends PlayerData {
 
     public ArrayList<WorldBlockPos> getActiveAltarsWorldBlockPos() {
         ArrayList<WorldBlockPos> results = new ArrayList<>();
-        if (this.essencePool.altarPos != null && this.essencePool.worldKey != null) {
-            results.add(new WorldBlockPos(this.essencePool.altarPos, this.essencePool.worldKey));
+        if (this.essencePool.getAltarPos() != null && this.essencePool.getWorldKey() != null) {
+            results.add(new WorldBlockPos(this.essencePool.getAltarPos(), this.essencePool.getWorldKey()));
         }
         return results;
     }
 
     public ArrayList<BlockPos> getConnectedSkullPedestals() {
         ArrayList<BlockPos> results = new ArrayList<>();
-        for (BlockPos pos : this.essencePool.pedestals.keySet()) {
+        for (BlockPos pos : this.essencePool.getPedestalPositions()) {
             results.add(pos);
         }
         return results;
     }
 
     public RegistryKey<World> getSkullAltarWorldKey() {
-        return this.essencePool.worldKey;
+        return this.essencePool.getWorldKey();
     }
 
     public ArrayList<WorldBlockPos> getActiveSpellShrinesWorldBlockPos() {
@@ -165,9 +165,13 @@ public class ClientData extends PlayerData {
     }
 
     public WorldBlockPos getActiveAltarWorldBlockPos() {
-        if(this.essencePool.altarPos==null){
+        if (this.essencePool.getAltarPos() == null) {
             return null;
         }
-        return new WorldBlockPos(this.essencePool.altarPos, this.essencePool.worldKey);
+        return new WorldBlockPos(this.essencePool.getAltarPos(), this.essencePool.getWorldKey());
+    }
+
+    public boolean isLinkedToAltar() {
+        return this.getEssencePool().getAltarPos() != null;
     }
 }

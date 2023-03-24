@@ -67,6 +67,7 @@
     "skullmagic.message.already_linked_to_altar_at": "You are already linked to an altar at: ",
     "skullmagic.message.altar_linked_to_other_player": "This altar is already linked to another player.",
     "skullmagic.message.unlinked_altar_from_player": "Unlinked this altar from you.",
+    "skullmagic.message.linked_altar_to_player": "This altar is now linked to you.",
     "tooltip.skullmagic.level_cost": "Level Cost: ",
     "tooltip.skullmagic.spell_learned": "Spell Learned!",
     "tooltip.skullmagic.spelldata_powerlevel": "Power Level: ",

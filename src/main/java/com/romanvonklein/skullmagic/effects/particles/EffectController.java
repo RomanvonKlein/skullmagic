@@ -53,9 +53,10 @@ public class EffectController {
                         }
                     }
                 }
+                SkullMagic.LOGGER
+                        .info("Spawned particles: spellshrines: " + spellParticles + " skullshrines: "
+                                + skullparticles);
             }
-            SkullMagic.LOGGER
-                    .info("Spawned particles: spellshrines: " + spellParticles + " skullshrines: " + skullparticles);
         }
 
     }

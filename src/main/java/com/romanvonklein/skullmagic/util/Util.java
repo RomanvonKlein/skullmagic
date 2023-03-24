@@ -18,15 +18,18 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class Util {
-    public static boolean isValidSkullPedestalCombo(World world, BlockPos pedestalPos) {
+    public static String getPedestalSkullIdentifier(World world, BlockPos pedestalPos) {
         java.util.Optional<SkullPedestalBlockEntity> pedestalCandidate = world.getBlockEntity(pedestalPos,
                 SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
+        String result = null;
         if (pedestalCandidate.isPresent()) {
             BlockState skullCandidate = world.getBlockState(pedestalPos.up());
             String blockIdentifier = Registry.BLOCK.getId(skullCandidate.getBlock()).toString();
-            return Config.getConfig().skulls.containsKey(blockIdentifier);
+            if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
+                result = blockIdentifier;
+            }
         }
-        return false;
+        return result;
     }
 
     public static <T extends BlockEntity> List<T> getBlockEntitiesOfTypeInBox(

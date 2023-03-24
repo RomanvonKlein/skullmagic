@@ -26,7 +26,6 @@ public class PlaceBlockMixin {
     @Inject(method = "onPlaced(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;)V", at = @At("HEAD"))
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
-        // TODO: overwrite onPlaced instead for custom bocks/blockEntities
         if (!world.isClient()) {
             String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
             // cases:
@@ -40,7 +39,7 @@ public class PlaceBlockMixin {
     @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable = true)
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
         if (!world.isClient) {
-            if (Util.isValidSkullPedestalCombo(world, pos.down())) {
+            if (Util.getPedestalSkullIdentifier(world, pos.down()) != null) {
                 SkullMagic.getServerData().removePedestal((ServerWorld) world, pos.down());
             }
         }

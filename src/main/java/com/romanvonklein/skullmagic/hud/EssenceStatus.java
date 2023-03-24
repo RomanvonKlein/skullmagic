@@ -19,7 +19,8 @@ public class EssenceStatus {
         public static void drawEssenceStatus(MatrixStack matrixStack, float tickDelta) {
 
                 // collect data to draw for player
-                if (ClientInitializer.getClientData() != null) {
+                if (ClientInitializer.getClientData() != null
+                                && ClientInitializer.getClientData().isLinkedToAltar()) {
                         // TODO: cleanup - maybe make all sizes and positions cofigurable?
                         int symbolSpace = 16;
                         int borderwidth = 5;

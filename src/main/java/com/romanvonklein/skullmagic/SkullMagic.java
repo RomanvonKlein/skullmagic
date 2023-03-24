@@ -2,6 +2,7 @@ package com.romanvonklein.skullmagic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -413,5 +414,11 @@ public class SkullMagic implements ModInitializer {
 
 	public static ServerData getServerData() {
 		return serverData;
+	}
+
+	public static void updatePlayer(UUID playerToUpdate) {
+		if (playerToUpdate != null) {
+			SkullMagic.getServerData().updatePlayer(playerToUpdate);
+		}
 	}
 }
