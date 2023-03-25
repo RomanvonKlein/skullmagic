@@ -28,6 +28,9 @@ public class WorldBlockPos extends BlockPos {
     }
 
     public boolean isEqualTo(BlockPos pos2) {
+        if (pos2 == null) {
+            return false;
+        }
         return pos2.getX() == this.getX() && pos2.getY() == this.getY() && pos2.getZ() == this.getZ();
     }
 }

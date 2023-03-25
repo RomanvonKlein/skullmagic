@@ -27,6 +27,13 @@ public class ClientData extends PlayerData {
         super(data.spells, data.essencePool, data.selectedSpell);
     }
 
+    public ClientData() {
+        this.spellnames = new ArrayList<>();
+        this.essencePool = new EssencePool();
+        this.selectedSpell = "";
+        this.spells = new HashMap<>();
+    }
+
     public static ClientData fromNbt(NbtCompound nbt) {
         PlayerData playerData = PlayerData.fromNbt(nbt.getCompound("playerdata"));
         ClientData data = new ClientData(playerData);

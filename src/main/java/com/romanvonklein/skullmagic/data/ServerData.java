@@ -96,8 +96,17 @@ public class ServerData extends PersistentState {
         this.playersToUpdate.clear();
     }
 
+    public void clearEssencePool(UUID playerId) {
+        this.players.get(playerId).getEssencePool().clear();
+        SkullMagic.updatePlayer(playerId);
+    }
+
     public void removeSkullAltar(World world, BlockPos pos) {
-        throw new NotImplementedException();
+        WorldBlockPos altarPos = new WorldBlockPos(pos, world.getRegistryKey());
+        if (altarIsBound(altarPos)) {
+            UUID ownerID = getPlayerConnectedToAltar(altarPos);
+            clearEssencePool(ownerID);
+        }
     }
 
     public void removePedestal(ServerWorld world, BlockPos pos) {
@@ -329,7 +338,10 @@ public class ServerData extends PersistentState {
         if (skullIdentifier != null
                 && !pedestalIsLinked(new WorldBlockPos(pedPos, world.getRegistryKey()))) {
             HashMap<WorldBlockPos, UUID> activeAltars = getActiveAltarsInBox(world,
-                    new Box(pedPos.subtract((new Vec3i(0, 0, 0))), pedPos.add(new Vec3i(0, 0, 0))));
+                    new Box(pedPos.subtract((new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                            Config.getConfig().scanWidth))),
+                            pedPos.add(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                                    Config.getConfig().scanWidth))));
             for (WorldBlockPos altarPos : activeAltars.keySet()) {
                 linkSkullPedestalToPlayerAltar(world, activeAltars.get(altarPos), pedPos, skullIdentifier);
                 break;

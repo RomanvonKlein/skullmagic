@@ -186,9 +186,11 @@ public class ClientInitializer implements ClientModInitializer {
     }
 
     public static ClientData getClientData() {
+        if (clientData == null) {
+            clientData = new ClientData();
+        }
         return clientData;
     }
-
 
     public static void setClientData(ClientData newData) {
         clientData = newData;

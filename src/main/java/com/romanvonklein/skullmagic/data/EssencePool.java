@@ -48,6 +48,8 @@ class EssencePool extends PersistentState {
 
     void setEssenceChargeRate(int currentChargeRate, UUID playerToUpdate) {
         this.essenceChargeRate = currentChargeRate;
+        SkullMagic.updatePlayer(playerToUpdate);
+
     }
 
     private int maxEssence;
@@ -58,6 +60,7 @@ class EssencePool extends PersistentState {
 
     void setMaxEssence(int maxEssence, UUID playerToUpdate) {
         this.maxEssence = maxEssence;
+        SkullMagic.updatePlayer(playerToUpdate);
     }
 
     EssencePool(BlockPos altarPos, RegistryKey<World> worldKey, HashMap<BlockPos, String> pedestals,
@@ -144,6 +147,7 @@ class EssencePool extends PersistentState {
         if (this.essence >= reducedEssenceCost) {
             this.essence -= reducedEssenceCost;
             success = true;
+            SkullMagic.updatePlayer(playerToUpdate);
         }
         return success;
     }
@@ -153,6 +157,8 @@ class EssencePool extends PersistentState {
         if (this.essence > this.maxEssence) {
             this.essence = this.maxEssence;
         }
+        SkullMagic.updatePlayer(playerToUpdate);
+
         /*
          * consumer entities should tick by themselves...
          * for (BlockPos consumerPos : this.consumers) {
@@ -167,6 +173,7 @@ class EssencePool extends PersistentState {
     public void addPedestal(BlockPos pedPos, String skullIdentifier, UUID playerToUpdate) {
         this.pedestals.put(pedPos, skullIdentifier);
         this.essenceChargeRate += Config.getConfig().skulls.get(skullIdentifier);
+        SkullMagic.updatePlayer(playerToUpdate);
     }
 
     public void removePedestal(BlockPos pedPos, UUID playerToUpdate) {
@@ -189,6 +196,16 @@ class EssencePool extends PersistentState {
 
     public ArrayList<BlockPos> getConsumerPositions() {
         return this.consumers;
+    }
+
+    public void clear() {
+        this.altarPos = null;
+        this.consumers.clear();
+        this.essence = 0;
+        this.essenceChargeRate = 0;
+        this.maxEssence = 0;
+        this.worldKey = null;
+        this.pedestals.clear();
     }
 
 }

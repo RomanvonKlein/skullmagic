@@ -11,9 +11,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class ServerPackageSender {
 
     public static void sendUpdatePlayerDataPackageForPlayer(ServerPlayerEntity player) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        NbtCompound nbtCompound = SkullMagic.getServerData().getNbtCompoundForPlayer(player);
-        buf.writeNbt(nbtCompound);
-        ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_PLAYER_DATA, buf);
+        if (player != null) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            NbtCompound nbtCompound = SkullMagic.getServerData().getNbtCompoundForPlayer(player);
+            buf.writeNbt(nbtCompound);
+            ServerPlayNetworking.send(player, NetworkingConstants.UPDATE_PLAYER_DATA, buf);
+        }
     }
 }
