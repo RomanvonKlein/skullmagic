@@ -99,4 +99,28 @@ class SpellShrineData extends PersistentState {
         return new SpellShrineData(worldKey, shrinePos, powerPedestals, efficiencyPedestals, cooldownPedestals);
     }
 
+    public double getPowerLevel() {
+        double sum = 0;
+        for (int powervalue : this.powerPedestals.values()) {
+            sum += powervalue;
+        }
+        return 1.0 + Math.sqrt(sum);
+    }
+
+    public double getEfficiencyLevel() {
+        double sum = 0;
+        for (int efficiencyvalue : this.efficiencyPedestals.values()) {
+            sum += efficiencyvalue;
+        }
+        return 1.0 + Math.sqrt(sum);
+    }
+
+    public double getCooldownLevel() {
+        double sum = 0;
+        for (int cooldownvalue : this.cooldownPedestals.values()) {
+            sum += cooldownvalue;
+        }
+        return 1.0 + Math.sqrt(sum);
+    }
+
 }

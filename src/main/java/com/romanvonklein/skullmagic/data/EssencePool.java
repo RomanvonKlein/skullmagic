@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.config.Config.ConfigData;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.minecraft.nbt.NbtCompound;
@@ -29,7 +30,7 @@ class EssencePool extends PersistentState {
         worldKey = null;
         pedestals = new HashMap<>();
         consumers = new ArrayList<>();
-        essence = 0;
+        essence = Config.getConfig().altarCapacity;
     }
 
     int getEssence() {
@@ -69,7 +70,17 @@ class EssencePool extends PersistentState {
         this.worldKey = worldKey;
         this.pedestals = pedestals;
         this.consumers = consumers;
+        this.maxEssence = Config.getConfig().altarCapacity;
+        this.recalculateEssenceChargeRate();
+    }
 
+    private void recalculateEssenceChargeRate() {
+        ConfigData config = Config.getConfig();
+        for (String skullKey : this.pedestals.values()) {
+            if (config.skulls.containsKey(skullKey)) {
+                this.essenceChargeRate += config.skulls.get(skullKey);
+            }
+        }
     }
 
     @Override
@@ -79,6 +90,9 @@ class EssencePool extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
+
+        // essence
+        tag.putInt("essence", this.essence);
 
         // altarPos
         if (altarPos != null) {
@@ -109,6 +123,7 @@ class EssencePool extends PersistentState {
     }
 
     static EssencePool fromNbt(NbtCompound tag) {
+
         // altarPos
         BlockPos altarPos = null;
         if (tag.contains("altarPos")) {
@@ -137,9 +152,10 @@ class EssencePool extends PersistentState {
         for (int i = 0; i < consumerCoords.length; i += 3) {
             consumers.add(new BlockPos(consumerCoords[i], consumerCoords[i + 1], consumerCoords[i + 2]));
         }
-
-        return new EssencePool(altarPos, worldKey, pedestals, consumers);
-
+        EssencePool pool = new EssencePool(altarPos, worldKey, pedestals, consumers);
+        // essence
+        pool.essence = tag.getInt("essence");
+        return pool;
     }
 
     boolean dischargeEssence(int reducedEssenceCost, UUID playerToUpdate) {

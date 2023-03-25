@@ -216,16 +216,14 @@ public class ServerData extends PersistentState {
 
     public void linkAltar(ServerPlayerEntity player, WorldBlockPos pos) {
         ServerWorld world = player.getServer().getWorld(pos.worldKey);
+        Vec3i distVec = new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                Config.getConfig().scanWidth);
+        Box searchbox = new Box(pos.subtract(distVec), pos.add(distVec));
         HashMap<BlockPos, String> pedestals = getUnlinkedSkullPedestalsInBox(world,
-                new Box(pos.subtract(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                        Config.getConfig().scanWidth))));
-        ArrayList<BlockPos> consumers = getUnlinkedConsumersInBox(world,
-                new Box(pos.subtract(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                        Config.getConfig().scanWidth)),
-                        pos.add(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                                Config.getConfig().scanWidth))));
-        this.players.get(player.getUuid()).essencePool = new EssencePool(pos, pos.worldKey, pedestals, consumers);
-        ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(player);
+                searchbox);
+        ArrayList<BlockPos> consumers = getUnlinkedConsumersInBox(world, searchbox);
+        this.players.get(player.getUuid())
+                .setEssencePool(new EssencePool(pos, pos.worldKey, pedestals, consumers), player.getUuid());
     }
 
     private ArrayList<BlockPos> getUnlinkedConsumersInBox(ServerWorld world, Box box) {
@@ -429,7 +427,7 @@ public class ServerData extends PersistentState {
     }
 
     public boolean doesPlayerKnowSpell(UUID playerID, String spellname) {
-        return this.players.get(playerID).spells.containsKey(spellname);
+        return this.players.get(playerID).knowsSpell(spellname);
     }
 
     public static int getLevelCost(String spellname) {
@@ -442,16 +440,17 @@ public class ServerData extends PersistentState {
         if (!doesPlayerKnowSpell(playerID, spellname)) {
             // check player level and deduct if sufficient
             if (force) {
-                this.players.get(playerID).spells.put(spellname, new SpellData(spells.get(spellname)));
-                ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(player);
+                this.players.get(playerID).learnSpell(spellname, new SpellData(spells.get(spellname)),
+                        player.getUuid());
                 success = true;
             } else {
                 int spellcost = getLevelCost(spellname);
                 if (player.experienceLevel >= spellcost) {
                     // player.getServer().level
                     player.addExperienceLevels(-spellcost);
-                    this.players.get(playerID).spells.put(spellname, new SpellData(spells.get(spellname)));
-                    ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(player);
+                    this.players.get(playerID).learnSpell(spellname, new SpellData(spells.get(spellname)),
+                            player.getUuid());
+
                     success = true;
                 } else {
                     player.sendMessage(new TranslatableText("skullmagic.message.missing_required_level")
@@ -484,8 +483,54 @@ public class ServerData extends PersistentState {
         throw new NotImplementedException();
     }
 
-    public void castSpell(String spellname, ServerPlayerEntity serverPlayerEntity, World world) {
-        throw new NotImplementedException();
+    public void tryCastSpell(String spellname, ServerPlayerEntity player, World world) {
+        UUID playerID = player.getUuid();
+        if (playerKnowsSpell(playerID, spellname)) {
+            if (isSpellOffCoolown(playerID, spellname)) {
+                int essenceCost = getEssenceCostForSpell(playerID, spellname);
+                if (canAffordEssenceCost(playerID, essenceCost)) {
+                    castSpell(player, spellname);
+                }
+            }
+        }
+    }
+
+    private boolean canAffordEssenceCost(UUID playerID, int essenceCost) {
+        return this.players.get(playerID).canAfford(essenceCost);
+    }
+
+    private int getEssenceCostForSpell(UUID playerID, String spellname) {
+        return this.players.get(playerID).getEssenceCostForSpell(spellname);
+    }
+
+    private boolean isSpellOffCoolown(UUID playerID, String spellname) {
+        return players.get(playerID).isSpellOffCoolown(spellname);
+    }
+
+    private boolean playerKnowsSpell(UUID playerID, String spellname) {
+        return this.players.get(playerID).knowsSpell(spellname);
+    }
+
+    public void castSpell(ServerPlayerEntity player, String spellname) {
+        UUID playerID = player.getUuid();
+        double powerLevel = getSpellPowerLevel(playerID, spellname);
+        if (spells.get(spellname).action.apply(player, powerLevel)) {
+            setSpellOnCooldown(playerID, spellname);
+            dischargeSpellcost(playerID, spellname);
+        }
+    }
+
+    private void dischargeSpellcost(UUID playerID, String spellname) {
+        int essenceCost = this.players.get(playerID).getEssenceCostForSpell(spellname);
+        this.players.get(playerID).getEssencePool().dischargeEssence(essenceCost, playerID);
+    }
+
+    private void setSpellOnCooldown(UUID playerID, String spellname) {
+        this.players.get(playerID).setSpellOnCooldown(spellname, playerID);
+    }
+
+    private double getSpellPowerLevel(UUID playerID, String spellname) {
+        return this.players.get(playerID).getSpellPower(spellname);
     }
 
     public void removeSpellShrineForPlayer(ServerWorld world, BlockPos pos, ServerPlayerEntity player) {

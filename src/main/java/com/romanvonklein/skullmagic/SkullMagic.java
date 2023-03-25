@@ -391,7 +391,7 @@ public class SkullMagic implements ModInitializer {
 					String spellname = buf.readString(100);
 					if (serverData.playerHasAltar(serverPlayerEntity)) {
 						server.execute(() -> {
-							serverData.castSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
+							serverData.tryCastSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
 						});
 					}
 				});

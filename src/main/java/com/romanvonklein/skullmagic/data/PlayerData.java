@@ -1,6 +1,9 @@
 package com.romanvonklein.skullmagic.data;
 
 import java.util.HashMap;
+import java.util.UUID;
+
+import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
@@ -52,7 +55,7 @@ class PlayerData extends PersistentState {
         // spells
         HashMap<String, SpellData> spells = new HashMap<>();
         for (String spellname : tag.getCompound("spells").getKeys()) {
-            spells.put(spellname, SpellData.fromNbt(tag.getCompound("spells").getCompound(spellname)));
+            spells.put(spellname, SpellData.fromNbt(tag.getCompound("spells").getCompound(spellname), spellname));
         }
 
         // essencePool
@@ -65,6 +68,40 @@ class PlayerData extends PersistentState {
 
     EssencePool getEssencePool() {
         return this.essencePool;
+    }
+
+    public boolean knowsSpell(String spellname) {
+        return this.spells.containsKey(spellname);
+    }
+
+    public boolean isSpellOffCoolown(String spellname) {
+        return knowsSpell(spellname) && !this.spells.get(spellname).isOnCooldown();
+    }
+
+    public void learnSpell(String spellname, SpellData spellData, UUID playerToUpdate) {
+        this.spells.put(spellname, spellData);
+        SkullMagic.updatePlayer(playerToUpdate);
+    }
+
+    public int getEssenceCostForSpell(String spellname) {
+        return this.spells.get(spellname).getEssenceCost();
+    }
+
+    public boolean canAfford(int essenceCost) {
+        return this.getEssencePool().getEssence() >= essenceCost;
+    }
+
+    public double getSpellPower(String spellname) {
+        return this.spells.get(spellname).getPowerLevel();
+    }
+
+    public void setSpellOnCooldown(String spellname, UUID playerToUpdate) {
+        this.spells.get(spellname).setOnCooldown(playerToUpdate);
+    }
+
+    public void setEssencePool(EssencePool essencePool2, UUID uuid) {
+        this.essencePool = essencePool2;
+        SkullMagic.updatePlayer(uuid);
     }
 
 }
