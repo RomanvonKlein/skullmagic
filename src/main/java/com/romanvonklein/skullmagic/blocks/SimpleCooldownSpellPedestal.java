@@ -8,7 +8,7 @@ import net.minecraft.world.BlockView;
 public class SimpleCooldownSpellPedestal extends ASPellPedestal {
 
     public SimpleCooldownSpellPedestal(Settings settings) {
-        super(settings, "cooldown");
+        super(settings, "cooldown", 1);
     }
 
     @Override

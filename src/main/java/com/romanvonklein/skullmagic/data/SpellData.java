@@ -6,6 +6,7 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.spells.Spell;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 
 class SpellData extends PersistentState {
@@ -119,4 +120,58 @@ class SpellData extends PersistentState {
         SkullMagic.updatePlayer(playerToUpdate);
     }
 
+    public void removeSpellShrine(UUID playerToUpdate) {
+        this.spellShrine = new SpellShrineData();
+        this.powerLevel = 1.0;
+        this.efficiencyLevel = 1.0;
+        this.cooldownLevel = 1.0;
+        SkullMagic.updatePlayer(playerToUpdate);
+    }
+
+    public BlockPos getShrinePos() {
+        return this.spellShrine.shrinePos;
+    }
+
+    public boolean containsPedestal(WorldBlockPos worldBlockPos) {
+        boolean result = false;
+        outer: if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+            for (BlockPos pos : this.spellShrine.powerPedestals.keySet()) {
+                if (worldBlockPos.isEqualTo(pos)) {
+                    result = true;
+                    break outer;
+                }
+            }
+            for (BlockPos pos : this.spellShrine.efficiencyPedestals.keySet()) {
+                if (worldBlockPos.isEqualTo(pos)) {
+                    result = true;
+                    break outer;
+                }
+            }
+            for (BlockPos pos : this.spellShrine.cooldownPedestals.keySet()) {
+                if (worldBlockPos.isEqualTo(pos)) {
+                    result = true;
+                    break outer;
+                }
+            }
+        }
+        return result;
+    }
+
+    public void addSpellPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate, String type, int level) {
+        if (type.equals("power")) {
+            this.spellShrine.addPowerPedestal(worldBlockPos, level);
+            this.powerLevel = this.spellShrine.getPowerLevel();
+        } else if (type.equals("efficiency")) {
+            this.spellShrine.addEfficiencyPedestal(worldBlockPos, level);
+            this.efficiencyLevel = this.spellShrine.getEfficiencyLevel();
+
+        } else if (type.equals("cooldown")) {
+            this.spellShrine.addCooldownPedestal(worldBlockPos, level);
+            this.cooldownLevel = this.spellShrine.getCooldownLevel();
+
+        } else {
+            throw new IllegalArgumentException("Type: '" + type + "' is not a valid spellpedestal type.");
+        }
+        SkullMagic.updatePlayer(playerToUpdate);
+    }
 }

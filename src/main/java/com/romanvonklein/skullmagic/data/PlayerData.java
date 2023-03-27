@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
@@ -119,6 +121,73 @@ class PlayerData extends PersistentState {
 
     public void removeCapacityCrystal(BlockPos pos, UUID playerID) {
         this.getEssencePool().removeCapacityCrystal(pos, playerID);
+    }
+
+    public boolean tryAddConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID playerID) {
+        boolean result = false;
+        if (this.essencePool.getWorldKey().toString().equals(registryKey.toString())
+                && Util.inRange(pos, this.getAltarPos(), Config.getConfig().scanWidth, Config.getConfig().scanHeight)) {
+            this.essencePool.addConsumer(pos, playerID);
+            result = true;
+        }
+        return result;
+    }
+
+    public boolean isSameAltarPos(WorldBlockPos worldBlockPos) {
+        return this.getAltarPos() != null && worldBlockPos.isEqualTo(this.getAltarPos());
+    }
+
+    public void removeSpellShrine(BlockPos pos, UUID playerid) {
+        for (String spellname : this.spells.keySet()) {
+            BlockPos candidatePos = this.spells.get(spellname).getShrinePos();
+            if (candidatePos != null && pos.getX() == candidatePos.getX() && pos.getY() == candidatePos.getY()
+                    && pos.getZ() == candidatePos.getZ()) {
+                this.spells.remove(spellname);
+                SkullMagic.updatePlayer(playerid);
+                break;
+            }
+        }
+    }
+
+    public boolean hasConsumerAtPos(WorldBlockPos worldPos) {
+        return this.getEssencePool().hasConumerAtPos(worldPos);
+    }
+
+    public void addSpellShrine(String spellname, RegistryKey<World> registryKey, BlockPos pos,
+            HashMap<BlockPos, Integer> powerPedestals,
+            HashMap<BlockPos, Integer> efficiencyPedestals, HashMap<BlockPos, Integer> cooldownPedestals,
+            UUID playerToUpdate) {
+        this.spells.get(spellname).spellShrine = new SpellShrineData(registryKey, pos, powerPedestals,
+                efficiencyPedestals, cooldownPedestals);
+        SkullMagic.updatePlayer(playerToUpdate);
+    }
+
+    public boolean hasSpellPedestal(WorldBlockPos worldBlockPos) {
+        boolean result = false;
+
+        for (SpellData data : this.spells.values()) {
+            if (data.containsPedestal(worldBlockPos)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public boolean tryAddSpellPedestal(WorldBlockPos worldBlockPos, String spellname, String shrineType,
+            int shrineLevel,
+            UUID playerToUpdate) {
+        boolean result = false;
+        SpellData data = this.spells.get(spellname);
+        if (data != null) {
+
+            if (Util.inRange(worldBlockPos, data.getShrinePos(), Config.getConfig().shrineRangePerLevel * 1,
+                    Config.getConfig().shrineRangePerLevel * shrineLevel)) {// TODO: implement shrine levels here!
+                data.addSpellPedestal(worldBlockPos, playerToUpdate, shrineType, shrineLevel);
+                result = true;
+            }
+        }
+        return result;
     }
 
 }

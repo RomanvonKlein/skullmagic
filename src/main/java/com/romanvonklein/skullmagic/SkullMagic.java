@@ -73,7 +73,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.Identifier;
@@ -362,27 +361,28 @@ public class SkullMagic implements ModInitializer {
 
 		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
 			if (entity != null) {
-
-				if (entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
-					// broke a skullAltar
-					serverData.removeSkullAltar((ServerWorld) world, pos);// essenceManager.removeSkullAltar((ServerWorld)world,
-																			// pos);
-				} else if (entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
-					// broke a skullpedestal
-					serverData.removePedestal((ServerWorld) (ServerWorld) world, pos);
-				} else if (entity.getType().equals(SPELL_SHRINE_BLOCK_ENTITY)) {
-					// broke a spell altar
-					serverData.removeSpellAltar((ServerWorld) world, pos);
-				} else if (entity.getType().equals(COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY)) {
-					// broke a cooldown pedestal
-					serverData.removeSpellCooldownPedestal((ServerWorld) world, pos);
-				} else if (entity.getType().equals(EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY)) {
-					// broke a efficiency pedestal
-					serverData.removeSpellEfficiencyPedestal((ServerWorld) world, pos);
-				} else if (entity.getType().equals(POWER_SPELL_PEDESTAL_BLOCK_ENTITY)) {
-					// broke a power pedestal
-					serverData.removeSpellPowerPedestal((ServerWorld) world, pos);
-				}
+				// TODO: this needs to only happen for skulls, not the custom blocks...
+				// if (entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
+				// // broke a skullAltar
+				// serverData.removeSkullAltar((ServerWorld) world, pos);//
+				// essenceManager.removeSkullAltar((ServerWorld)world,
+				// // pos);
+				// } else if (entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
+				// // broke a skullpedestal
+				// serverData.removePedestal((ServerWorld) (ServerWorld) world, pos);
+				// } else if (entity.getType().equals(SPELL_SHRINE_BLOCK_ENTITY)) {
+				// // broke a spell altar
+				// serverData.tryRemoveSpellAltar((ServerWorld) world, pos);
+				// } else if (entity.getType().equals(COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+				// // broke a cooldown pedestal
+				// serverData.removeSpellCooldownPedestal((ServerWorld) world, pos);
+				// } else if (entity.getType().equals(EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+				// // broke a efficiency pedestal
+				// serverData.removeSpellEfficiencyPedestal((ServerWorld) world, pos);
+				// } else if (entity.getType().equals(POWER_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+				// // broke a power pedestal
+				// serverData.removeSpellPowerPedestal((ServerWorld) world, pos);
+				// }
 			}
 		}));
 

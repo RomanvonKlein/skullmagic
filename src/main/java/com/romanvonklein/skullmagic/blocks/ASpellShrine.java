@@ -15,7 +15,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -91,7 +90,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
                     player.giveItemStack(blockEnt.getScroll());
                     blockEnt.setScroll(null);
                     SkullMagic.getServerData().removeSpellShrineForPlayer((ServerWorld) world, pos,
-                            (ServerPlayerEntity) player);
+                            player.getGameProfile().getId());
                 }
 
             }

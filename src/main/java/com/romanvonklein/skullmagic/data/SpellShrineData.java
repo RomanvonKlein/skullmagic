@@ -123,4 +123,16 @@ class SpellShrineData extends PersistentState {
         return 1.0 + Math.sqrt(sum);
     }
 
+    public void addPowerPedestal(WorldBlockPos worldBlockPos, int level) {
+        this.powerPedestals.put(worldBlockPos, level);
+    }
+
+    public void addEfficiencyPedestal(WorldBlockPos worldBlockPos, int level) {
+        this.efficiencyPedestals.put(worldBlockPos, level);
+    }
+
+    public void addCooldownPedestal(WorldBlockPos worldBlockPos, int level) {
+        this.cooldownPedestals.put(worldBlockPos, level);
+    }
+
 }

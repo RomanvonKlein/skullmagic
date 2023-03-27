@@ -294,4 +294,20 @@ class EssencePool extends PersistentState {
         }
     }
 
+    public void addConsumer(BlockPos pos, UUID playerID) {
+        this.consumers.add(pos);
+        SkullMagic.updatePlayer(playerID);
+    }
+
+    public boolean hasConumerAtPos(WorldBlockPos worldPos) {
+        boolean result = false;
+        for (BlockPos pos : this.consumers) {
+            if (worldPos.isEqualTo(pos)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
 }

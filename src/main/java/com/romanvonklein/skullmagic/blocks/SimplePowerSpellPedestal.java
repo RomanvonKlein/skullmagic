@@ -8,7 +8,7 @@ import net.minecraft.world.BlockView;
 public class SimplePowerSpellPedestal extends ASPellPedestal {
 
     public SimplePowerSpellPedestal(Settings settings) {
-        super(settings, "power");
+        super(settings, "power", 1);
     }
 
     @Override

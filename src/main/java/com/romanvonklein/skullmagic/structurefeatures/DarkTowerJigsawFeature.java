@@ -15,11 +15,6 @@ import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 
 public class DarkTowerJigsawFeature extends StructureFeature<StructurePoolFeatureConfig> {
-
-    // public DarkTowerFeature(Codec<StructurePoolFeatureConfig> configCodec) {
-    // super(configCodec, 0, true, true, DarkTowerFeature::canGenerate);
-    // }
-
     public DarkTowerJigsawFeature(Codec<StructurePoolFeatureConfig> codec, int structureStartY,
             boolean modifyBoundingBox,
             boolean surface,

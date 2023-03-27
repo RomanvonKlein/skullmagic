@@ -32,7 +32,7 @@ public abstract class AConsumerBlock extends BlockWithEntity {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         if (!world.isClient) {
-            if ((placer instanceof ServerPlayerEntity) && SkullMagic.getServerData().addConsumer(world.getRegistryKey(),
+            if ((placer instanceof ServerPlayerEntity) && SkullMagic.getServerData().tryAddConsumer(world.getRegistryKey(),
                     pos, ((ServerPlayerEntity) placer).getGameProfile().getId())) {
                 world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE,
                         SoundCategory.BLOCKS, 1.0f, 1.0f, true);

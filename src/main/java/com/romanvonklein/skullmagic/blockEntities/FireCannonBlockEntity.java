@@ -6,6 +6,7 @@ import com.romanvonklein.skullmagic.data.WorldBlockPos;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
@@ -35,7 +36,8 @@ public class FireCannonBlockEntity extends AConsumerBlockEntity {
                         target = state.get(Properties.FACING);
                     }
                     Vec3f angle = target.getUnitVector();
-                    ServerPlayerEntity player = SkullMagic.getServerData().getPlayerForConsumerWorldPos(worldPos);
+                    ServerPlayerEntity player = SkullMagic.getServerData().getPlayerForConsumerWorldPos((ServerWorld)world,
+                            worldPos);
                     FireballEntity ent = new FireballEntity(world, player, angle.getX(), angle.getY(), angle.getZ(),
                             1);
                     ent.setPos(pos.getX() + angle.getX(), pos.getY() + angle.getY(), pos.getZ() + angle.getZ());

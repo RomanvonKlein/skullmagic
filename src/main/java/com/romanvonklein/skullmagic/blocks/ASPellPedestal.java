@@ -36,10 +36,12 @@ import net.minecraft.world.explosion.Explosion;
 
 public abstract class ASPellPedestal extends BlockWithEntity {
     public String type = "none";
+    public int level;
 
-    public ASPellPedestal(Settings settings, String type) {
+    public ASPellPedestal(Settings settings, String type, int level) {
         super(settings);
         this.type = type;
+        this.level = level;
     }
 
     @Override

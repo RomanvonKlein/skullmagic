@@ -11,6 +11,9 @@ import org.apache.commons.lang3.NotImplementedException;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.AConsumerBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.CapacityCrystalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.config.Config;
@@ -112,6 +115,7 @@ public class ServerData extends PersistentState {
 
     public void removePedestal(ServerWorld world, BlockPos pos) {
         // TODO:: with data shortcuts, this might be more efficient.
+        // TODO: old code - refactor
         boolean result = false;
         UUID playerid = null;
         for (UUID candidateID : this.players.keySet()) {
@@ -142,9 +146,22 @@ public class ServerData extends PersistentState {
         }
     }
 
-    public void removeSpellAltar(ServerWorld world, BlockPos pos) {
-        throw new NotImplementedException();
+    public void tryRemoveSpellAltar(ServerWorld world, BlockPos pos) {
+        UUID ownerid = getOwnerForAltar(new WorldBlockPos(pos, world.getRegistryKey()));
+        if (ownerid != null) {
+            removeSpellShrineForPlayer(world, pos, ownerid);
+        }
+    }
 
+    private UUID getOwnerForAltar(WorldBlockPos worldBlockPos) {
+        UUID result = null;
+        for (UUID playerID : this.players.keySet()) {
+            if (this.players.get(playerID).isSameAltarPos(worldBlockPos)) {
+                result = playerID;
+                break;
+            }
+        }
+        return result;
     }
 
     public void removeSpellCooldownPedestal(ServerWorld world, BlockPos pos) {
@@ -380,8 +397,12 @@ public class ServerData extends PersistentState {
         players = new HashMap<>();
     }
 
-    public boolean addConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID id) {
-        throw new NotImplementedException();
+    public boolean tryAddConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID playerID) {
+        boolean result = false;
+        if (this.playerHasAltar(playerID)) {
+            result = this.players.get(playerID).tryAddConsumer(registryKey, pos, playerID);
+        }
+        return result;
     }
 
     public EssencePool getEssencePoolForConsumer(RegistryKey<World> registryKey, BlockPos pos) {
@@ -444,10 +465,14 @@ public class ServerData extends PersistentState {
         return this.toString();
     }
 
+    public boolean playerHasAltar(UUID playerid) {
+        return this.players.containsKey(playerid) && this.players.get(playerid).getEssencePool() != null
+                && this.players.get(playerid).getEssencePool().getAltarPos() != null;
+    }
+
     public boolean playerHasAltar(ServerPlayerEntity serverPlayerEntity) {
         UUID id = serverPlayerEntity.getGameProfile().getId();
-        return this.players.containsKey(id) && this.players.get(id).getEssencePool() != null
-                && this.players.get(id).getEssencePool().getAltarPos() != null;
+        return playerHasAltar(id);
     }
 
     // Deep Access Functions
@@ -530,14 +555,33 @@ public class ServerData extends PersistentState {
         throw new NotImplementedException();
     }
 
-    public boolean tryAddSpellPedestal(ServerWorld world, BlockPos pos, UUID id, String spellname,
-            ASPellPedestal asPellPedestal) {
-        throw new NotImplementedException();
-        // return false;
+    public boolean tryAddSpellPedestal(ServerWorld world, BlockPos pos, UUID placerID, String spellname,
+            ASPellPedestal aSpellPedestal) {
+        boolean result = false;
+        if (playerKnowsSpell(placerID, spellname) && players.get(placerID)
+                .tryAddSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()), spellname, aSpellPedestal.type,
+                        aSpellPedestal.level, placerID)) {
+            result = true;
+        } else {
+            for (UUID candidateID : this.players.keySet()) {
+                if (playerKnowsSpell(candidateID, spellname)
+                        && players.get(candidateID).tryAddSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()),
+                                spellname, aSpellPedestal.type, aSpellPedestal.level, candidateID)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     public void learnAllSpellsForPlayer(ServerPlayerEntity player) {
-        throw new NotImplementedException();
+        for (String spellname : spells.keySet()) {
+            if (!playerKnowsSpell(player.getUuid(), spellname)) {
+                this.players.get(player.getUuid()).learnSpell(spellname, new SpellData(spells.get(spellname)),
+                        player.getUuid());
+            }
+        }
     }
 
     public void tryCastSpell(String spellname, ServerPlayerEntity player, World world) {
@@ -590,12 +634,101 @@ public class ServerData extends PersistentState {
         return this.players.get(playerID).getSpellPower(spellname);
     }
 
-    public void removeSpellShrineForPlayer(ServerWorld world, BlockPos pos, ServerPlayerEntity player) {
-        throw new NotImplementedException();
+    public void removeSpellShrineForPlayer(ServerWorld world, BlockPos pos, UUID playerid) {
+        this.players.get(playerid).removeSpellShrine(pos, playerid);
     }
 
-    public void addNewSpellShrineForPlayer(ServerWorld world, BlockPos pos, UUID id, String spellname) {
-        throw new NotImplementedException();
+    public void addNewSpellShrineForPlayer(ServerWorld world, BlockPos pos, UUID playerid, String spellname) {
+        if (playerKnowsSpell(playerid, spellname) && !playerHasSpellShrine(playerid, spellname)) {
+            PlayerData data = this.players.get(playerid);
+            Vec3i rangevec = new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
+                    Config.getConfig().scanWidth);
+            Box box = new Box(pos.subtract(rangevec), pos.add(rangevec));
+            ArrayList<Tuple<BlockPos, String>> powerPedestalsList = getUnlinkedPowerSpellPedestals(world, box,
+                    spellname);
+            ArrayList<Tuple<BlockPos, String>> efficiencyPedestalsList = getUnlinkedEfficiencySpellPedestals(world, box,
+                    spellname);
+            ArrayList<Tuple<BlockPos, String>> cooldownPedestalsList = getUnlinkedCooldownSpellPedestals(world, box,
+                    spellname);
+
+            HashMap<BlockPos, Integer> powerPedestals = new HashMap<>();
+            for (Tuple<BlockPos, String> pair : powerPedestalsList) {
+                powerPedestals.put(pair.first, Config.getConfig().shrines.get(pair.second));
+            }
+            HashMap<BlockPos, Integer> efficiencyPedestals = new HashMap<>();
+            for (Tuple<BlockPos, String> pair : efficiencyPedestalsList) {
+                efficiencyPedestals.put(pair.first, Config.getConfig().shrines.get(pair.second));
+            }
+            HashMap<BlockPos, Integer> cooldownPedestals = new HashMap<>();
+            for (Tuple<BlockPos, String> pair : cooldownPedestalsList) {
+                cooldownPedestals.put(pair.first, Config.getConfig().shrines.get(pair.second));
+            }
+
+            data.addSpellShrine(spellname, world.getRegistryKey(), pos, powerPedestals, efficiencyPedestals,
+                    cooldownPedestals, playerid);
+        }
+    }
+
+    private ArrayList<Tuple<BlockPos, String>> getUnlinkedCooldownSpellPedestals(ServerWorld world, Box box,
+            String spellname) {
+        ArrayList<Tuple<BlockPos, String>> results = new ArrayList<>();
+
+        for (CooldownSpellPedestalBlockEntity ent : Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+            BlockPos pos = ent.getPos();
+            if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
+                    && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
+                results.add(new Tuple<BlockPos, String>(pos,
+                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+            }
+        }
+
+        return results;
+    }
+
+    private ArrayList<Tuple<BlockPos, String>> getUnlinkedEfficiencySpellPedestals(ServerWorld world, Box box,
+            String spellname) {
+        ArrayList<Tuple<BlockPos, String>> results = new ArrayList<>();
+
+        for (EfficiencySpellPedestalBlockEntity ent : Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+            BlockPos pos = ent.getPos();
+            if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
+                    && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
+                results.add(new Tuple<BlockPos, String>(pos,
+                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+            }
+        }
+
+        return results;
+    }
+
+    private ArrayList<Tuple<BlockPos, String>> getUnlinkedPowerSpellPedestals(ServerWorld world, Box box,
+            String spellname) {
+        ArrayList<Tuple<BlockPos, String>> results = new ArrayList<>();
+
+        for (PowerSpellPedestalBlockEntity ent : Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY)) {
+            BlockPos pos = ent.getPos();
+            if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
+                    && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
+                results.add(new Tuple<BlockPos, String>(pos,
+                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+            }
+        }
+
+        return results;
+    }
+
+    private boolean isSpellPedestalUnbound(WorldBlockPos worldBlockPos) {
+        boolean result = false;
+        for (PlayerData data : this.players.values()) {
+            if (data.hasSpellPedestal(worldBlockPos)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     public boolean playerHasSpellShrine(UUID playerid, String spellname) {
@@ -614,8 +747,16 @@ public class ServerData extends PersistentState {
         throw new NotImplementedException();
     }
 
-    public ServerPlayerEntity getPlayerForConsumerWorldPos(WorldBlockPos worldPos) {
-        throw new NotImplementedException();
+    public ServerPlayerEntity getPlayerForConsumerWorldPos(ServerWorld world, WorldBlockPos worldPos) {
+        // TODO: this could be alot more efficient with data shortcuts
+        ServerPlayerEntity result = null;
+        for (UUID playerID : this.players.keySet()) {
+            if (this.players.get(playerID).hasConsumerAtPos(worldPos)) {
+                result = (ServerPlayerEntity) world.getPlayerByUuid(playerID);
+                break;
+            }
+        }
+        return result;
     }
 
     public static void initSpells() {

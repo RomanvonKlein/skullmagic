@@ -82,7 +82,9 @@ public class SkullAltar extends BlockWithEntity {
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-        SkullMagic.getServerData().removeSkullAltar(world, pos);
+        if (!world.isClient) {
+            SkullMagic.getServerData().removeSkullAltar(world, pos);
+        }
         super.onDestroyedByExplosion(world, pos, explosion);
     }
 }
