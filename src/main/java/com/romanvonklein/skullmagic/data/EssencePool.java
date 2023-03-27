@@ -54,7 +54,6 @@ class EssencePool extends PersistentState {
     void setEssenceChargeRate(int currentChargeRate, UUID playerToUpdate) {
         this.essenceChargeRate = currentChargeRate;
         SkullMagic.updatePlayer(playerToUpdate);
-
     }
 
     private int maxEssence;
@@ -79,6 +78,12 @@ class EssencePool extends PersistentState {
         this.essence = essence;
 
         this.recalculateEssenceChargeRate();
+        this.recalculateMaxEssence();
+    }
+
+    private void recalculateMaxEssence() {
+        int essencePerCrystal = Config.getConfig().capacityCrystalStrength;
+        this.maxEssence += essencePerCrystal * this.capacityCrystals.size();
     }
 
     private void recalculateEssenceChargeRate() {
@@ -127,7 +132,7 @@ class EssencePool extends PersistentState {
         }
         tag.putIntArray("consumers", allConsumerCoords);
 
-        // consumers
+        // capacityCrystals
         int[] allCapacityCrystalCords = new int[this.capacityCrystals.size() * 3];
         for (int i = 0; i < capacityCrystals.size(); i++) {
             BlockPos pos = capacityCrystals.get(i);
@@ -250,6 +255,7 @@ class EssencePool extends PersistentState {
         this.maxEssence = 0;
         this.worldKey = null;
         this.pedestals.clear();
+        this.capacityCrystals.clear();
     }
 
     public void addCapacityCrystal(BlockPos pos, UUID playerToUpdate) {

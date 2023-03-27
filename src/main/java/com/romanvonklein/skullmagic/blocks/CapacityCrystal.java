@@ -57,19 +57,19 @@ public class CapacityCrystal extends BlockWithEntity {
 
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
         if (!world.isClient) {
             SkullMagic.getServerData().removeCapacityCrystal(world.getRegistryKey(), pos);
         }
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
         if (!world.isClient && placer != null && placer instanceof ServerPlayerEntity) {
             SkullMagic.getServerData().tryAddCapacityCrystal((ServerWorld) world, pos,
                     ((ServerPlayerEntity) placer));
         }
+        super.onPlaced(world, pos, state, placer, itemStack);
     }
 
     @Override

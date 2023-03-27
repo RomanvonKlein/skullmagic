@@ -81,9 +81,8 @@ public class BlockPlacerBlockEntity extends AConsumerBlockEntity
 
     @Override
     public void writeNbt(NbtCompound tag) {
-        super.writeNbt(tag);
-
         Inventories.writeNbt(tag, this.getItems());
+        super.writeNbt(tag);
     }
 
     @Override

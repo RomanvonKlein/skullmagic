@@ -68,10 +68,10 @@ public abstract class ASPellPedestal extends BlockWithEntity {
 
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
         if (!world.isClient) {
             SkullMagic.getServerData().removeSpellPedestal((ServerWorld) world, pos, this.type);
         }
+        super.onBreak(world, pos, state, player);
     }
 
     @Override

@@ -23,15 +23,14 @@ public abstract class AConsumerBlock extends BlockWithEntity {
 
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
         if (!world.isClient) {
             SkullMagic.getServerData().removeConsumer(world.getRegistryKey(), pos);
         }
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
         if (!world.isClient) {
             if ((placer instanceof ServerPlayerEntity) && SkullMagic.getServerData().addConsumer(world.getRegistryKey(),
                     pos, ((ServerPlayerEntity) placer).getGameProfile().getId())) {
@@ -42,13 +41,14 @@ public abstract class AConsumerBlock extends BlockWithEntity {
                         SoundCategory.BLOCKS, 1.0f, 1.0f, true);
             }
         }
+        super.onPlaced(world, pos, state, placer, itemStack);
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-        super.onDestroyedByExplosion(world, pos, explosion);
         if (!world.isClient) {
             SkullMagic.getServerData().removeConsumer(world.getRegistryKey(), pos);
         }
+        super.onDestroyedByExplosion(world, pos, explosion);
     }
 }

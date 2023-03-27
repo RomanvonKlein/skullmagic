@@ -77,12 +77,12 @@ public class FireBreath extends AbstractFireballEntity {
 
     @Override
     public void tick() {
-        super.tick();
         if (this.lifeTime > 0) {
             this.lifeTime--;
         } else {
             this.discard();
         }
+        super.tick();
 
     }
 }

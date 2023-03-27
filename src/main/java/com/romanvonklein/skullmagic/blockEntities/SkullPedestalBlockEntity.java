@@ -31,7 +31,6 @@ public class SkullPedestalBlockEntity extends BlockEntity {
 
     @Override
     public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
         if (tag.contains("linkedAltarPosition")) {
             try {
                 linkedAltarCoords = tag.getIntArray("linkedAltarPosition");
@@ -44,6 +43,7 @@ public class SkullPedestalBlockEntity extends BlockEntity {
                 SkullMagic.LOGGER.error("Failed loading linked altar position from NBT data!");
             }
         }
+        super.readNbt(tag);
     }
 
     @Nullable

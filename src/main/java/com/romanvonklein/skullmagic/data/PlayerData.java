@@ -112,7 +112,8 @@ class PlayerData extends PersistentState {
     }
 
     public boolean hasCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos) {
-        return this.getEssencePool().getWorldKey().toString().equals(registryKey.toString())
+        return this.getEssencePool().getWorldKey() != null
+                && this.getEssencePool().getWorldKey().toString().equals(registryKey.toString())
                 && this.getEssencePool().containsCapacityCrystal(pos);
     }
 

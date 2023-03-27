@@ -51,11 +51,11 @@ public class EffectBall extends AbstractFireballEntity {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        super.onCollision(hitResult);
         if (!this.world.isClient) {
             spawnLingeringEffect();
             this.discard();
         }
+        super.onCollision(hitResult);
     }
 
     @Override
@@ -88,20 +88,20 @@ public class EffectBall extends AbstractFireballEntity {
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
         nbt.putByte("radius", (byte) this.radius);
         nbt.putInt("statuseffect", StatusEffect.getRawId(this.effect));
+        super.writeCustomDataToNbt(nbt);
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
         if (nbt.contains("radius")) {
             this.radius = nbt.getByte("radius");
         }
         if (nbt.contains("statuseffect")) {
             this.effect = StatusEffect.byRawId(nbt.getInt("statuseffect"));
         }
+        super.readCustomDataFromNbt(nbt);
     }
 
 }
