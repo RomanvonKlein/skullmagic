@@ -262,4 +262,30 @@ class EssencePool extends PersistentState {
         return this.capacityCrystals;
     }
 
+    public boolean containsCapacityCrystal(BlockPos pos) {
+        boolean result = false;
+
+        for (BlockPos candidate : this.capacityCrystals) {
+            if (candidate.getX() == pos.getX() && candidate.getY() == pos.getY() && candidate.getZ() == pos.getZ()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public void removeCapacityCrystal(BlockPos pos, UUID playerID) {
+        BlockPos foundPos = null;
+        for (BlockPos candidate : this.capacityCrystals) {
+            if (candidate.getX() == pos.getX() && candidate.getY() == pos.getY() && candidate.getZ() == pos.getZ()) {
+                foundPos = candidate;
+                break;
+            }
+        }
+        if (foundPos != null) {
+            this.capacityCrystals.remove(foundPos);
+            SkullMagic.updatePlayer(playerID);
+        }
+    }
+
 }

@@ -248,7 +248,7 @@ public class ServerData extends PersistentState {
         ArrayList<BlockPos> results = new ArrayList<>();
 
         ArrayList<AConsumerBlockEntity> candidates = new ArrayList<>();
-        
+
         // find all types of consumers. There's propably a smarter way to do this...
         candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
                 SkullMagic.FIRE_CANNON_BLOCK_ENTITY));
@@ -355,7 +355,14 @@ public class ServerData extends PersistentState {
     }
 
     public void removeCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos) {
-        throw new NotImplementedException();
+
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.hasCapacityCrystal(registryKey, pos)) {
+                data.removeCapacityCrystal(pos, playerID);
+                break;
+            }
+        }
     }
 
     public void tryAddCapacityCrystal(ServerWorld world, BlockPos pos, ServerPlayerEntity player) {

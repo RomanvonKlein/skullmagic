@@ -7,7 +7,9 @@ import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.World;
 
 class PlayerData extends PersistentState {
     protected HashMap<String, SpellData> spells;
@@ -107,6 +109,15 @@ class PlayerData extends PersistentState {
 
     public BlockPos getAltarPos() {
         return this.getEssencePool().getAltarPos();
+    }
+
+    public boolean hasCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos) {
+        return this.getEssencePool().getWorldKey().toString().equals(registryKey.toString())
+                && this.getEssencePool().containsCapacityCrystal(pos);
+    }
+
+    public void removeCapacityCrystal(BlockPos pos, UUID playerID) {
+        this.getEssencePool().removeCapacityCrystal(pos, playerID);
     }
 
 }
