@@ -49,4 +49,10 @@ public class Util {
         }
         return results;
     }
+
+    public static boolean inRange(BlockPos altarPos, BlockPos pos, int rangeWidth, int rangeHeight) {
+        BlockPos diff = altarPos.subtract(pos);
+        return Math.abs(diff.getX()) <= rangeWidth && Math.abs(diff.getY()) <= rangeHeight
+                && Math.abs(diff.getZ()) <= rangeWidth;
+    }
 }

@@ -23,6 +23,7 @@ class EssencePool extends PersistentState {
     private RegistryKey<World> worldKey;
     private HashMap<BlockPos, String> pedestals;
     private ArrayList<BlockPos> consumers;
+    private ArrayList<BlockPos> capacityCrystals;
     private int essence;
 
     public EssencePool() {
@@ -30,7 +31,10 @@ class EssencePool extends PersistentState {
         worldKey = null;
         pedestals = new HashMap<>();
         consumers = new ArrayList<>();
-        essence = Config.getConfig().altarCapacity;
+        essence = 0;
+        this.maxEssence = Config.getConfig().altarCapacity;
+        this.essenceChargeRate = 0;
+        this.capacityCrystals = new ArrayList<>();
     }
 
     int getEssence() {
@@ -65,12 +69,15 @@ class EssencePool extends PersistentState {
     }
 
     EssencePool(BlockPos altarPos, RegistryKey<World> worldKey, HashMap<BlockPos, String> pedestals,
-            ArrayList<BlockPos> consumers) {
+            ArrayList<BlockPos> consumers, ArrayList<BlockPos> capacityCrystals, int essence) {
         this.altarPos = altarPos;
         this.worldKey = worldKey;
         this.pedestals = pedestals;
         this.consumers = consumers;
+        this.capacityCrystals = capacityCrystals;
         this.maxEssence = Config.getConfig().altarCapacity;
+        this.essence = essence;
+
         this.recalculateEssenceChargeRate();
     }
 
@@ -119,6 +126,16 @@ class EssencePool extends PersistentState {
             allConsumerCoords[i * 3 + 2] = pos.getZ();
         }
         tag.putIntArray("consumers", allConsumerCoords);
+
+        // consumers
+        int[] allCapacityCrystalCords = new int[this.capacityCrystals.size() * 3];
+        for (int i = 0; i < capacityCrystals.size(); i++) {
+            BlockPos pos = capacityCrystals.get(i);
+            allCapacityCrystalCords[i * 3] = pos.getX();
+            allCapacityCrystalCords[i * 3 + 1] = pos.getY();
+            allCapacityCrystalCords[i * 3 + 2] = pos.getZ();
+        }
+        tag.putIntArray("capacityCrystals", allCapacityCrystalCords);
         return tag;
     }
 
@@ -152,9 +169,20 @@ class EssencePool extends PersistentState {
         for (int i = 0; i < consumerCoords.length; i += 3) {
             consumers.add(new BlockPos(consumerCoords[i], consumerCoords[i + 1], consumerCoords[i + 2]));
         }
-        EssencePool pool = new EssencePool(altarPos, worldKey, pedestals, consumers);
+
+        // capacity crystals
+        ArrayList<BlockPos> capacityCrystals = new ArrayList<>();
+        int[] capacityCrystalCoords = tag.getIntArray("capacityCrystals");
+        for (int i = 0; i < capacityCrystalCoords.length; i += 3) {
+            capacityCrystals
+                    .add(new BlockPos(capacityCrystalCoords[i], capacityCrystalCoords[i + 1],
+                            capacityCrystalCoords[i + 2]));
+        }
+
         // essence
-        pool.essence = tag.getInt("essence");
+        int essence = tag.getInt("essence");
+
+        EssencePool pool = new EssencePool(altarPos, worldKey, pedestals, consumers, capacityCrystals, essence);
         return pool;
     }
 
@@ -222,6 +250,16 @@ class EssencePool extends PersistentState {
         this.maxEssence = 0;
         this.worldKey = null;
         this.pedestals.clear();
+    }
+
+    public void addCapacityCrystal(BlockPos pos, UUID playerToUpdate) {
+        this.capacityCrystals.add(pos);
+        this.maxEssence += Config.getConfig().capacityCrystalStrength;
+        SkullMagic.updatePlayer(playerToUpdate);
+    }
+
+    public ArrayList<BlockPos> getCapacityCrystalPositions() {
+        return this.capacityCrystals;
     }
 
 }

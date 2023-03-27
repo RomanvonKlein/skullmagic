@@ -13,6 +13,7 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -66,14 +67,16 @@ public class CapacityCrystal extends BlockWithEntity {
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
         if (!world.isClient && placer != null && placer instanceof ServerPlayerEntity) {
-            SkullMagic.getServerData().tryAddCapacityCrystal(world.getRegistryKey(), pos,
-                    ((ServerPlayerEntity) placer).getGameProfile().getId());
+            SkullMagic.getServerData().tryAddCapacityCrystal((ServerWorld) world, pos,
+                    ((ServerPlayerEntity) placer));
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-        SkullMagic.getServerData().removeCapacityCrystal(world.getRegistryKey(), pos);
+        if (!world.isClient) {
+            SkullMagic.getServerData().removeCapacityCrystal(world.getRegistryKey(), pos);
+        }
         super.onDestroyedByExplosion(world, pos, explosion);
     }
 }

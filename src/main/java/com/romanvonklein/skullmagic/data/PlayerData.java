@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 
 class PlayerData extends PersistentState {
@@ -102,6 +103,10 @@ class PlayerData extends PersistentState {
     public void setEssencePool(EssencePool essencePool2, UUID uuid) {
         this.essencePool = essencePool2;
         SkullMagic.updatePlayer(uuid);
+    }
+
+    public BlockPos getAltarPos() {
+        return this.getEssencePool().getAltarPos();
     }
 
 }

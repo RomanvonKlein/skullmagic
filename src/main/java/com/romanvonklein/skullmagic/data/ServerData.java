@@ -10,6 +10,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.AConsumerBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.CapacityCrystalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
 import com.romanvonklein.skullmagic.config.Config;
@@ -222,16 +223,41 @@ public class ServerData extends PersistentState {
         HashMap<BlockPos, String> pedestals = getUnlinkedSkullPedestalsInBox(world,
                 searchbox);
         ArrayList<BlockPos> consumers = getUnlinkedConsumersInBox(world, searchbox);
+        ArrayList<BlockPos> capacityCrystals = getUnlinkedCapacityCrystalsInBox(world, searchbox);
         this.players.get(player.getUuid())
-                .setEssencePool(new EssencePool(pos, pos.worldKey, pedestals, consumers), player.getUuid());
+                .setEssencePool(new EssencePool(pos, pos.worldKey, pedestals, consumers, capacityCrystals, 0),
+                        player.getUuid());
+    }
+
+    private ArrayList<BlockPos> getUnlinkedCapacityCrystalsInBox(ServerWorld world, Box box) {
+        ArrayList<BlockPos> results = new ArrayList<>();
+
+        ArrayList<CapacityCrystalBlockEntity> candidates = new ArrayList<>();
+        candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.CAPACITY_CRYSTAL_BLOCK_ENTITY));
+
+        for (CapacityCrystalBlockEntity entity : candidates) {
+            if (!capacityCrystalIsLinked(new WorldBlockPos(entity.getPos(),
+                    world.getRegistryKey())))
+                results.add(entity.getPos());
+        }
+        return results;
     }
 
     private ArrayList<BlockPos> getUnlinkedConsumersInBox(ServerWorld world, Box box) {
         ArrayList<BlockPos> results = new ArrayList<>();
 
         ArrayList<AConsumerBlockEntity> candidates = new ArrayList<>();
+        
+        // find all types of consumers. There's propably a smarter way to do this...
         candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
                 SkullMagic.FIRE_CANNON_BLOCK_ENTITY));
+        candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.BLOCK_PLACER_BLOCK_ENTITY));
+        candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.BLOCK_USER_BLOCK_ENTITY));
+        candidates.addAll(Util.getBlockEntitiesOfTypeInBox(world, box,
+                SkullMagic.WITHER_ENERGY_CHANNELER_BLOCK_ENTITY));
 
         for (AConsumerBlockEntity entity : candidates) {
             if (!consumerIsLinked(new WorldBlockPos(entity.getPos(),
@@ -247,6 +273,23 @@ public class ServerData extends PersistentState {
         boolean result = false;
         outer: for (PlayerData data : this.players.values()) {
             for (BlockPos pos : data.getEssencePool().getConsumerPositions()) {
+                if (worldBlockPos.getX() == pos.getX() && worldBlockPos.getY() == pos.getY()
+                        && worldBlockPos.getZ() == pos.getZ()
+                        && data.getEssencePool().getWorldKey().toString().equals(worldBlockPos.worldKey.toString())) {
+                    result = true;
+                    break outer;
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean capacityCrystalIsLinked(WorldBlockPos worldBlockPos) {
+        // TODO: this could be alot more efficient if we were to use data shortcuts
+        // consumersToEssencePools.
+        boolean result = false;
+        outer: for (PlayerData data : this.players.values()) {
+            for (BlockPos pos : data.getEssencePool().getCapacityCrystalPositions()) {
                 if (worldBlockPos.getX() == pos.getX() && worldBlockPos.getY() == pos.getY()
                         && worldBlockPos.getZ() == pos.getZ()
                         && data.getEssencePool().getWorldKey().toString().equals(worldBlockPos.worldKey.toString())) {
@@ -315,8 +358,15 @@ public class ServerData extends PersistentState {
         throw new NotImplementedException();
     }
 
-    public void tryAddCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos, UUID id) {
-        throw new NotImplementedException();
+    public void tryAddCapacityCrystal(ServerWorld world, BlockPos pos, ServerPlayerEntity player) {
+        if (playerHasAltar(player)) {
+            UUID playerID = player.getGameProfile().getId();
+            PlayerData data = this.players.get(playerID);
+            if (Util.inRange(data.getAltarPos(), pos, Config.getConfig().scanWidth,
+                    Config.getConfig().scanHeight)) {
+                data.getEssencePool().addCapacityCrystal(pos, playerID);
+            }
+        }
     }
 
     public void clear() {
