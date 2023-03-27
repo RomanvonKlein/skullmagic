@@ -8,7 +8,7 @@ import net.minecraft.world.BlockView;
 public class SimpleEfficiencySpellPedestal extends ASPellPedestal {
 
     public SimpleEfficiencySpellPedestal(Settings settings) {
-        super(settings, "efficiency");
+        super(settings, "efficiency",1);
     }
 
     @Override
