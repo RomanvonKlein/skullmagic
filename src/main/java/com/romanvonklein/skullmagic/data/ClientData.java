@@ -148,7 +148,9 @@ public class ClientData extends PlayerData {
         ArrayList<WorldBlockPos> results = new ArrayList<>();
         for (String learnedSpellname : this.spells.keySet()) {
             SpellShrineData spellShrineData = this.spells.get(learnedSpellname).spellShrine;
-            results.add(new WorldBlockPos(spellShrineData.shrinePos, spellShrineData.worldKey));
+            if (spellShrineData.shrinePos != null && spellShrineData.worldKey != null) {
+                results.add(new WorldBlockPos(spellShrineData.shrinePos, spellShrineData.worldKey));
+            }
         }
         return results;
     }

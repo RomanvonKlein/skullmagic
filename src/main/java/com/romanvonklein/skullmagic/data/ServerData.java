@@ -358,8 +358,7 @@ public class ServerData extends PersistentState {
             if (data.getEssencePool().getWorldKey() != null
                     && data.getEssencePool().getWorldKey().toString().equals(worldBlockPos.worldKey.toString())) {
                 for (BlockPos pedestalPos : data.getEssencePool().getPedestalPositions()) {
-                    if (pedestalPos.getX() == worldBlockPos.getX() && pedestalPos.getY() == worldBlockPos.getY()
-                            && pedestalPos.getZ() == worldBlockPos.getZ()) {
+                    if (worldBlockPos.isEqualTo(pedestalPos)) {
                         result = true;
                         break outer;
                     }
@@ -381,7 +380,7 @@ public class ServerData extends PersistentState {
             EssencePool pool = data.getEssencePool();
             if (pool != null && pool.getWorldKey() != null
                     && pool.getWorldKey().toString().equals(pos.worldKey.toString())
-                    && pool.getAltarPos().toShortString().equals(pos.toShortString())) {
+                    && pos.isEqualTo(pool.getAltarPos())) {
                 result = true;
                 break;
             }

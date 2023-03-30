@@ -150,7 +150,7 @@ class EssencePool extends PersistentState {
         BlockPos altarPos = null;
         if (tag.contains("altarPos")) {
             int[] altarCoords = tag.getIntArray("altarPos");
-            altarPos = new BlockPos(altarCoords[0], altarCoords[0], altarCoords[0]);
+            altarPos = new BlockPos(altarCoords[0], altarCoords[1], altarCoords[2]);
         }
 
         // worldkey

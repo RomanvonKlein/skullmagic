@@ -19,6 +19,9 @@ class SpellShrineData extends PersistentState {
     HashMap<BlockPos, Integer> cooldownPedestals;
 
     public SpellShrineData() {
+        this.powerPedestals = new HashMap<>();
+        this.efficiencyPedestals = new HashMap<>();
+        this.cooldownPedestals = new HashMap<>();
     }
 
     SpellShrineData(RegistryKey<World> worldKey, BlockPos shrinePos, HashMap<BlockPos, Integer> powerPedestals,
@@ -33,10 +36,14 @@ class SpellShrineData extends PersistentState {
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
         // shrinePos
-        tag.putIntArray("shrinePos", new int[] { shrinePos.getX(), shrinePos.getY(), shrinePos.getZ() });
+        if (this.shrinePos != null) {
+            tag.putIntArray("shrinePos", new int[] { shrinePos.getX(), shrinePos.getY(), shrinePos.getZ() });
+        }
 
         // worldkey
-        tag.putString("worldKey", worldKey.getValue().toString());
+        if (this.worldKey != null) {
+            tag.putString("worldKey", worldKey.getValue().toString());
+        }
 
         // powerPedestals
         NbtCompound powerPedestalsCompound = new NbtCompound();
@@ -64,13 +71,19 @@ class SpellShrineData extends PersistentState {
 
     static SpellShrineData fromNbt(NbtCompound tag) {
         // shrinePos
-        int[] shrineCoords = tag.getIntArray("shrinePos");
-        BlockPos shrinePos = new BlockPos(shrineCoords[0], shrineCoords[0], shrineCoords[0]);
+        BlockPos shrinePos = null;
+        if (tag.contains("shrinePos")) {
+            int[] shrineCoords = tag.getIntArray("shrinePos");
+            shrinePos = new BlockPos(shrineCoords[0], shrineCoords[1], shrineCoords[2]);
+        }
 
         // worldkey
-        String worldKeyString = tag.getString("worldKey");
-        RegistryKey<World> worldKey = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
-                Identifier.tryParse(worldKeyString));
+        RegistryKey<World> worldKey = null;
+        if (tag.contains("worldKey")) {
+            String worldKeyString = tag.getString("worldKey");
+            worldKey = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
+                    Identifier.tryParse(worldKeyString));
+        }
 
         // powerPedestals
         HashMap<BlockPos, Integer> powerPedestals = new HashMap<>();

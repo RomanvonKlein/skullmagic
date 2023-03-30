@@ -85,6 +85,9 @@ class PlayerData extends PersistentState {
 
     public void learnSpell(String spellname, SpellData spellData, UUID playerToUpdate) {
         this.spells.put(spellname, spellData);
+        if (this.selectedSpell == null || this.selectedSpell.equals("")) {
+            this.selectedSpell = spellname;
+        }
         SkullMagic.updatePlayer(playerToUpdate);
     }
 
@@ -179,7 +182,7 @@ class PlayerData extends PersistentState {
             UUID playerToUpdate) {
         boolean result = false;
         SpellData data = this.spells.get(spellname);
-        if (data != null) {
+        if (data != null && data.getShrinePos() != null) {
 
             if (Util.inRange(worldBlockPos, data.getShrinePos(), Config.getConfig().shrineRangePerLevel * 1,
                     Config.getConfig().shrineRangePerLevel * shrineLevel)) {// TODO: implement shrine levels here!
