@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.AConsumerBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.CapacityCrystalBlockEntity;
@@ -66,6 +64,7 @@ public class ServerData extends PersistentState {
      */
     private void GenerateBufferedData() {
         SkullMagic.LOGGER.warn("Buffer gerneration not implemented yet.");
+        // throw new NotImplementedException();
     }
 
     /**
@@ -165,22 +164,41 @@ public class ServerData extends PersistentState {
     }
 
     public void removeSpellCooldownPedestal(ServerWorld world, BlockPos pos) {
-        throw new NotImplementedException();
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.tryRemoveSpellCooldownPedestal(new WorldBlockPos(pos, world.getRegistryKey()), playerID)) {
+                break;
+            }
+        }
 
     }
 
     public void removeSpellEfficiencyPedestal(ServerWorld world, BlockPos pos) {
-        throw new NotImplementedException();
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.tryRemoveSpellEfficiencyPedestal(new WorldBlockPos(pos, world.getRegistryKey()), playerID)) {
+                break;
+            }
+        }
 
     }
 
     public void removeSpellPowerPedestal(ServerWorld world, BlockPos pos) {
-        throw new NotImplementedException();
-
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.tryRemoveSpellPowerPedestal(new WorldBlockPos(pos, world.getRegistryKey()), playerID)) {
+                break;
+            }
+        }
     }
 
     public void removeConsumer(RegistryKey<World> worldKey, BlockPos pos) {
-        throw new NotImplementedException();
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.tryRemoveConsumer(new WorldBlockPos(pos, worldKey), playerID)) {
+                break;
+            }
+        }
     }
 
     public WorldBlockPos getAltarWorldPosForPlayer(ServerPlayerEntity player) {
@@ -406,7 +424,14 @@ public class ServerData extends PersistentState {
     }
 
     public EssencePool getEssencePoolForConsumer(RegistryKey<World> registryKey, BlockPos pos) {
-        return null;
+        EssencePool result = null;
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.hasConsumerAtPos(new WorldBlockPos(pos, registryKey))) {
+                result = data.getEssencePool();
+            }
+        }
+        return result;
     }
 
     public void tryLinkSkullPedestalToNearbyAltar(ServerWorld world, BlockPos pedPos) {
@@ -547,12 +572,21 @@ public class ServerData extends PersistentState {
         return Parsing.setToStringArr(spells.keySet());
     }
 
-    public void removeSpellShrine(ServerWorld world, BlockPos pos) {
-        throw new NotImplementedException();
+    public void removeSpellShrine(WorldBlockPos worldBlockPos) {
+        for (PlayerData data : this.players.values()) {
+            if (data.tryRemoveSpellShrine(worldBlockPos)) {
+                break;
+            }
+        }
     }
 
     public void removeSpellPedestal(ServerWorld world, BlockPos pos, String type) {
-        throw new NotImplementedException();
+        for (UUID playerID : this.players.keySet()) {
+            PlayerData data = this.players.get(playerID);
+            if (data.tryRemoveSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()), playerID)) {
+                break;
+            }
+        }
     }
 
     public boolean tryAddSpellPedestal(ServerWorld world, BlockPos pos, UUID placerID, String spellname,
@@ -732,19 +766,23 @@ public class ServerData extends PersistentState {
     }
 
     public boolean playerHasSpellShrine(UUID playerid, String spellname) {
-        throw new NotImplementedException();
+        return this.players.get(playerid).hasSpellShrine(spellname);
     }
 
     public BlockPos getSpellShrineForPlayer(UUID playerid, String spellname) {
-        throw new NotImplementedException();
+        return this.players.get(playerid).getSpellShrine(spellname);
     }
 
     public boolean canConsumerApply(WorldBlockPos pos, int essenceCost) {
-        throw new NotImplementedException();
+        return getEssencePoolForConsumer(pos.worldKey, pos).canAfford(essenceCost);
     }
 
     public void applyConsumer(WorldBlockPos pos, int essenceCost) {
-        throw new NotImplementedException();
+        for (UUID playerID : this.players.keySet()) {
+            if (this.players.get(playerID).hasConsumerAtPos(pos)) {
+                this.players.get(playerID).applyConsumer(pos, essenceCost, playerID);
+            }
+        }
     }
 
     public ServerPlayerEntity getPlayerForConsumerWorldPos(ServerWorld world, WorldBlockPos worldPos) {

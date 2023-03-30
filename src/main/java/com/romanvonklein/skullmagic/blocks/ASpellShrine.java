@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
+import com.romanvonklein.skullmagic.data.WorldBlockPos;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 
 import net.minecraft.block.BlockRenderType;
@@ -33,7 +34,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if (!world.isClient) {
-            SkullMagic.getServerData().removeSpellShrine((ServerWorld) world, pos);
+            SkullMagic.getServerData().removeSpellShrine(new WorldBlockPos(pos, world.getRegistryKey()));
         }
         super.onBreak(world, pos, state, player);
     }
@@ -41,7 +42,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.getServerData().removeSpellShrine((ServerWorld) world, pos);
+            SkullMagic.getServerData().removeSpellShrine(new WorldBlockPos(pos, world.getRegistryKey()));
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }

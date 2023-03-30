@@ -190,4 +190,87 @@ class PlayerData extends PersistentState {
         return result;
     }
 
+    public boolean tryRemoveSpellPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        for (SpellData data : this.spells.values()) {
+
+            if (data.tryRemoveSpellPedestal(worldBlockPos, playerToUpdate)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public boolean tryRemoveSpellShrine(WorldBlockPos worldBlockPos) {
+        boolean result = false;
+        for (String spellname : this.spells.keySet()) {
+            SpellData data = this.spells.get(spellname);
+            if (worldBlockPos.worldKey.toString().equals(data.spellShrine.worldKey.toString())
+                    && worldBlockPos.isEqualTo(data.getShrinePos())) {
+                this.spells.remove(spellname);
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public boolean hasSpellShrine(String spellname) {
+        boolean result = false;
+        if (this.spells.containsKey(spellname)) {
+            SpellData data = this.spells.get(spellname);
+            result = data != null && data.spellShrine != null && data.spellShrine.shrinePos != null;
+        }
+        return result;
+    }
+
+    public BlockPos getSpellShrine(String spellname) {
+        BlockPos result = null;
+        if (this.spells.containsKey(spellname)) {
+            result = this.spells.get(spellname).getShrinePos();
+        }
+        return result;
+    }
+
+    public boolean tryRemoveConsumer(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        return this.getEssencePool() != null
+                && this.getEssencePool().getWorldKey().toString().equals(worldBlockPos.worldKey.toString())
+                && this.getEssencePool().tryRemoveConsumer(worldBlockPos, playerToUpdate);
+    }
+
+    public boolean tryRemoveSpellPowerPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        for (String spellname : this.spells.keySet()) {
+            if (this.spells.get(spellname).tryRemoveSpellPowerPedestal(worldBlockPos, playerToUpdate)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public boolean tryRemoveSpellCooldownPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        for (String spellname : this.spells.keySet()) {
+            if (this.spells.get(spellname).tryRemoveSpellCooldownPedestal(worldBlockPos, playerToUpdate)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public boolean tryRemoveSpellEfficiencyPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        for (String spellname : this.spells.keySet()) {
+            if (this.spells.get(spellname).tryRemoveSpellEfficiencyPedestal(worldBlockPos, playerToUpdate)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public void applyConsumer(WorldBlockPos pos, int essenceCost, UUID playerToUpdate) {
+        this.essencePool.dischargeEssence(essenceCost, playerToUpdate);
+    }
+
 }

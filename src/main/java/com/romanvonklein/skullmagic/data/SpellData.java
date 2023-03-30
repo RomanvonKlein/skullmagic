@@ -174,4 +174,70 @@ class SpellData extends PersistentState {
         }
         SkullMagic.updatePlayer(playerToUpdate);
     }
+
+    public boolean tryRemoveSpellPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        return this.tryRemoveSpellPowerPedestal(worldBlockPos, playerToUpdate)
+                || this.tryRemoveSpellCooldownPedestal(worldBlockPos, playerToUpdate)
+                || this.tryRemoveSpellEfficiencyPedestal(worldBlockPos, playerToUpdate);
+    }
+
+    public boolean tryRemoveSpellPowerPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        BlockPos posToRemove = null;
+        if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+            for (BlockPos pos : this.spellShrine.powerPedestals.keySet()) {
+                if (worldBlockPos.isEqualTo(pos)) {
+                    posToRemove = pos;
+                    result = true;
+                    break;
+                }
+            }
+        }
+        if (result) {
+            this.spellShrine.powerPedestals.remove(posToRemove);
+
+            SkullMagic.updatePlayer(playerToUpdate);
+        }
+        return result;
+    }
+
+    public boolean tryRemoveSpellEfficiencyPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        BlockPos posToRemove = null;
+        if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+            for (BlockPos pos : this.spellShrine.efficiencyPedestals.keySet()) {
+                if (worldBlockPos.isEqualTo(pos)) {
+                    posToRemove = pos;
+                    result = true;
+                    break;
+                }
+            }
+        }
+        if (result) {
+            this.spellShrine.efficiencyPedestals.remove(posToRemove);
+
+            SkullMagic.updatePlayer(playerToUpdate);
+        }
+        return result;
+    }
+
+    public boolean tryRemoveSpellCooldownPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        BlockPos posToRemove = null;
+        if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+            for (BlockPos pos : this.spellShrine.cooldownPedestals.keySet()) {
+                if (worldBlockPos.isEqualTo(pos)) {
+                    posToRemove = pos;
+                    result = true;
+                    break;
+                }
+            }
+        }
+        if (result) {
+            this.spellShrine.cooldownPedestals.remove(posToRemove);
+
+            SkullMagic.updatePlayer(playerToUpdate);
+        }
+        return result;
+    }
 }

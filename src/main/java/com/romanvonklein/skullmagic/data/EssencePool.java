@@ -310,4 +310,24 @@ class EssencePool extends PersistentState {
         return result;
     }
 
+    public boolean tryRemoveConsumer(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
+        boolean result = false;
+        BlockPos posToRemove = null;
+        for (BlockPos pos : this.consumers) {
+            if (worldBlockPos.isEqualTo(pos)) {
+                posToRemove = pos;
+                break;
+            }
+        }
+        if (result) {
+            this.consumers.remove(posToRemove);
+            SkullMagic.updatePlayer(playerToUpdate);
+        }
+        return result;
+    }
+
+    public boolean canAfford(int essenceCost) {
+        return this.getEssence() >= essenceCost;
+    }
+
 }
