@@ -1,28 +1,17 @@
 package com.romanvonklein.skullmagic.effects.particles;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.util.math.BlockPos;
 
-public class LinkingParticles implements ParticleEffect {
+@Environment(value = EnvType.CLIENT)
+public class LinkingParticles extends DefaultParticleType {
+    BlockPos targetBlockPos;
 
-    @Override
-    public ParticleType<?> getType() {
-        return ParticleTypes.BLOCK_MARKER;
-    }
-
-    @Override
-    public void write(PacketByteBuf var1) {
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public String asString() {
-        // TODO Auto-generated method stub
-        return null;
+    protected LinkingParticles(boolean alwaysShow, BlockPos target) {
+        super(alwaysShow);
+        this.targetBlockPos = target;
     }
 
 }

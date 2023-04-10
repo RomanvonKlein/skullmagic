@@ -13,8 +13,12 @@ import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEnti
 import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.ASpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
+import com.romanvonklein.skullmagic.blocks.ASpellShrine;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.spells.Spell;
 import com.romanvonklein.skullmagic.spells.SpellInitializer;
@@ -22,12 +26,17 @@ import com.romanvonklein.skullmagic.util.Parsing;
 import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -572,14 +581,15 @@ public class ServerData extends PersistentState {
     }
 
     public void removeSpellShrine(WorldBlockPos worldBlockPos) {
-        for (PlayerData data : this.players.values()) {
-            if (data.tryRemoveSpellShrine(worldBlockPos)) {
+        for (UUID playerToUpdate: this.players.keySet()) {
+            PlayerData data = this.players.get(playerToUpdate);
+            if (data.tryRemoveSpellShrine(worldBlockPos, playerToUpdate)) {
                 break;
             }
         }
     }
 
-    public void removeSpellPedestal(ServerWorld world, BlockPos pos, String type) {
+    public void tryRemoveSpellPedestal(ServerWorld world, BlockPos pos, String type) {
         for (UUID playerID : this.players.keySet()) {
             PlayerData data = this.players.get(playerID);
             if (data.tryRemoveSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()), playerID)) {
@@ -591,17 +601,21 @@ public class ServerData extends PersistentState {
     public boolean tryAddSpellPedestal(ServerWorld world, BlockPos pos, UUID placerID, String spellname,
             ASPellPedestal aSpellPedestal) {
         boolean result = false;
-        if (playerKnowsSpell(placerID, spellname) && players.get(placerID)
-                .tryAddSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()), spellname, aSpellPedestal.type,
-                        aSpellPedestal.level, placerID)) {
-            result = true;
-        } else {
-            for (UUID candidateID : this.players.keySet()) {
-                if (playerKnowsSpell(candidateID, spellname)
-                        && players.get(candidateID).tryAddSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()),
-                                spellname, aSpellPedestal.type, aSpellPedestal.level, candidateID)) {
-                    result = true;
-                    break;
+
+        if (playerKnowsSpell(placerID, spellname)) {
+            if (players.get(placerID)
+                    .tryAddSpellPedestal(new WorldBlockPos(pos, world.getRegistryKey()), spellname, aSpellPedestal.type,
+                            aSpellPedestal.level, placerID)) {
+                result = true;
+            } else {
+                for (UUID candidateID : this.players.keySet()) {
+                    if (playerKnowsSpell(candidateID, spellname)
+                            && players.get(candidateID).tryAddSpellPedestal(
+                                    new WorldBlockPos(pos, world.getRegistryKey()),
+                                    spellname, aSpellPedestal.type, aSpellPedestal.level, candidateID)) {
+                        result = true;
+                        break;
+                    }
                 }
             }
         }
@@ -814,6 +828,80 @@ public class ServerData extends PersistentState {
     public void updatePlayer(UUID playerToUpdate) {
         if (!this.playersToUpdate.contains(playerToUpdate)) {
             this.playersToUpdate.add(playerToUpdate);
+        }
+    }
+
+    public void updateSpellPedestal(ASPellPedestal pedestal, ASpellPedestalBlockEntity ent, String type,
+            PlayerEntity player, World world,
+            BlockPos pos) {
+
+        // check if the socket is empty
+        if (ent.getScroll() == null || ent.getScroll().isOf(Items.AIR)) {
+            // if empty, check wether the player holds a valid scroll.
+            ItemStack scrollItemStack = player.getMainHandStack();
+            if (scrollItemStack.getItem() instanceof KnowledgeOrb) {
+                String spellname = ((KnowledgeOrb) scrollItemStack.getItem()).spellName;
+                if (this.tryAddSpellPedestal((ServerWorld) world, pos,
+                        player.getGameProfile().getId(), spellname, pedestal)) {
+                    ent.setScroll(scrollItemStack.copy());
+                    scrollItemStack.decrement(1);
+                    world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
+                            SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
+                            SoundCategory.BLOCKS, 1.0f, 1.0f, true);
+                    player.sendMessage(Text.of("Bound this spell pedestal to your spell shrine."), true);
+                } else {
+                    player.sendMessage(
+                            Text.of("Could not find a spell shrine linked to you and " + spellname
+                                    + " in range."),
+                            true);
+                }
+            } else {
+                player.sendMessage(Text.of("Not a valid scroll!"), true);
+            }
+        } else {
+            // if not empty, drop the contained item.
+            ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                    ent.getScroll());
+            itemEnt.setPickupDelay(0);
+            world.spawnEntity(itemEnt);
+            ent.setScroll(null);
+            this.tryRemoveSpellPedestal((ServerWorld) world, pos, type);
+        }
+    }
+
+    public void updateSpellShrine(ServerWorld world, PlayerEntity player, SpellShrineBlockEntity blockEnt,
+            ASpellShrine aSpellShrine) {
+        UUID playerid = player.getGameProfile().getId();
+        if (blockEnt.getScroll() == null || blockEnt.getScroll().isOf(Items.AIR)) {
+            // if empty, check wether the player holds a valid scroll.
+            ItemStack itemStack = player.getMainHandStack();
+            if (itemStack.getItem() instanceof KnowledgeOrb) {
+                String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+                // dont do anything if the player already has a shrine for that spell assigned
+                // to him
+                if (SkullMagic.getServerData().playerHasSpellShrine(playerid, spellname)) {
+                    player.sendMessage(
+                            Text.of("You already have a shrine for the spell " + spellname
+                                    + " assigned to you at "
+                                    + SkullMagic.getServerData().getSpellShrineForPlayer(playerid, spellname)
+                                            .toShortString()),
+                            true);
+                } else {
+                    SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, blockEnt.getPos(),
+                            player.getGameProfile().getId(), spellname);
+                    blockEnt.setScroll(itemStack.copy());
+                    itemStack.decrement(1);
+                }
+            }
+        } else {
+            // if not empty, drop the contained item.
+            ItemEntity scroll = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                    blockEnt.getScroll());
+
+            scroll.setPickupDelay(0);
+            world.spawnEntity(scroll);
+            blockEnt.setScroll(null);
+            this.tryRemoveSpellAltar(world, blockEnt.getPos());
         }
     }
 }

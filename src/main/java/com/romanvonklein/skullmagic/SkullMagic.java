@@ -52,7 +52,6 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -358,33 +357,6 @@ public class SkullMagic implements ModInitializer {
 			getServerData().createPlayerEntryIfNotExists(serverPlayNetworkHandler.player);
 			ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(serverPlayNetworkHandler.player);
 		});
-
-		PlayerBlockBreakEvents.AFTER.register(((world, player, pos, state, entity) -> {
-			if (entity != null) {
-				// TODO: this needs to only happen for skulls, not the custom blocks...
-				// if (entity.getType().equals(SKULL_ALTAR_BLOCK_ENTITY)) {
-				// // broke a skullAltar
-				// serverData.removeSkullAltar((ServerWorld) world, pos);//
-				// essenceManager.removeSkullAltar((ServerWorld)world,
-				// // pos);
-				// } else if (entity.getType().equals(SKULL_PEDESTAL_BLOCK_ENTITY)) {
-				// // broke a skullpedestal
-				// serverData.removePedestal((ServerWorld) (ServerWorld) world, pos);
-				// } else if (entity.getType().equals(SPELL_SHRINE_BLOCK_ENTITY)) {
-				// // broke a spell altar
-				// serverData.tryRemoveSpellAltar((ServerWorld) world, pos);
-				// } else if (entity.getType().equals(COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY)) {
-				// // broke a cooldown pedestal
-				// serverData.removeSpellCooldownPedestal((ServerWorld) world, pos);
-				// } else if (entity.getType().equals(EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY)) {
-				// // broke a efficiency pedestal
-				// serverData.removeSpellEfficiencyPedestal((ServerWorld) world, pos);
-				// } else if (entity.getType().equals(POWER_SPELL_PEDESTAL_BLOCK_ENTITY)) {
-				// // broke a power pedestal
-				// serverData.removeSpellPowerPedestal((ServerWorld) world, pos);
-				// }
-			}
-		}));
 
 		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.SPELL_CAST_ID,
 				(server, serverPlayerEntity, handler, buf, packetSender) -> {

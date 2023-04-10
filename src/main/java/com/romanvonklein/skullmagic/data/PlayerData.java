@@ -205,7 +205,7 @@ class PlayerData extends PersistentState {
         return result;
     }
 
-    public boolean tryRemoveSpellShrine(WorldBlockPos worldBlockPos) {
+    public boolean tryRemoveSpellShrine(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
         boolean result = false;
         for (String spellname : this.spells.keySet()) {
             SpellData data = this.spells.get(spellname);
@@ -213,6 +213,7 @@ class PlayerData extends PersistentState {
                     && worldBlockPos.isEqualTo(data.getShrinePos())) {
                 this.spells.remove(spellname);
                 result = true;
+                SkullMagic.updatePlayer(playerToUpdate);
                 break;
             }
         }

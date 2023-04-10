@@ -1,12 +1,10 @@
 package com.romanvonklein.skullmagic.blocks;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import com.romanvonklein.skullmagic.data.WorldBlockPos;
-import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -15,9 +13,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -62,38 +58,8 @@ public abstract class ASpellShrine extends BlockWithEntity {
             Optional<SpellShrineBlockEntity> opt = world.getBlockEntity(pos, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY);
             // check if the socket is empty
             if (opt.isPresent()) {
-                UUID playerid = player.getGameProfile().getId();
-
                 SpellShrineBlockEntity blockEnt = opt.get();
-                if (blockEnt.getScroll() == null) {
-                    // if empty, check wether the player holds a valid scroll.
-                    ItemStack itemStack = player.getMainHandStack();
-                    if (itemStack.getItem() instanceof KnowledgeOrb) {
-                        String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                        // dont do anything if the player already has a shrine for that spell assigned
-                        // to him
-                        if (SkullMagic.getServerData().playerHasSpellShrine(playerid, spellname)) {
-                            player.sendMessage(
-                                    Text.of("You already have a shrine for the spell " + spellname
-                                            + " assigned to you at "
-                                            + SkullMagic.getServerData().getSpellShrineForPlayer(playerid, spellname)
-                                                    .toShortString()),
-                                    true);
-                        } else {
-                            SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, pos,
-                                    player.getGameProfile().getId(), spellname);
-                            blockEnt.setScroll(itemStack.copy());
-                            itemStack.decrement(1);
-                        }
-                    }
-                } else {
-                    // if not empty, drop the contained item.
-                    player.giveItemStack(blockEnt.getScroll());
-                    blockEnt.setScroll(null);
-                    SkullMagic.getServerData().removeSpellShrineForPlayer((ServerWorld) world, pos,
-                            player.getGameProfile().getId());
-                }
-
+                SkullMagic.getServerData().updateSpellShrine((ServerWorld)world, player, blockEnt, this);
             }
         }
         return result;
