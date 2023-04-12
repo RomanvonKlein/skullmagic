@@ -202,21 +202,14 @@ class EssencePool extends PersistentState {
     }
 
     void tick(MinecraftServer server, UUID playerToUpdate) {
+        int prevEssence = this.essence;
         this.essence += this.essenceChargeRate;
         if (this.essence > this.maxEssence) {
             this.essence = this.maxEssence;
         }
-        SkullMagic.updatePlayer(playerToUpdate);
-
-        /*
-         * consumer entities should tick by themselves...
-         * for (BlockPos consumerPos : this.consumers) {
-         * ServerWorld world = server.getWorld(this.worldKey);
-         * world.getBlockEntity(consumerPos, AConsumerBlockEntity);
-         * AConsumerBlockEntity consumerEntity = ;
-         * consumerEntity.tick(server);
-         * }
-         */
+        if (prevEssence != this.essence) {
+            SkullMagic.updatePlayer(playerToUpdate);
+        }
     }
 
     public void addPedestal(BlockPos pedPos, String skullIdentifier, UUID playerToUpdate) {

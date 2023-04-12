@@ -63,7 +63,7 @@ class SpellData extends PersistentState {
     static SpellData fromNbt(NbtCompound tag, String spellname) {
 
         // spellShrine
-        SpellShrineData spellShrineData = SpellShrineData.fromNbt(tag);
+        SpellShrineData spellShrineData = SpellShrineData.fromNbt(tag.getCompound("spellShrine"));
 
         // cooldownleft
         int cooldownLeft = tag.getInt("cooldownLeft");
@@ -184,7 +184,8 @@ class SpellData extends PersistentState {
     public boolean tryRemoveSpellPowerPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
         boolean result = false;
         BlockPos posToRemove = null;
-        if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+        if (this.spellShrine.worldKey != null
+                && this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
             for (BlockPos pos : this.spellShrine.powerPedestals.keySet()) {
                 if (worldBlockPos.isEqualTo(pos)) {
                     posToRemove = pos;
@@ -204,7 +205,8 @@ class SpellData extends PersistentState {
     public boolean tryRemoveSpellEfficiencyPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
         boolean result = false;
         BlockPos posToRemove = null;
-        if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+        if (this.spellShrine.worldKey != null
+                && this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
             for (BlockPos pos : this.spellShrine.efficiencyPedestals.keySet()) {
                 if (worldBlockPos.isEqualTo(pos)) {
                     posToRemove = pos;
@@ -224,7 +226,8 @@ class SpellData extends PersistentState {
     public boolean tryRemoveSpellCooldownPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
         boolean result = false;
         BlockPos posToRemove = null;
-        if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+        if (this.spellShrine.worldKey != null
+                && this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
             for (BlockPos pos : this.spellShrine.cooldownPedestals.keySet()) {
                 if (worldBlockPos.isEqualTo(pos)) {
                     posToRemove = pos;

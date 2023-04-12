@@ -76,7 +76,7 @@ class SpellShrineData extends PersistentState {
             int[] shrineCoords = tag.getIntArray("shrinePos");
             shrinePos = new BlockPos(shrineCoords[0], shrineCoords[1], shrineCoords[2]);
         }
-
+        
         // worldkey
         RegistryKey<World> worldKey = null;
         if (tag.contains("worldKey")) {

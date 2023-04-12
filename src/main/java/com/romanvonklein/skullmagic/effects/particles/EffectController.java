@@ -41,9 +41,9 @@ public class EffectController {
                     if (client.world.getRegistryKey().toString().equals(shrinePos.worldKey.toString())) {
                         for (BlockPos pedPos : ClientInitializer.getClientData()
                                 .getSpellPedestalsForSpellAltar(shrinePos)) {
-                            Vec3f velocity = new Vec3f(pedPos.getX() - shrinePos.getX(),
-                                    pedPos.getY() - shrinePos.getY(),
-                                    pedPos.getZ() - shrinePos.getZ());
+                            Vec3f velocity = new Vec3f(shrinePos.getX()-pedPos.getX(),
+                                    shrinePos.getY()-pedPos.getY(),
+                                    shrinePos.getZ()-pedPos.getZ());
                             velocity.scale(0.1f);
                             client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
                                     pedPos.getY() + 0.5,

@@ -38,7 +38,7 @@ public class ClientData extends PlayerData {
         PlayerData playerData = PlayerData.fromNbt(nbt.getCompound("playerdata"));
         ClientData data = new ClientData(playerData);
         data.spellnames = new ArrayList<String>();
-        for (String spellName : nbt.getString("spellnames").split(";")) {
+        for (String spellName :playerData.spells.keySet()){//nbt.getString("spellnames").split(";")) {
             data.spellnames.add(spellName);
         }
         return data;
