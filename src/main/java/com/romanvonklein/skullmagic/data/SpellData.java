@@ -51,7 +51,7 @@ class SpellData extends PersistentState {
         this.cooldownLeft = cooldownLeft;
         this.powerLevel = powerLevel2;
         this.efficiencyLevel = efficiencyLevel2;
-        this.cooldownLeft = cooldownLeft;
+        this.cooldownLevel = cooldownLevel2;
         this.baseCooldown = ServerData.getSpells().get(spellname).cooldownTicks;
         this.baseCost = ServerData.getSpells().get(spellname).essenceCost;
     }
