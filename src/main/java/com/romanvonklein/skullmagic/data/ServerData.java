@@ -581,7 +581,7 @@ public class ServerData extends PersistentState {
     }
 
     public void removeSpellShrine(WorldBlockPos worldBlockPos) {
-        for (UUID playerToUpdate: this.players.keySet()) {
+        for (UUID playerToUpdate : this.players.keySet()) {
             PlayerData data = this.players.get(playerToUpdate);
             if (data.tryRemoveSpellShrine(worldBlockPos, playerToUpdate)) {
                 break;
@@ -877,20 +877,25 @@ public class ServerData extends PersistentState {
             ItemStack itemStack = player.getMainHandStack();
             if (itemStack.getItem() instanceof KnowledgeOrb) {
                 String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
-                // dont do anything if the player already has a shrine for that spell assigned
-                // to him
-                if (SkullMagic.getServerData().playerHasSpellShrine(playerid, spellname)) {
-                    player.sendMessage(
-                            Text.of("You already have a shrine for the spell " + spellname
-                                    + " assigned to you at "
-                                    + SkullMagic.getServerData().getSpellShrineForPlayer(playerid, spellname)
-                                            .toShortString()),
-                            true);
+                // only continue if the player knowns the spell
+                if (playerKnowsSpell(playerid, spellname)) {
+                    // dont do anything if the player already has a shrine for that spell assigned
+                    // to him
+                    if (SkullMagic.getServerData().playerHasSpellShrine(playerid, spellname)) {
+                        player.sendMessage(
+                                Text.of("You already have a shrine for the spell " + spellname
+                                        + " assigned to you at "
+                                        + SkullMagic.getServerData().getSpellShrineForPlayer(playerid, spellname)
+                                                .toShortString()),
+                                true);
+                    } else {
+                        SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, blockEnt.getPos(),
+                                player.getGameProfile().getId(), spellname);
+                        blockEnt.setScroll(itemStack.copy());
+                        itemStack.decrement(1);
+                    }
                 } else {
-                    SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, blockEnt.getPos(),
-                            player.getGameProfile().getId(), spellname);
-                    blockEnt.setScroll(itemStack.copy());
-                    itemStack.decrement(1);
+                    player.sendMessage(Text.of("You dont know this spell yet."), true);
                 }
             }
         } else {
