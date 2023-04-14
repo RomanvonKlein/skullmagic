@@ -41,6 +41,7 @@ import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
+import com.romanvonklein.skullmagic.lootTablemodifiers.LootTableModifier;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
@@ -375,6 +376,9 @@ public class SkullMagic implements ModInitializer {
 				END_SKULLIUM_ORE_PLACED_FEATURE);
 		BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(), GenerationStep.Feature.UNDERGROUND_ORES,
 				RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier(MODID, "end_skullium_ore")));
+
+		//initialize loot tables
+		LootTableModifier.initializeLootTableModifications();
 	}
 
 	public TaskManager getTaskManager() {

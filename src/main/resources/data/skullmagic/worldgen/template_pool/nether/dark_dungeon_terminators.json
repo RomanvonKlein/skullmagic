@@ -1,12 +1,40 @@
 {
   "name": "skullmagic:nether/dark_dungeon",
-  "fallback": "minecraft:empty",
+  "fallback": "skullmagic:nether/dark_dungeon_terminators",
   "elements": [
     {
       "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:nether/dark_dungeon/dark_dungeon_entrance_01",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_terminator_02",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_terminator_01",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    }
+    ,
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_terminator_03",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }
