@@ -63,6 +63,7 @@
     "item.skullmagic.teleport_orb": "Scroll of Teleporting",
     "item.skullmagic.resistancebuff_orb": "Scroll of Resistance",
     "item.skullmagic.fireresistance_orb": "Scroll of Fire Resistance",
+    "item.skullmagic.skull_wand": "Skull Wand",
     "skullmagic.message.missing_required_level": "Can't affort level cost: ",
     "skullmagic.message.already_linked_to_altar_at": "You are already linked to an altar at: ",
     "skullmagic.message.altar_linked_to_other_player": "This altar is already linked to another player.",

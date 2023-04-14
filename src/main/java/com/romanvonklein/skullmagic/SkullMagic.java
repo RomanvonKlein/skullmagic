@@ -152,6 +152,7 @@ public class SkullMagic implements ModInitializer {
 	// items
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
 	public static final Item SKULLIUM_SHARD = new Item(new FabricItemSettings().group(ItemGroup.MISC));
+	public static final Item SKULL_WAND = new Item(new FabricItemSettings().group(ItemGroup.MISC));
 
 	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
@@ -325,6 +326,7 @@ public class SkullMagic implements ModInitializer {
 			Registry.register(Registry.ITEM, new Identifier(MODID, orb.spellName + "_orb"), orb);
 		}
 		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_shard"), SKULLIUM_SHARD);
+		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_wand"), SKULL_WAND);
 
 		// register entities
 		EFFECT_BALL = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "effect_ball"),

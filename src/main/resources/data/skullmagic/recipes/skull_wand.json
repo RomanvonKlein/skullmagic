@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "S",
+        "I",
+        "I"
+    ],
+    "key": {
+        "S": {
+            "item": "minecraft:zombie_head"
+        },
+        "I": {
+            "item": "minecraft:iron_ingot"
+        }
+    },
+    "result": {
+        "item": "skullmagic:skull_wand",
+        "count": 1
+    }
+}
