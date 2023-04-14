@@ -13,6 +13,7 @@ import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRend
 import com.romanvonklein.skullmagic.data.ClientData;
 import com.romanvonklein.skullmagic.data.ServerData;
 import com.romanvonklein.skullmagic.effects.particles.EffectController;
+import com.romanvonklein.skullmagic.effects.particles.LinkingParticle;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
@@ -159,7 +160,7 @@ public class ClientInitializer implements ClientModInitializer {
                     registry.register(new Identifier(SkullMagic.MODID, "particle/link_particle"));
                 }));
 
-        ParticleFactoryRegistry.getInstance().register(SkullMagic.LINK_PARTICLE, FlameParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(SkullMagic.LINK_PARTICLE, LinkingParticle.Factory::new);
         // screenstuff
         HandledScreens.register(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, BlockPlacerScreen::new);
         // clientside hud render stuff

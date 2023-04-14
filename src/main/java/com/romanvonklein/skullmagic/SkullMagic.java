@@ -37,6 +37,7 @@ import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.data.ServerData;
+import com.romanvonklein.skullmagic.effects.particles.LinkingParticle;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
@@ -190,7 +191,8 @@ public class SkullMagic implements ModInitializer {
 					HeightRangePlacementModifier.uniform(YOffset.getBottom(), YOffset.fixed(256))));
 
 	// particles
-	public static final DefaultParticleType LINK_PARTICLE = FabricParticleTypes.simple();
+	public static final DefaultParticleType LINK_PARTICLE = FabricParticleTypes
+			.simple();
 
 	// custom managers
 	private static ServerData serverData;
@@ -377,7 +379,7 @@ public class SkullMagic implements ModInitializer {
 		BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(), GenerationStep.Feature.UNDERGROUND_ORES,
 				RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier(MODID, "end_skullium_ore")));
 
-		//initialize loot tables
+		// initialize loot tables
 		LootTableModifier.initializeLootTableModifications();
 	}
 

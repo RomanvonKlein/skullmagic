@@ -25,31 +25,29 @@ public class EffectController {
                 if (altarPos != null && client.world.getRegistryKey().toString().equals(altarPos.worldKey.toString())) {
                     for (BlockPos pedPos : ClientInitializer.getClientData()
                             .getConnectedSkullPedestals()) {
-                        Vec3f velocity = new Vec3f(altarPos.getX() - pedPos.getX(), altarPos.getY() - pedPos.getY(),
-                                altarPos.getZ() - pedPos.getZ());
-                        velocity.scale(0.1f);
-                        client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
-                                pedPos.getY() + 0.5,
-                                pedPos.getZ() + 0.5, velocity.getX(),
-                                velocity.getY(), velocity.getZ());
-                        skullparticles++;
+                        if (Math.random() > 0.25) {
+                            client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
+                                    pedPos.getY() + 0.5,
+                                    pedPos.getZ() + 0.5, altarPos.getX() + 0.5, altarPos.getY() + 0.5,
+                                    altarPos.getZ() + 0.5);
+                            skullparticles++;
+                        }
                     }
                 }
 
                 // SpellAltars
                 for (WorldBlockPos shrinePos : ClientInitializer.getClientData().getActiveSpellShrinesWorldBlockPos()) {
-                    if (client.world.getRegistryKey().toString().equals(shrinePos.worldKey.toString())) {
+                    if (client.world.getRegistryKey().toString().equals(shrinePos.worldKey.toString())
+                            && Math.random() > 0.25) {
                         for (BlockPos pedPos : ClientInitializer.getClientData()
                                 .getSpellPedestalsForSpellAltar(shrinePos)) {
-                            Vec3f velocity = new Vec3f(shrinePos.getX()-pedPos.getX(),
-                                    shrinePos.getY()-pedPos.getY(),
-                                    shrinePos.getZ()-pedPos.getZ());
-                            velocity.scale(0.1f);
-                            client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
-                                    pedPos.getY() + 0.5,
-                                    pedPos.getZ() + 0.5, velocity.getX(),
-                                    velocity.getY(), velocity.getZ());
-                            spellParticles++;
+                            if (Math.random() > 0.25) {
+                                client.world.addParticle(SkullMagic.LINK_PARTICLE, true, pedPos.getX() + 0.5,
+                                        pedPos.getY() + 0.5,
+                                        pedPos.getZ() + 0.5, shrinePos.getX() + 0.5, shrinePos.getY() + 0.5,
+                                        shrinePos.getZ() + 0.5);
+                                spellParticles++;
+                            }
                         }
                     }
                 }
