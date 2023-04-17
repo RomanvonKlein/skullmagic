@@ -9,37 +9,23 @@ import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.StructureGeneratorFactory;
 import net.minecraft.structure.pool.StructurePools;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.GenerationStep;
-import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
+import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.world.gen.structure.EndCityStructure;
+import net.minecraft.world.gen.structure.Structure;
+import net.minecraft.world.gen.structure.StructureType;
 
-public class DarkTowerJigsawFeature extends StructureFeature<StructurePoolFeatureConfig> {
-    public DarkTowerJigsawFeature(Codec<StructurePoolFeatureConfig> codec, int structureStartY,
-            boolean modifyBoundingBox,
-            boolean surface,
-            Predicate<StructureGeneratorFactory.Context<StructurePoolFeatureConfig>> contextPredicate) {
-        super(codec, context -> {
-            if (!contextPredicate.test(context)) {
-                return Optional.empty();
-            }
-            BlockPos blockPos = new BlockPos(context.chunkPos().getStartX(), structureStartY,
-                    context.chunkPos().getStartZ());
-            StructurePools.initDefaultPools();
-            return SkullMagicStructurePoolBasedGenerator.generateNew(context, PoolStructurePiece::new, blockPos,
-                    modifyBoundingBox,
-                    surface);
-        });
+public class DarkTowerJigsawFeature extends Structure {
+    public static final Codec<DarkTowerJigsawFeature> CODEC = createCodec(DarkTowerJigsawFeature::new);
+    public DarkTowerJigsawFeature(Structure.Config config) {
+        super(config);
+    }
+    @Override
+    protected Optional<StructurePosition> getStructurePosition(Context context) {
+        return Optional.empty();
     }
 
     @Override
-    public Codec<ConfiguredStructureFeature<StructurePoolFeatureConfig, StructureFeature<StructurePoolFeatureConfig>>> getCodec() {
-        return super.getCodec();
+    public StructureType<?> getType() {
+        return StructureType.JIGSAW;
     }
-
-    @Override
-    public GenerationStep.Feature getGenerationStep() {
-        return GenerationStep.Feature.SURFACE_STRUCTURES;
-    }
-
 }

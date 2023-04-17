@@ -13,8 +13,8 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
 
 public class FireCannonBlockEntity extends AConsumerBlockEntity {
 
@@ -35,13 +35,13 @@ public class FireCannonBlockEntity extends AConsumerBlockEntity {
                     if (state.contains(Properties.FACING)) {
                         target = state.get(Properties.FACING);
                     }
-                    Vec3f angle = target.getUnitVector();
+                    Vector3f angle = target.getUnitVector();
                     ServerPlayerEntity player = SkullMagic.getServerData().getPlayerForConsumerWorldPos((ServerWorld)world,
                             worldPos);
-                    FireballEntity ent = new FireballEntity(world, player, angle.getX(), angle.getY(), angle.getZ(),
+                    FireballEntity ent = new FireballEntity(world, player, angle.x(), angle.y(), angle.z(),
                             1);
-                    ent.setPos(pos.getX() + angle.getX(), pos.getY() + angle.getY(), pos.getZ() + angle.getZ());
-                    ent.setVelocity(new Vec3d(angle.getX(), angle.getY(), angle.getZ()));
+                    ent.setPos(pos.getX() + angle.x(), pos.getY() + angle.y(), pos.getZ() + angle.z());
+                    ent.setVelocity(new Vec3d(angle.x(), angle.y(), angle.z()));
                     world.spawnEntity(ent);
                     SkullMagic.getServerData().applyConsumer(worldPos, essenceCost);
                     world.playSound(null, new BlockPos(pos),

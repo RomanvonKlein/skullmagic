@@ -6,12 +6,13 @@ import com.romanvonklein.skullmagic.data.WorldBlockPos;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class WitherEnergyChannelerBlockEntity extends AConsumerBlockEntity {
@@ -39,7 +40,7 @@ public class WitherEnergyChannelerBlockEntity extends AConsumerBlockEntity {
                     for (int i = 1; i < range + 1; i++) {
                         BlockPos toTest = new BlockPos(pos.add(target.getVector().multiply(i)));
 
-                        String blockIdentifier = Registry.BLOCK
+                        String blockIdentifier = Registries.BLOCK
                                 .getId(world.getBlockState(toTest).getBlock()).toString();
                         if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                             skull = toTest;

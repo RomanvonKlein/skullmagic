@@ -13,7 +13,8 @@ import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 
 public class Config {
     private static String configPath = "./Config/skullmagic.json";
@@ -85,39 +86,39 @@ public class Config {
 
         // mobdrops
         HashMap<String, Float> zombieDrops = new HashMap<>();
-        zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 0.025f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
+        zombieDrops.put(Registries.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
         HashMap<String, Float> skeletonDrops = new HashMap<>();
-        skeletonDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 0.025f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
+        skeletonDrops.put(Registries.ITEM.getId(Items.SKELETON_SKULL).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
         HashMap<String, Float> creeperDrops = new HashMap<>();
-        creeperDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 0.025f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
+        creeperDrops.put(Registries.ITEM.getId(Items.CREEPER_HEAD).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
         HashMap<String, Float> enderDragonDrops = new HashMap<>();
-        enderDragonDrops.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 1.0f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ENDER_DRAGON).toString(), enderDragonDrops);
+        enderDragonDrops.put(Registries.ITEM.getId(Items.DRAGON_HEAD).toString(), 1.0f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.ENDER_DRAGON).toString(), enderDragonDrops);
         HashMap<String, Float> spiderDrops = new HashMap<>();
-        spiderDrops.put(Registry.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 0.025f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.SPIDER).toString(), spiderDrops);
+        spiderDrops.put(Registries.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.SPIDER).toString(), spiderDrops);
         HashMap<String, Float> blazeDrops = new HashMap<>();
-        blazeDrops.put(Registry.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 0.025f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.BLAZE).toString(), blazeDrops);
+        blazeDrops.put(Registries.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.BLAZE).toString(), blazeDrops);
         HashMap<String, Float> endermanDrops = new HashMap<>();
-        endermanDrops.put(Registry.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 0.025f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ENDERMAN).toString(), endermanDrops);
+        endermanDrops.put(Registries.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.ENDERMAN).toString(), endermanDrops);
 
         // skull values
-        defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 2);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 15);
-        defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 1);
-        defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 3);
-        defaultData.skulls.put(Registry.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 4);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.WITHER_SKELETON_SKULL.asItem()).toString(), 4);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.CREEPER_HEAD).toString(), 2);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.DRAGON_HEAD).toString(), 15);
+        defaultData.skulls.put(Registries.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 1);
+        defaultData.skulls.put(Registries.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 3);
+        defaultData.skulls.put(Registries.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 4);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.WITHER_SKELETON_SKULL.asItem()).toString(), 4);
 
         // shrine values
-        defaultData.shrines.put(Registry.ITEM.getId(SkullMagic.SIMPLE_SPELL_SHRINE.asItem()).toString(), 3);
+        defaultData.shrines.put(Registries.ITEM.getId(SkullMagic.SIMPLE_SPELL_SHRINE.asItem()).toString(), 3);
 
         defaultData.scanHeight = 2;
         defaultData.scanWidth = 5;

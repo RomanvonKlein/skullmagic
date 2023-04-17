@@ -5,9 +5,10 @@ import java.util.HashMap;
 import com.romanvonklein.skullmagic.util.Parsing;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
@@ -81,7 +82,7 @@ class SpellShrineData extends PersistentState {
         RegistryKey<World> worldKey = null;
         if (tag.contains("worldKey")) {
             String worldKeyString = tag.getString("worldKey");
-            worldKey = RegistryKey.of(net.minecraft.util.registry.Registry.WORLD_KEY,
+            worldKey = RegistryKey.of(RegistryKeys.WORLD,
                     Identifier.tryParse(worldKeyString));
         }
 

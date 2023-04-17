@@ -26,7 +26,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -114,10 +114,7 @@ public class BlockPlacerBlockEntity extends AConsumerBlockEntity
 
     @Override
     public Text getDisplayName() {
-        // versions 1.18.2 and below
-        return new TranslatableText("skullmagic.blockplacer.guiname");
-        // versions since 1.19
-        // return Text.translatable("container.chest");
+        return Text.translatable("skullmagic.blockplacer.guiname");
     }
 
     @Override

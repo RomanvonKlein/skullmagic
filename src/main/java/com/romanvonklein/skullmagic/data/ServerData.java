@@ -31,18 +31,19 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
@@ -232,12 +233,12 @@ public class ServerData extends PersistentState {
             // player has no altar
             if (altarIsBound(pos)) {
                 // altar is bound => tell player
-                player.sendMessage(new TranslatableText("skullmagic.message.altar_linked_to_other_player"), true);
+                player.sendMessage(Text.translatable("skullmagic.message.altar_linked_to_other_player"), true);
 
             } else {
                 // altar is unlinked => bind the altar
                 linkAltar(player, pos);
-                player.sendMessage(new TranslatableText("skullmagic.message.linked_altar_to_player"), true);
+                player.sendMessage(Text.translatable("skullmagic.message.linked_altar_to_player"), true);
 
             }
         } else {
@@ -245,15 +246,15 @@ public class ServerData extends PersistentState {
             if (pos.equals(getAltarWorldPosForPlayer(player))) {
                 // the clicked altar is the player's => unbind the altar
                 unlinkAltar(player);
-                player.sendMessage(new TranslatableText("skullmagic.message.unlinked_altar_from_player"), true);
+                player.sendMessage(Text.translatable("skullmagic.message.unlinked_altar_from_player"), true);
 
             } else if (altarIsBound(pos)) {
                 // the player clicked someone elses altar => tell player
-                player.sendMessage(new TranslatableText("skullmagic.message.already_linked_to_altar_at")
+                player.sendMessage(Text.translatable("skullmagic.message.already_linked_to_altar_at")
                         .append(pos.toShortString()), true);
             } else {
                 // the player clickes an unlinked altar => tell player
-                player.sendMessage(new TranslatableText("skullmagic.message.already_linked_to_altar_at")
+                player.sendMessage(Text.translatable("skullmagic.message.already_linked_to_altar_at")
                         .append(pos.toShortString()), true);
             }
         }
@@ -353,7 +354,7 @@ public class ServerData extends PersistentState {
             BlockPos pos = ent.getPos();
             if (Util.getPedestalSkullIdentifier(world, pos) != null
                     && !pedestalIsLinked(new WorldBlockPos(pos, world.getRegistryKey()))) {
-                results.put(pos, Registry.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString());
+                results.put(pos, Registries.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString());
             }
         }
 
@@ -568,7 +569,7 @@ public class ServerData extends PersistentState {
 
                     success = true;
                 } else {
-                    player.sendMessage(new TranslatableText("skullmagic.message.missing_required_level")
+                    player.sendMessage(Text.translatable("skullmagic.message.missing_required_level")
                             .append(Integer.toString(spellcost)), true);
                 }
             }
@@ -726,7 +727,7 @@ public class ServerData extends PersistentState {
             if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
                     && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.add(new Tuple<BlockPos, String>(pos,
-                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+                        Registries.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
             }
         }
 
@@ -743,7 +744,7 @@ public class ServerData extends PersistentState {
             if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
                     && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.add(new Tuple<BlockPos, String>(pos,
-                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+                        Registries.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
             }
         }
 
@@ -760,7 +761,7 @@ public class ServerData extends PersistentState {
             if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
                     && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.add(new Tuple<BlockPos, String>(pos,
-                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+                        Registries.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
             }
         }
 

@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+
 import java.util.function.BiFunction;
 
+import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.function.TriFunction;
 
 import com.romanvonklein.skullmagic.SkullMagic;
@@ -40,8 +41,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.Structure;
-import net.minecraft.structure.StructureManager;
+import net.minecraft.structure.StructureTemplate;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.hit.EntityHitResult;
@@ -50,8 +51,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
 
 public class SpellInitializer {
 
@@ -99,21 +100,21 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            Vec3f angle = Direction.DOWN.getUnitVector();
-                            Random rand = new Random();
+                            Vector3f angle = Direction.DOWN.getUnitVector();
+                            Random rand = Random.create();
 
                             World world = player.world;
                             for (int i = 0; i < meteoriteCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                        rand.nextInt(0, maxDelay),
+                                        rand.nextInt(maxDelay),
                                         new TriFunction<Object[], Object, Object, Boolean>() {
                                             @Override
                                             public Boolean apply(Object[] data, Object n1, Object n2) {
-                                                FireballEntity ent = new FireballEntity(world, player, angle.getX(),
-                                                        angle.getY(), angle.getZ(),
+                                                FireballEntity ent = new FireballEntity(world, player, angle.x(),
+                                                        angle.y(), angle.z(),
                                                         (int) Math.round(
                                                                 Math.max(1.0,
-                                                                        Math.min(rand.nextInt(minPower, maxPower)
+                                                                        Math.min(minPower+rand.nextInt(maxPower-minPower)
                                                                                 + (powerlevel - 1) * 0.5,
                                                                                 5.0))));
                                                 ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
@@ -186,7 +187,7 @@ public class SpellInitializer {
                                             int breathLife = ((int[]) data[0])[1];
                                             int burnDuration = ((int[]) data[0])[2];
 
-                                            Random rand = new Random();
+                                            Random rand = Random.create();
                                             Vec3d dir = player.getRotationVector().normalize();
 
                                             World world = player.world;
@@ -232,7 +233,7 @@ public class SpellInitializer {
                                             int breathLife = ((int[]) data[0])[1];
                                             int witherDuration = ((int[]) data[0])[2];
                                             int damage = ((int[]) data[0])[3];
-                                            Random rand = new Random();
+                                            Random rand = Random.create();
                                             Vec3d dir = player.getRotationVector().normalize();
 
                                             World world = player.world;
@@ -387,7 +388,7 @@ public class SpellInitializer {
                             Vec3d center = result.getPos();
 
                             World world = player.world;
-                            world.playSound(null, new BlockPos(center),
+                            world.playSound(null, BlockPos.ofFloored(center),
                                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
                             player.teleport(center.x, center.y, center.z, true);
                             success = true;
@@ -414,7 +415,7 @@ public class SpellInitializer {
                                 cameraPos,
                                 vec3d3,
                                 box,
-                                (entityx) -> !entityx.isSpectator() && entityx.collides(),
+                                (entityx) -> !entityx.isSpectator() && entityx.canHit(),
                                 reachDistance * reachDistance);
                         if (entityHitResult != null && entityHitResult.getEntity() instanceof VillagerEntity villager) {
                             ServerWorld world = (ServerWorld) player.world;
@@ -427,7 +428,7 @@ public class SpellInitializer {
                                     SpawnReason.CONVERSION, new ZombieData(false, true), null);
                             zombieVillagerEntity.setVillagerData(villager.getVillagerData());
                             zombieVillagerEntity
-                                    .setGossipData(villager.getGossip().serialize(NbtOps.INSTANCE).getValue());
+                                    .setGossipData(villager.getGossip().serialize(NbtOps.INSTANCE));
                             zombieVillagerEntity.setOfferData(villager.getOffers().toNbt());
                             zombieVillagerEntity.setXp(villager.getExperience());
                             success = true;
@@ -454,12 +455,12 @@ public class SpellInitializer {
                                 cameraPos,
                                 vec3d3,
                                 box,
-                                (entityx) -> !entityx.isSpectator() && entityx.collides(),
+                                (entityx) -> !entityx.isSpectator() && entityx.canHit(),
                                 reachDistance * reachDistance);
                         if (entityHitResult != null
                                 && entityHitResult.getEntity() instanceof ZombieVillagerEntity zombie) {
                             ((ZombieVillagerEntityMixin) zombie).invokeSetConverting(player.getUuid(),
-                                    new Random().nextInt(2401) + 3600);
+                                    Random.create().nextInt(2401) + 3600);
                             success = true;
                         }
                         return success;
@@ -511,7 +512,7 @@ public class SpellInitializer {
                                     ent.addVelocity(vel.x, vel.y + 4.0, vel.z);
                                 }
                             }
-                            world.playSound(null, new BlockPos(playerpos),
+                            world.playSound(null, BlockPos.ofFloored(playerpos),
                                     SoundEvents.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.BLOCKS, 1f, 1f);
                         }
                         return true;
@@ -525,16 +526,16 @@ public class SpellInitializer {
                         boolean castResult = false;
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            BlockPos pos = new BlockPos(center);
+                            BlockPos pos = BlockPos.ofFloored(center);
                             ServerWorld world = (ServerWorld) player.world;
                             // Structure structure = StructurePlacer.place(world, false,
                             // new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"),
                             // pos);
-                            Optional<Structure> optional;
-                            StructureManager structureManager = world.getStructureManager();
-                            Structure structure;
+                            Optional<StructureTemplate> optional;
+                            StructureTemplateManager structureManager = world.getStructureTemplateManager();
+                            StructureTemplate structure;
                             try {
-                                optional = structureManager.getStructure(
+                                optional = structureManager.getTemplate(
                                         new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"));
                                 structure = optional.get();
                             } catch (InvalidIdentifierException invalidIdentifierException) {
@@ -542,10 +543,14 @@ public class SpellInitializer {
                             }
 
                             SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos, structure);
-                            if (structure != null) {
-                                world.playSound(null, new BlockPos(center),
-                                        SoundEvents.AMBIENT_CAVE, SoundCategory.BLOCKS, 1.0f, 1f);
-                            }
+                            world.playSound(null,
+                                        center.x,
+                                        center.y,
+                                        center.z,
+                                        SoundEvents.BLOCK_CONDUIT_AMBIENT,
+                                        SoundCategory.BLOCKS,
+                                        1.5f,
+                                        1f);
                             // Context<StructurePoolFeatureConfig> context = new
                             // Context<StructurePoolFeatureConfig>(featureConfig, chunkGenerator,
                             // structureManager, chunkPos, heightLimitView, chunkRandom, l);
@@ -603,7 +608,7 @@ public class SpellInitializer {
                                                     // does the tool have enough durability?
                                                     if (!tool.isDamageable() || toolStack.getMaxDamage() > 1
                                                             + toolStack.getDamage()) {
-                                                        toolStack.damage(1, new Random(), player);
+                                                        toolStack.damage(1, Random.create(), player);
                                                     } else {
                                                         canBreakBlock = false;
                                                     }
@@ -655,8 +660,14 @@ public class SpellInitializer {
                                 }
                             }
                             if (placedAnything) {
-                                world.playSound(null, new BlockPos(center),
-                                        SoundEvents.BLOCK_ROOTED_DIRT_PLACE, SoundCategory.BLOCKS, 1.5f, 1f);
+                                world.playSound(null,
+                                        center.x,
+                                        center.y,
+                                        center.z,
+                                        SoundEvents.BLOCK_ROOTED_DIRT_PLACE,
+                                        SoundCategory.BLOCKS,
+                                        1.5f,
+                                        1f);
                             }
                         }
                         return true;
@@ -673,10 +684,10 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            Random rand = new Random();
+                            Random rand = Random.create();
                             for (int i = 0; i < lightningCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                        rand.nextInt(0, maxDelay),
+                                        rand.nextInt(maxDelay),
                                         new TriFunction<Object[], Object, Object, Boolean>() {
                                             @Override
                                             public Boolean apply(Object[] data, Object n1, Object n2) {

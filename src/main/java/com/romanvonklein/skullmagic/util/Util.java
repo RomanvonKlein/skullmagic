@@ -11,20 +11,21 @@ import com.romanvonklein.skullmagic.config.Config;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class Util {
     public static String getPedestalSkullIdentifier(World world, BlockPos pedestalPos) {
-        java.util.Optional<SkullPedestalBlockEntity> pedestalCandidate = world.getBlockEntity(pedestalPos,
+        Optional<SkullPedestalBlockEntity> pedestalCandidate = world.getBlockEntity(pedestalPos,
                 SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY);
         String result = null;
         if (pedestalCandidate.isPresent()) {
             BlockState skullCandidate = world.getBlockState(pedestalPos.up());
-            String blockIdentifier = Registry.BLOCK.getId(skullCandidate.getBlock()).toString();
+            String blockIdentifier = Registries.BLOCK.getId(skullCandidate.getBlock()).toString();
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 result = blockIdentifier;
             }
@@ -39,7 +40,7 @@ public class Util {
         for (double x = box.minX; x <= box.maxX; x++) {
             for (double y = box.minY; y <= box.maxY; y++) {
                 for (double z = box.minZ; z <= box.maxZ; z++) {
-                    BlockPos candidatePos = new BlockPos(x, y, z);
+                    BlockPos candidatePos = BlockPos.ofFloored(x, y, z);
                     Optional<T> opt = world.getBlockEntity(candidatePos, bet);
                     if (opt.isPresent()) {
                         results.add(opt.get());

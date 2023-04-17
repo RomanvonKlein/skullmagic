@@ -2,8 +2,20 @@ package com.romanvonklein.skullmagic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
+import com.romanvonklein.skullmagic.util.CreativeTabInitializer;
+import com.romanvonklein.skullmagic.util.CreativeTabLists;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.resource.featuretoggle.FeatureFlag;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
+import net.minecraft.resource.featuretoggle.FeatureManager;
+import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.structure.Structure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +49,6 @@ import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
 import com.romanvonklein.skullmagic.data.ServerData;
-import com.romanvonklein.skullmagic.effects.particles.LinkingParticle;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
@@ -73,23 +84,16 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.BuiltinRegistries;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.YOffset;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
-import net.minecraft.world.gen.feature.PlacedFeature;
-import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 import net.minecraft.world.gen.placementmodifier.CountPlacementModifier;
 import net.minecraft.world.gen.placementmodifier.HeightRangePlacementModifier;
 import net.minecraft.world.gen.placementmodifier.SquarePlacementModifier;
@@ -99,17 +103,17 @@ public class SkullMagic implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
 	// structure features
-	public static final Codec<StructurePoolFeatureConfig> SKULLMAGIC_CODEC = RecordCodecBuilder
+	public static final Codec<FeatureConfig> SKULLMAGIC_CODEC = RecordCodecBuilder
 			.create(instance -> instance
 					.group(StructurePool.REGISTRY_CODEC.fieldOf("start_pool")
-							.forGetter(t -> ((StructurePoolFeatureConfig) t).getStartPool()),
+							.forGetter(t -> ((FeatureConfig) t).getStartPool()),
 							Codec.intRange(0, 1000).fieldOf("size")
-									.forGetter(StructurePoolFeatureConfig::getSize))
+									.forGetter(FeatureConfig::getSize))
 					.apply(instance,
-							StructurePoolFeatureConfig::new));
+							FeatureConfig::new));
 
-	public static final StructureFeature<StructurePoolFeatureConfig> DARK_TOWER = Registry.register(
-			Registry.STRUCTURE_FEATURE,
+	public static final Structure DARK_TOWER = Registry.register(
+			Registries.FEATURE,
 			MODID + ":dark_tower",
 			new DarkTowerFeature(SKULLMAGIC_CODEC));
 
@@ -151,8 +155,21 @@ public class SkullMagic implements ModInitializer {
 
 	// items
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
-	public static final Item SKULLIUM_SHARD = new Item(new FabricItemSettings().group(ItemGroup.MISC));
-	public static final Item SKULL_WAND = new Item(new FabricItemSettings().group(ItemGroup.MISC));
+	public static final Item SKULLIUM_SHARD = generateItem(new FabricItemSettings(),CreativeTabLists.miscTabList);
+	public static final Item SKULL_WAND = generateItem(new FabricItemSettings(),CreativeTabLists.miscTabList);
+
+	public static Item generateItem(FabricItemSettings settings, List<ItemGroup> tablList){
+		Item result = new Item(settings);
+		CreativeTabLists.addItemToTabs(result,tablList);
+		return result;
+	}
+
+	public static void registerBlockWithItem(Block block, String id,List<ItemGroup> tabList){
+		Registry.register(Registries.BLOCK, new Identifier(MODID, id), block);
+		Item result = Registry.register(Registries.ITEM, new Identifier(MODID, id),
+				new BlockItem(block, new FabricItemSettings()));
+		CreativeTabLists.addItemToTabs(result,tabList);
+	}
 
 	// block entities
 	public static BlockEntityType<SkullAltarBlockEntity> SKULL_ALTAR_BLOCK_ENTITY;
@@ -205,117 +222,67 @@ public class SkullMagic implements ModInitializer {
 		Commands.registerCommands();
 
 		// register blockentities
-		WITHER_ENERGY_CHANNELER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		WITHER_ENERGY_CHANNELER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":wither_energy_channeler_block_entity",
 				FabricBlockEntityTypeBuilder.create(WitherEnergyChannelerBlockEntity::new, WitherEnergyChanneler)
 						.build(null));
-		POWER_SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		POWER_SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":power_spell_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(PowerSpellPedestalBlockEntity::new, SPELL_POWER_PEDESTAL)
 						.build(null));
-		EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":efficiency_spell_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(EfficiencySpellPedestalBlockEntity::new, SPELL_EFFICIENCY_PEDESTAL)
 						.build(null));
-		COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":cooldown_spell_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(CooldownSpellPedestalBlockEntity::new, SPELL_COOLDOWN_PEDESTAL)
 						.build(null));
-		SPELL_SHRINE_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		SPELL_SHRINE_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":spell_shrine_block_entity",
 				FabricBlockEntityTypeBuilder.create(SpellShrineBlockEntity::new, SIMPLE_SPELL_SHRINE,
 						INTERMEDIATE_SPELL_SHRINE, ADVANCED_SPELL_SHRINE).build(null));
-		BLOCK_USER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		BLOCK_USER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":block_user_block_entity",
 				FabricBlockEntityTypeBuilder.create(BlockUserBlockEntity::new, BLOCK_USER_BLOCK).build(null));
-		CAPACITY_CRYSTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		CAPACITY_CRYSTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":capacity_crystal_block_entity",
 				FabricBlockEntityTypeBuilder.create(CapacityCrystalBlockEntity::new, CapacityCrystal).build(null));
-		FIRE_CANNON_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":fire_cannon_block_entity",
+		FIRE_CANNON_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, MODID + ":fire_cannon_block_entity",
 				FabricBlockEntityTypeBuilder.create(FireCannonBlockEntity::new, FireCannon).build(null));
-		BLOCK_PLACER_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":block_placer_block_entity",
+		BLOCK_PLACER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, MODID + ":block_placer_block_entity",
 				FabricBlockEntityTypeBuilder.create(BlockPlacerBlockEntity::new, BlockPlacer).build(null));
-		SKULL_ALTAR_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, MODID + ":skull_altar_block_entity",
+		SKULL_ALTAR_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, MODID + ":skull_altar_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullAltarBlockEntity::new, SkullAltar).build(null));
-		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullPedestalBlockEntity::new, SkullPedestal).build(null));
 
-		SKULL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+		SKULL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullMagicSkullBlockEntity::new, ENDERMAN_HEAD_BLOCK,
 						SPIDER_HEAD_BLOCK, BLAZE_HEAD_BLOCK).build(null));
 
 		// register blocks
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "block_user"), BLOCK_USER_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "block_user"),
-				new BlockItem(BLOCK_USER_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "wither_energy_channeler"), WitherEnergyChanneler);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "wither_energy_channeler"),
-				new BlockItem(WitherEnergyChanneler, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "capacity_crystal"), CapacityCrystal);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "capacity_crystal"),
-				new BlockItem(CapacityCrystal, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "fire_cannon"), FireCannon);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "fire_cannon"),
-				new BlockItem(FireCannon, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_pedestal"), SkullPedestal);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_pedestal"),
-				new BlockItem(SkullPedestal, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "skull_altar"),
-				SkullAltar);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_altar"),
-				new BlockItem(SkullAltar, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "block_placer"), BlockPlacer);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "block_placer"),
-				new BlockItem(BlockPlacer, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_power_pedestal"), SPELL_POWER_PEDESTAL);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_power_pedestal"),
-				new BlockItem(SPELL_POWER_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_efficiency_pedestal"),
-				SPELL_EFFICIENCY_PEDESTAL);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_efficiency_pedestal"),
-				new BlockItem(SPELL_EFFICIENCY_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "spell_cooldown_pedestal"), SPELL_COOLDOWN_PEDESTAL);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "spell_cooldown_pedestal"),
-				new BlockItem(SPELL_COOLDOWN_PEDESTAL, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "simple_spell_shrine"), SIMPLE_SPELL_SHRINE);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "simple_spell_shrine"),
-				new BlockItem(SIMPLE_SPELL_SHRINE, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "intermediate_spell_shrine"),
-				INTERMEDIATE_SPELL_SHRINE);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "intermediate_spell_shrine"),
-				new BlockItem(INTERMEDIATE_SPELL_SHRINE, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "advanced_spell_shrine"), ADVANCED_SPELL_SHRINE);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "advanced_spell_shrine"),
-				new BlockItem(ADVANCED_SPELL_SHRINE, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "enderman_head"), ENDERMAN_HEAD_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "enderman_head"),
-				new BlockItem(ENDERMAN_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "spider_head"), SPIDER_HEAD_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "spider_head"),
-				new BlockItem(SPIDER_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
-
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "blaze_head"), BLAZE_HEAD_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "blaze_head"),
-				new BlockItem(BLAZE_HEAD_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "skullium_ore"), SKULLIUM_ORE);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_ore"),
-				new BlockItem(SKULLIUM_ORE, new FabricItemSettings().group(ItemGroup.MISC)));
-		Registry.register(Registry.BLOCK, new Identifier(MODID, "skullium_block"), SKULLIUM_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_block"),
-				new BlockItem(SKULLIUM_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+		registerBlockWithItem(BLOCK_USER_BLOCK,"block_user",CreativeTabLists.miscTabList);
+		registerBlockWithItem(WitherEnergyChanneler,"wither_energy_channeler",CreativeTabLists.miscTabList);
+		registerBlockWithItem(CapacityCrystal,"capacity_crystal",CreativeTabLists.miscTabList);
+		registerBlockWithItem(FireCannon,"fire_cannon",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SkullPedestal,"skull_pedestal",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SkullAltar,"skull_altar",CreativeTabLists.miscTabList);
+		registerBlockWithItem(BlockPlacer,"block_placer",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SPELL_POWER_PEDESTAL,"spell_power_pedestal",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SPELL_EFFICIENCY_PEDESTAL,"spell_efficiency_pedestal",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SPELL_COOLDOWN_PEDESTAL,"spell_cooldown_pedestal",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SIMPLE_SPELL_SHRINE,"simple_spell_shrine",CreativeTabLists.miscTabList);
+		registerBlockWithItem(INTERMEDIATE_SPELL_SHRINE,"intermediate_spell_shrine",CreativeTabLists.miscTabList);
+		registerBlockWithItem(ADVANCED_SPELL_SHRINE,"advanced_spell_shrine",CreativeTabLists.miscTabList);
+		registerBlockWithItem(ENDERMAN_HEAD_BLOCK,"enderman_head",CreativeTabLists.miscTabList);
+		registerBlockWithItem(INTERMEDIATE_SPELL_SHRINE,"intermediate_spell_shrine",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SPIDER_HEAD_BLOCK,"spider_head",CreativeTabLists.miscTabList);
+		registerBlockWithItem(BLAZE_HEAD_BLOCK,"blaze_head",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SKULLIUM_ORE,"skullium_ore",CreativeTabLists.miscTabList);
+		registerBlockWithItem(SKULLIUM_BLOCK,"skullium_block",CreativeTabLists.miscTabList);
 
 		// register spells
 		ServerData.initSpells();
@@ -323,29 +290,32 @@ public class SkullMagic implements ModInitializer {
 		// register items
 		knowledgeOrbs = KnowledgeOrb.generateKnowledgeOrbs();
 		for (KnowledgeOrb orb : knowledgeOrbs) {
-			Registry.register(Registry.ITEM, new Identifier(MODID, orb.spellName + "_orb"), orb);
+			Registry.register(Registries.ITEM, new Identifier(MODID, orb.spellName + "_orb"), orb);
 		}
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skullium_shard"), SKULLIUM_SHARD);
-		Registry.register(Registry.ITEM, new Identifier(MODID, "skull_wand"), SKULL_WAND);
+		Registry.register(Registries.ITEM, new Identifier(MODID, "skullium_shard"), SKULLIUM_SHARD);
+		Registry.register(Registries.ITEM, new Identifier(MODID, "skull_wand"), SKULL_WAND);
 
 		// register entities
-		EFFECT_BALL = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "effect_ball"),
+		EFFECT_BALL = Registry.register(Registries.ENTITY_TYPE, new Identifier(MODID, "effect_ball"),
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, EffectBall::new)
 						.dimensions(EntityDimensions.fixed(0.75f, 0.75f)).build());
-		FIRE_BREATH = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "fire_breath"),
+		FIRE_BREATH = Registry.register(Registries.ENTITY_TYPE, new Identifier(MODID, "fire_breath"),
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, FireBreath::new)
 						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
-		WITHER_BREATH = Registry.register(Registry.ENTITY_TYPE, new Identifier(MODID, "wither_breath"),
+		WITHER_BREATH = Registry.register(Registries.ENTITY_TYPE, new Identifier(MODID, "wither_breath"),
 				FabricEntityTypeBuilder.create(SpawnGroup.MISC, WitherBreath::new)
 						.dimensions(EntityDimensions.fixed(0.1f, 0.1f)).build());
 
 		// register particles
-		Registry.register(Registry.PARTICLE_TYPE, new Identifier(MODID, "link_particle"), LINK_PARTICLE);
+		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "link_particle"), LINK_PARTICLE);
+		FeatureManager.Builder builder = new FeatureManager.Builder("skullmagic");
+		 FeatureFlag base = builder.addFlag(new Identifier(this.MODID, "block_player_screen"));
 
+		FeatureSet set = FeatureSet.of(base);
 		// register screenhandler stuff
 		BLOCK_PLACER_SCREEN_HANDLER = Registry.register(
-				Registry.SCREEN_HANDLER, new Identifier(MODID, "block_placer_screen_handler"),
-				new ScreenHandlerType<>((syncId, inventory) -> new BlockPlacerScreenHandler(syncId, inventory)));
+				Registries.SCREEN_HANDLER, new Identifier(MODID, "block_placer_screen_handler"),
+				new ScreenHandlerType<>(BlockPlacerScreenHandler::new,set));
 
 		// register stuff for saving to persistent state manager.
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
@@ -374,15 +344,18 @@ public class SkullMagic implements ModInitializer {
 				});
 
 		// feature initialization
-		Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, new Identifier(MODID, "end_skullium_ore"),
+		Registry.register(Registries.FEATURE, new Identifier(MODID, "end_skullium_ore"),
 				END_SKULLIUM_ORE_CONFIGURED_FEATURE);
-		Registry.register(BuiltinRegistries.PLACED_FEATURE, new Identifier(MODID, "end_skullium_ore"),
+		Registry.register(Registries.FEATURE, new Identifier(MODID, "end_skullium_ore"),
 				END_SKULLIUM_ORE_PLACED_FEATURE);
 		BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(), GenerationStep.Feature.UNDERGROUND_ORES,
-				RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier(MODID, "end_skullium_ore")));
+				RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(MODID, "end_skullium_ore")));
 
 		// initialize loot tables
 		LootTableModifier.initializeLootTableModifications();
+
+		//initialize items for creative tabs
+		CreativeTabInitializer.init();
 	}
 
 	public TaskManager getTaskManager() {

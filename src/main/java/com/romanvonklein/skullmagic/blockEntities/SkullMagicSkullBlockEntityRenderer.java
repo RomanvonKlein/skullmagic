@@ -33,24 +33,24 @@ import net.minecraft.util.math.Direction;
 @Environment(value = EnvType.CLIENT)
 public class SkullMagicSkullBlockEntityRenderer
         implements BlockEntityRenderer<SkullMagicSkullBlockEntity> {
-    private final Map<SkullMagicSkullBlock.SkullType, SkullBlockEntityModel> MODELS;
-    private static final Map<SkullMagicSkullBlock.SkullType, Identifier> TEXTURES = Util.make(Maps.newHashMap(),
+    private final Map<SkullType, SkullBlockEntityModel> MODELS;
+    private static final Map<SkullType, Identifier> TEXTURES = Util.make(Maps.newHashMap(),
             map -> {
-                map.put(SkullMagicSkullBlock.SkullType.ENDERMAN,
+                map.put(SkullType.ENDERMAN,
                         new Identifier("textures/entity/enderman/enderman.png"));
-                map.put(SkullMagicSkullBlock.SkullType.BLAZE,
+                map.put(SkullType.BLAZE,
                         new Identifier("textures/entity/blaze.png"));
-                map.put(SkullMagicSkullBlock.SkullType.SPIDER,
+                map.put(SkullType.SPIDER,
                         new Identifier("textures/entity/spider/spider.png"));
             });
 
-    public static Map<SkullMagicSkullBlock.SkullType, SkullBlockEntityModel> getModels(EntityModelLoader modelLoader) {
-        ImmutableMap.Builder<SkullMagicSkullBlock.SkullType, SkullBlockEntityModel> builder = ImmutableMap.builder();
-        builder.put(SkullMagicSkullBlock.SkullType.ENDERMAN,
+    public static Map<SkullType, SkullBlockEntityModel> getModels(EntityModelLoader modelLoader) {
+        ImmutableMap.Builder<SkullType, SkullBlockEntityModel> builder = ImmutableMap.builder();
+        builder.put(SkullType.ENDERMAN,
                 new SkullEntityModel(modelLoader.getModelPart(EntityModelLayers.SKELETON_SKULL)));
-        builder.put(SkullMagicSkullBlock.SkullType.BLAZE,
+        builder.put(SkullType.BLAZE,
                 new SkullEntityModel(modelLoader.getModelPart(EntityModelLayers.SKELETON_SKULL)));
-        builder.put(SkullMagicSkullBlock.SkullType.SPIDER,
+        builder.put(SkullType.SPIDER,
                 new SkullEntityModel(modelLoader.getModelPart(EntityModelLayers.SKELETON_SKULL)));
         return builder.build();
     }
@@ -93,7 +93,7 @@ public class SkullMagicSkullBlockEntityRenderer
         matrices.pop();
     }
 
-    public static RenderLayer getRenderLayer(SkullMagicSkullBlock.SkullType type) {
+    public static RenderLayer getRenderLayer(SkullType type) {
         Identifier identifier = TEXTURES.get(type);
         return RenderLayer.getEntityCutoutNoCullZOffset(identifier);
     }

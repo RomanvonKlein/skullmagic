@@ -181,9 +181,8 @@ public class EssenceStatus {
                 float f1 = (color >> 8 & 255) / 255.0F;
                 float f2 = (color & 255) / 255.0F;
                 RenderSystem.enableBlend();
-                RenderSystem.disableTexture();
                 RenderSystem.defaultBlendFunc();
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
+                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
                 RenderSystem.disableDepthTest();
                 BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
                 vertexbuffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -193,8 +192,7 @@ public class EssenceStatus {
                 vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).color(f, f1, f2, f3).next();
                 vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).color(f, f1, f2, f3).next();
                 vertexbuffer.end();
-                BufferRenderer.draw(vertexbuffer);
-                RenderSystem.enableTexture();
+                BufferRenderer.draw(vertexbuffer.end());
                 RenderSystem.disableBlend();
                 RenderSystem.enableDepthTest();
         }
@@ -210,14 +208,13 @@ public class EssenceStatus {
          *               the width of the rectangle
          * @param height
          *               the height of the rectangle
-         * @param color
-         *               the color of the rectangle
+         * @param texture
+         *               the texture to draw
          */
         private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height,
                         Identifier texture) {
                 RenderSystem.enableBlend();
-                RenderSystem.enableTexture();
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
                 RenderSystem.setShaderTexture(0, texture);
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.disableDepthTest();
@@ -229,7 +226,7 @@ public class EssenceStatus {
                 vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).texture(1.0f, 0.0f).next();
                 vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).texture(0.0f, 0.0f).next();
                 vertexbuffer.end();
-                BufferRenderer.draw(vertexbuffer);
+                BufferRenderer.draw(vertexbuffer.end());
                 RenderSystem.disableBlend();
                 RenderSystem.enableDepthTest();
         }

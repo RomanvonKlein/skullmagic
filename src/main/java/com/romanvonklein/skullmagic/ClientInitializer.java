@@ -1,15 +1,6 @@
 package com.romanvonklein.skullmagic;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import org.lwjgl.glfw.GLFW;
-
-import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntityRenderer;
-import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntityRenderer;
-import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererShrine;
-import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
-import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.*;
 import com.romanvonklein.skullmagic.data.ClientData;
 import com.romanvonklein.skullmagic.data.ServerData;
 import com.romanvonklein.skullmagic.effects.particles.EffectController;
@@ -23,7 +14,6 @@ import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -34,10 +24,8 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
@@ -45,6 +33,10 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class ClientInitializer implements ClientModInitializer {
     // keybindings
@@ -155,11 +147,12 @@ public class ClientInitializer implements ClientModInitializer {
         }
 
         // register particles
+        /*
         ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE)
                 .register(((atlasTexture, registry) -> {
                     registry.register(new Identifier(SkullMagic.MODID, "particle/link_particle"));
                 }));
-
+        */
         ParticleFactoryRegistry.getInstance().register(SkullMagic.LINK_PARTICLE, LinkingParticle.Factory::new);
         // screenstuff
         HandledScreens.register(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, BlockPlacerScreen::new);

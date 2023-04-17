@@ -11,12 +11,14 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ServerData;
 
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class DebugCommands {
-        public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher, boolean dedicated) {
+
+                public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment) {
                 // debug clear
                 commandDispatcher.register(
                                 CommandManager.literal("skullmagic").then(CommandManager.literal("debug")
@@ -118,4 +120,5 @@ public class DebugCommands {
                                 true);
                 return 1;
         }
+
 }

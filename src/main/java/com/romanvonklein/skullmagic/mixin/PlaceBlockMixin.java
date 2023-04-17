@@ -1,5 +1,6 @@
 package com.romanvonklein.skullmagic.mixin;
 
+import net.minecraft.registry.Registries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,9 +15,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 @Mixin(Block.class)
@@ -27,7 +28,7 @@ public class PlaceBlockMixin {
     private void restrict(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack,
             CallbackInfo info) {
         if (!world.isClient()) {
-            String blockIdentifier = Registry.BLOCK.getId(state.getBlock()).toString();
+            String blockIdentifier = Registries.BLOCK.getId(state.getBlock()).toString();
             // cases:
             if (Config.getConfig().skulls.containsKey(blockIdentifier)) {
                 // skull placed on pedestal?

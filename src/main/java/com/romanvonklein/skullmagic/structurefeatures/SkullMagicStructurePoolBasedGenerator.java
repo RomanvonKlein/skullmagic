@@ -6,9 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Predicate;
 
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.gen.feature.FeatureConfig;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import com.google.common.collect.Lists;
@@ -16,13 +19,16 @@ import com.google.common.collect.Queues;
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.block.JigsawBlock;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.JigsawJunction;
 import net.minecraft.structure.PoolStructurePiece;
-import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructureGeneratorFactory;
-import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructurePiecesGenerator;
+import net.minecraft.structure.StructureTemplate;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.structure.pool.EmptyPoolElement;
 import net.minecraft.structure.pool.SinglePoolElement;
 import net.minecraft.structure.pool.StructurePool;
@@ -36,9 +42,8 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.math.random.CheckedRandom;
+import net.minecraft.util.math.random.ChunkRandom;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.HeightLimitView;
@@ -48,26 +53,25 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeCoords;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
-import net.minecraft.world.gen.random.AtomicSimpleRandom;
-import net.minecraft.world.gen.random.ChunkRandom;
+import net.minecraft.world.gen.structure.Structure;
 
 public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGenerator {
 
-    public static Optional<StructurePiecesGenerator<StructurePoolFeatureConfig>> generateNew(
-            StructureGeneratorFactory.Context<StructurePoolFeatureConfig> context2, PieceFactory pieceFactory,
+    public static Optional<StructurePiecesGenerator<FeatureConfig>> generateNew(
+            StructureGeneratorFactory.Context<FeatureConfig> context2, PieceFactory pieceFactory,
             BlockPos pos, boolean modifyBoundingBox, boolean goBelowSpawnLevel) {
-        ChunkRandom chunkRandom = new ChunkRandom(new AtomicSimpleRandom(0L));
+        ChunkRandom chunkRandom = new ChunkRandom(new CheckedRandom(0L));
         chunkRandom.setCarverSeed(context2.seed(), context2.chunkPos().x, context2.chunkPos().z);
         DynamicRegistryManager dynamicRegistryManager = context2.registryManager();
-        StructurePoolFeatureConfig structurePoolFeatureConfig = context2.config();
+        FeatureConfig structurePoolFeatureConfig = context2.config();
         ChunkGenerator chunkGenerator = context2.chunkGenerator();
-        StructureManager structureManager = context2.structureManager();
+        StructureTemplateManager structureManager = context2.structureTemplateManager();
         HeightLimitView heightLimitView = context2.world();
         Predicate<RegistryEntry<Biome>> predicate = context2.validBiome();
-        StructureFeature.init();
-        Registry<StructurePool> registry = dynamicRegistryManager.get(Registry.STRUCTURE_POOL_KEY);
+        Structure.init();
+        Registry<StructurePool> registry = dynamicRegistryManager.get(RegistryKeys.STRUCTURE_POOL_ELEMENT);
+
+
         BlockRotation blockRotation = BlockRotation.random(chunkRandom);
         StructurePool structurePool = structurePoolFeatureConfig.getStartPool().value();
         StructurePoolElement structurePoolElement = structurePool.getRandomElement(chunkRandom);
@@ -117,7 +121,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
     }
 
     public static void generate_1(DynamicRegistryManager registryManager, PoolStructurePiece piece, int maxDepth,
-            PieceFactory pieceFactory, ChunkGenerator chunkGenerator, StructureManager structureManager,
+            PieceFactory pieceFactory, ChunkGenerator chunkGenerator, StructureTemplateManager structureManager,
             List<? super PoolStructurePiece> results, Random random, HeightLimitView world) {
 
         SkullMagic.LOGGER.info("Generating skullMagicStructure.");
@@ -168,14 +172,14 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
     }
 
     public static interface PieceFactory {
-        public PoolStructurePiece create(StructureManager var1, StructurePoolElement var2, BlockPos var3, int var4,
+        public PoolStructurePiece create(StructureTemplateManager var1, StructurePoolElement var2, BlockPos var3, int var4,
                 BlockRotation var5, BlockBox var6);
     }
 
-    public static void generateFreely(ServerWorld world, int maxDepth, BlockPos pos, Structure structure) {
+    public static void generateFreely(ServerWorld world, int maxDepth, BlockPos pos, StructureTemplate structure) {
 
         ChunkGenerator chunkGenerator = world.getChunkManager().getChunkGenerator();
-        StructureManager structureManager = world.getStructureManager();
+        StructureTemplateManager structureManager = world.getStructureTemplateManager();
         StructureAccessor structureAccessor = world.getStructureAccessor();
         Random random = world.getRandom();
         ArrayList<PoolStructurePiece> list = Lists.newArrayList();
@@ -232,13 +236,13 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
         private final int maxSize;
         private final PieceFactory pieceFactory;
         private final ChunkGenerator chunkGenerator;
-        private final StructureManager structureManager;
+        private final StructureTemplateManager structureManager;
         private final List<? super PoolStructurePiece> children;
         private final Random random;
         final Deque<ShapedPoolStructurePiece> structurePieces = Queues.newArrayDeque();
 
         StructurePoolGenerator(Registry<StructurePool> registry, int maxSize, PieceFactory pieceFactory,
-                ChunkGenerator chunkGenerator, StructureManager structureManager,
+                ChunkGenerator chunkGenerator, StructureTemplateManager structureManager,
                 List<? super PoolStructurePiece> children, Random random) {
             this.registry = registry;
             this.maxSize = maxSize;
@@ -250,10 +254,10 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
         }
 
         static void generatePieceFreely(ServerWorld world, ShapedPoolStructurePiece shapedPiece,
-                int minY, int maxSize,
-                boolean modifyBoundingBox, Registry<StructurePool> registry,
-                Deque<ShapedPoolStructurePiece> structurePieces, Random random, PieceFactory pieceFactory) {
-            StructureManager structureManager = world.getStructureManager();
+                                        int minY, int maxSize,
+                                        boolean modifyBoundingBox, Registry<StructurePool> registry,
+                                        Deque<ShapedPoolStructurePiece> structurePieces, Random random, PieceFactory pieceFactory) {
+            StructureTemplateManager structureManager = world.getStructureTemplateManager();
             MutableObject<VoxelShape> pieceShape = shapedPiece.pieceShape;
             PoolStructurePiece piece = shapedPiece.piece;
             StructurePoolElement structurePoolElement = piece.getPoolElement();
@@ -264,7 +268,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
             MutableObject<VoxelShape> mutableObject = new MutableObject<VoxelShape>();
             BlockBox blockBox = piece.getBoundingBox();
             int i = blockBox.getMinY();
-            block0: for (Structure.StructureBlockInfo structureBlockInfo2 : structurePoolElement
+            block0: for (StructureTemplate.StructureBlockInfo structureBlockInfo2 : structurePoolElement
                     .getStructureBlockInfos(structureManager, blockPos, blockRotation, random)) {
                 StructurePoolElement structurePoolElement2;
                 MutableObject<VoxelShape> mutableObject2;
@@ -305,7 +309,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                 while (iterator.hasNext() && (structurePoolElement2 = (StructurePoolElement) iterator
                         .next()) != EmptyPoolElement.INSTANCE) {
                     for (BlockRotation blockRotation2 : BlockRotation.randomRotationOrder(random)) {
-                        List<Structure.StructureBlockInfo> list2 = structurePoolElement2.getStructureBlockInfos(
+                        List<StructureTemplate.StructureBlockInfo> list2 = structurePoolElement2.getStructureBlockInfos(
                                 structureManager, BlockPos.ORIGIN, blockRotation2, random);
                         BlockBox blockBox2 = structurePoolElement2.getBoundingBox(structureManager,
                                 BlockPos.ORIGIN, blockRotation2);
@@ -327,7 +331,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                                             .orElse(0);
                                     return Math.max(old_i, old_j);
                                 }).max().orElse(0);
-                        for (Structure.StructureBlockInfo structureBlockInfo22 : list2) {
+                        for (StructureTemplate.StructureBlockInfo structureBlockInfo22 : list2) {
                             int t;
                             int r;
                             int p;
@@ -404,7 +408,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
             MutableObject<VoxelShape> mutableObject = new MutableObject<VoxelShape>();
             BlockBox blockBox = piece.getBoundingBox();
             int i = blockBox.getMinY();
-            block0: for (Structure.StructureBlockInfo structureBlockInfo2 : structurePoolElement
+            block0: for (StructureTemplate.StructureBlockInfo structureBlockInfo2 : structurePoolElement
                     .getStructureBlockInfos(this.structureManager, blockPos, blockRotation, this.random)) {
                 StructurePoolElement structurePoolElement2;
                 MutableObject<VoxelShape> mutableObject2;
@@ -445,7 +449,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                 while (iterator.hasNext() && (structurePoolElement2 = (StructurePoolElement) iterator
                         .next()) != EmptyPoolElement.INSTANCE) {
                     for (BlockRotation blockRotation2 : BlockRotation.randomRotationOrder(this.random)) {
-                        List<Structure.StructureBlockInfo> list2 = structurePoolElement2.getStructureBlockInfos(
+                        List<StructureTemplate.StructureBlockInfo> list2 = structurePoolElement2.getStructureBlockInfos(
                                 this.structureManager, BlockPos.ORIGIN, blockRotation2, this.random);
                         BlockBox blockBox2 = structurePoolElement2.getBoundingBox(this.structureManager,
                                 BlockPos.ORIGIN, blockRotation2);
@@ -467,7 +471,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                                             .orElse(0);
                                     return Math.max(old_i, old_j);
                                 }).max().orElse(0);
-                        for (Structure.StructureBlockInfo structureBlockInfo22 : list2) {
+                        for (StructureTemplate.StructureBlockInfo structureBlockInfo22 : list2) {
                             int t;
                             int r;
                             int p;
