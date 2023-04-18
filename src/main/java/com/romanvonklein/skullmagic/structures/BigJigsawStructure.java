@@ -37,7 +37,7 @@ public class BigJigsawStructure extends Structure {
                     return structure.useExpansionHack;
                 }), Type.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter((structure) -> {
                     return structure.projectStartToHeightmap;
-                }), Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter((structure) -> {
+                }), Codec.intRange(1, 256).fieldOf("max_distance_from_center").forGetter((structure) -> {
                     return structure.maxDistanceFromCenter;
                 })).apply(instance, BigJigsawStructure::new);
     }).flatXmap(createValidator(), createValidator()).codec();
@@ -54,23 +54,23 @@ public class BigJigsawStructure extends Structure {
 
     private static Function<BigJigsawStructure, DataResult<BigJigsawStructure>> createValidator() {
         return (feature) -> {
-            byte var10000;
+            byte heightOnTerrain;
             switch (feature.getTerrainAdaptation()) {
                 case NONE:
-                    var10000 = 0;
+                    heightOnTerrain = 0;
                     break;
                 case BURY:
                 case BEARD_THIN:
                 case BEARD_BOX:
-                    var10000 = 12;
+                    heightOnTerrain = 12;
                     break;
                 default:
                     throw new IncompatibleClassChangeError();
             }
 
-            int i = var10000;
-            return feature.maxDistanceFromCenter + i > 128 ? DataResult.error(() -> {
-                return "Structure size including terrain adaptation must not exceed 128";
+            int i = heightOnTerrain;
+            return feature.maxDistanceFromCenter + i > 256 ? DataResult.error(() -> {
+                return "Structure size including terrain adaptation must not exceed 256";
             }) : DataResult.success(feature);
         };
     }
