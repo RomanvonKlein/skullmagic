@@ -56,7 +56,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.structure.Structure;
 
 public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGenerator {
-
+/*
     public static Optional<StructurePiecesGenerator<FeatureConfig>> generateNew(
             StructureGeneratorFactory.Context<FeatureConfig> context2, PieceFactory pieceFactory,
             BlockPos pos, boolean modifyBoundingBox, boolean goBelowSpawnLevel) {
@@ -118,12 +118,14 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
             }
             list.forEach(structurePiecesCollector::addPiece);
         });
-    }
+        */
+
+
 
     public static void generate_1(DynamicRegistryManager registryManager, PoolStructurePiece piece, int maxDepth,
             PieceFactory pieceFactory, ChunkGenerator chunkGenerator, StructureTemplateManager structureManager,
             List<? super PoolStructurePiece> results, Random random, HeightLimitView world) {
-
+/*
         SkullMagic.LOGGER.info("Generating skullMagicStructure.");
 
         Registry<StructurePool> registry = registryManager.get(Registry.STRUCTURE_POOL_KEY);
@@ -169,6 +171,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
          * shapedPoolStructurePiece.currentSize, false, world);
          * }
          */
+
     }
 
     public static interface PieceFactory {
@@ -177,7 +180,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
     }
 
     public static void generateFreely(ServerWorld world, int maxDepth, BlockPos pos, StructureTemplate structure) {
-
+/*
         ChunkGenerator chunkGenerator = world.getChunkManager().getChunkGenerator();
         StructureTemplateManager structureManager = world.getStructureTemplateManager();
         StructureAccessor structureAccessor = world.getStructureAccessor();
@@ -197,6 +200,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
             poolStructurePiece2.generate((StructureWorldAccess) world, structureAccessor, chunkGenerator, random,
                     BlockBox.infinite(), pos, false);
         }
+        */
     }
 
     /*
@@ -231,6 +235,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
      * }
      * }
      */
+    /*
     static final class StructurePoolGenerator {
         private final Registry<StructurePool> registry;
         private final int maxSize;
@@ -257,6 +262,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                                         int minY, int maxSize,
                                         boolean modifyBoundingBox, Registry<StructurePool> registry,
                                         Deque<ShapedPoolStructurePiece> structurePieces, Random random, PieceFactory pieceFactory) {
+            /*
             StructureTemplateManager structureManager = world.getStructureTemplateManager();
             MutableObject<VoxelShape> pieceShape = shapedPiece.pieceShape;
             PoolStructurePiece piece = shapedPiece.piece;
@@ -396,10 +402,12 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                     }
                 }
             }
-        }
 
+        }
+*/
         void generatePiece(PoolStructurePiece piece, MutableObject<VoxelShape> pieceShape, int minY,
                 boolean modifyBoundingBox, HeightLimitView world) {
+            /*
             StructurePoolElement structurePoolElement = piece.getPoolElement();
             BlockPos blockPos = piece.getPos();
             BlockRotation blockRotation = piece.getRotation();
@@ -539,8 +547,10 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
                 }
             }
         }
-    }
 
+             */
+    }
+/*
     static final class ShapedPoolStructurePiece {
         final PoolStructurePiece piece;
         final MutableObject<VoxelShape> pieceShape;
@@ -552,4 +562,5 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
             this.currentSize = currentSize;
         }
     }
+    */
 }
