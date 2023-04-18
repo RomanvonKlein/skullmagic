@@ -4,19 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
 import java.util.function.BiFunction;
 
-import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.function.TriFunction;
+import org.joml.Vector3f;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
 import com.romanvonklein.skullmagic.mixin.ZombieVillagerEntityMixin;
-import com.romanvonklein.skullmagic.structurefeatures.SkullMagicStructurePoolBasedGenerator;
+//import com.romanvonklein.skullmagic.structurefeatures.SkullMagicStructurePoolBasedGenerator;
 import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.block.BlockState;
@@ -41,18 +39,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.structure.StructureTemplateManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.joml.Vector3f;
 
 public class SpellInitializer {
 
@@ -518,7 +512,7 @@ public class SpellInitializer {
                         return true;
                     }
                 }));
-        spellList.put("dungeonrise",
+        /*spellList.put("dungeonrise",
                 new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
@@ -559,6 +553,8 @@ public class SpellInitializer {
                         return castResult;
                     }
                 }));
+
+         */
         spellList.put("lightningstrike",
                 new Spell(15000, 100, 55, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override

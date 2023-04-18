@@ -1,7 +1,5 @@
 package com.romanvonklein.skullmagic.effects.particles;
 
-import com.romanvonklein.skullmagic.SkullMagic;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.AbstractSlowingParticle;

@@ -1,4 +1,4 @@
-package com.romanvonklein.skullmagic.structurefeatures;
+package com.romanvonklein.skullmagic.structures;
 
 import java.util.Optional;
 

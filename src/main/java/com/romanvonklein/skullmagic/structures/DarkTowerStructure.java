@@ -7,8 +7,8 @@ import net.minecraft.world.gen.structure.StructureType;
 
 import java.util.Optional;
 
-public class DarkTowerFeature extends Structure {
-    public DarkTowerFeature(Config configCodec) {
+public class DarkTowerStructure extends Structure {
+    public DarkTowerStructure(Config configCodec) {
         super(configCodec);
     }
 

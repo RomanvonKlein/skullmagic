@@ -5,6 +5,7 @@ import net.minecraft.item.ItemGroup;
 
 public class CreativeTabInitializer {
     public static void init(){
+        CreativeTabLists.init();
         for (ItemGroup tab : CreativeTabLists.itemCreativeTabs.keySet()) {
             for (Item item : CreativeTabLists.itemCreativeTabs.get(tab)) {
                 ItemGroupEvents.modifyEntriesEvent(tab).register(entries -> entries.add(item));
