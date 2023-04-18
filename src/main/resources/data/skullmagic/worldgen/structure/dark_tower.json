@@ -1,7 +1,7 @@
 {
-  "type": "minecraft:jigsaw",
+  "type": "skullmagic:big_jigsaw",
   "start_pool": "skullmagic:overworld/dark_tower_base",
-  "size": 7,
+  "size": 11,
   "biomes": "#minecraft:is_forest",
   "step": "surface_structures",
   "adapt_noise": true,

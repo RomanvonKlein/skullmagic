@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
 
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;

@@ -3,26 +3,23 @@ package com.romanvonklein.skullmagic.items;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.romanvonklein.skullmagic.util.CreativeTabLists;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ServerData;
+import com.romanvonklein.skullmagic.util.CreativeTabLists;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;

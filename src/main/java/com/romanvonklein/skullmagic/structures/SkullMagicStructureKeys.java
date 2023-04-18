@@ -7,9 +7,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.structure.Structure;
 
 public interface SkullMagicStructureKeys {
-    RegistryKey<Structure> DARK_TOWER = of("dark_tower");
+    RegistryKey<Structure> BIG_JIGSAW_STRUCUTURE_KEY = of("big_jigsaw_structure");
 
     private static RegistryKey<Structure> of(String id) {
-        return RegistryKey.of(RegistryKeys.STRUCTURE, new Identifier(SkullMagic.MODID,id));
+        return RegistryKey.of(RegistryKeys.STRUCTURE, new Identifier(SkullMagic.MODID, id));
     }
 }

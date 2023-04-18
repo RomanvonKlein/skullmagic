@@ -14,7 +14,6 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
 public class Config {
     private static String configPath = "./Config/skullmagic.json";

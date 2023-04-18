@@ -7,12 +7,12 @@ import com.romanvonklein.skullmagic.blocks.AdvancedSpellShrine;
 import com.romanvonklein.skullmagic.blocks.IntermediateSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -43,7 +43,7 @@ public class SpellShrineBlockEntity extends BlockEntity {
     @Override
     public void readNbt(NbtCompound nbt) {
         this.level = nbt.getInt("level");
-        if (nbt.contains("scroll", NbtType.COMPOUND)) {
+        if (nbt.contains("scroll", NbtElement.COMPOUND_TYPE)) {
             this.scroll = ItemStack.fromNbt(nbt.getCompound("scroll"));
         } else {
             this.scroll = null;

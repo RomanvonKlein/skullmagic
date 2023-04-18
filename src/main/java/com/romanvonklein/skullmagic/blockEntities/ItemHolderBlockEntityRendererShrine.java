@@ -1,5 +1,8 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -8,15 +11,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import net.minecraft.util.math.Vec3d;
 
 @Environment(EnvType.CLIENT)
 public class ItemHolderBlockEntityRendererShrine implements BlockEntityRenderer<SpellShrineBlockEntity> {

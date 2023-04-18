@@ -4,13 +4,13 @@ import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -43,7 +43,7 @@ public abstract class ASpellPedestalBlockEntity extends BlockEntity {
     @Override
     public void readNbt(NbtCompound nbt) {
         this.scroll = null;
-        if (nbt.contains("scroll", NbtType.COMPOUND)) {
+        if (nbt.contains("scroll", NbtElement.COMPOUND_TYPE)) {
             this.scroll = ItemStack.fromNbt(nbt.getCompound("scroll"));
         }
     }

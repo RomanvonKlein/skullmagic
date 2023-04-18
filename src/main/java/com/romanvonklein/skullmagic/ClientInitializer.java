@@ -1,6 +1,15 @@
 package com.romanvonklein.skullmagic;
 
-import com.romanvonklein.skullmagic.blockEntities.*;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
+import org.lwjgl.glfw.GLFW;
+
+import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererShrine;
+import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
+import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.data.ClientData;
 import com.romanvonklein.skullmagic.data.ServerData;
 import com.romanvonklein.skullmagic.effects.particles.EffectController;
@@ -14,6 +23,7 @@ import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -30,13 +40,8 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 public class ClientInitializer implements ClientModInitializer {
     // keybindings
