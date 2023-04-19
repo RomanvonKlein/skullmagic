@@ -97,9 +97,8 @@ public class ServerData extends PersistentState {
     public void tick(MinecraftServer server) {
         for (UUID playerID : this.players.keySet()) {
             PlayerData data = this.players.get(playerID);
-            if (data.getEssencePool() != null) {
-                data.getEssencePool().tick(server, playerID);
-            }
+            data.tick(server, playerID);
+
         }
         for (UUID playerID : this.playersToUpdate) {
             ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(server.getPlayerManager().getPlayer(playerID));

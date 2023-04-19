@@ -54,7 +54,7 @@ public class KnowledgeOrb extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         if (world != null && world.isClient) {
-            if (ClientInitializer.getClientData().hasSpell(this.spellName)) {
+            if (ClientInitializer.getClientData().knowsSpell(this.spellName)) {
 
                 tooltip.add(Text.translatable("tooltip.skullmagic.spell_learned","Learned Spell",null).formatted(Formatting.GREEN));
                 // current spell levels

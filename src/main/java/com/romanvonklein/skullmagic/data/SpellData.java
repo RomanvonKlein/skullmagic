@@ -243,4 +243,15 @@ class SpellData extends PersistentState {
         }
         return result;
     }
+
+    public int getCooldownLeft() {
+        return this.cooldownLeft;
+    }
+
+    public void tick(UUID playerToUpdate) {
+        if (this.cooldownLeft > 0) {
+            this.cooldownLeft--;
+            SkullMagic.updatePlayer(playerToUpdate);
+        }
+    }
 }

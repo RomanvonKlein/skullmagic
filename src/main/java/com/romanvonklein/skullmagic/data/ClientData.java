@@ -64,12 +64,12 @@ public class ClientData extends PlayerData {
         this.getEssencePool().setEssenceChargeRate(amount, null);
     }
 
-    public boolean hasSpell(String spellname) {
+    public boolean knowsSpell(String spellname) {
         return this.spells.containsKey(spellname) && this.spells.get(spellname) != null;
     }
 
     public int getCooldownLeftForSpell(String spellname) {
-        return 0;
+        return this.spells.get(spellname).getCooldownLeft();
     }
 
     public int getMaxCooldownForSpell(String spellname) {

@@ -9,6 +9,7 @@ import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -275,6 +276,15 @@ class PlayerData extends PersistentState {
 
     public void applyConsumer(WorldBlockPos pos, int essenceCost, UUID playerToUpdate) {
         this.essencePool.dischargeEssence(essenceCost, playerToUpdate);
+    }
+
+    public void tick(MinecraftServer server, UUID playerToUpdate) {
+        if (this.getEssencePool() != null) {
+            this.getEssencePool().tick(server, playerToUpdate);
+        }
+        for (SpellData data : this.spells.values()) {
+            data.tick(playerToUpdate);
+        }
     }
 
 }

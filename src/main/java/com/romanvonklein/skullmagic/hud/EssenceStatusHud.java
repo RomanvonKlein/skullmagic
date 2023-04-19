@@ -17,6 +17,9 @@ public class EssenceStatusHud implements HudRenderCallback {
         private static final int essence_empty = Argb.getArgb(255, 120, 127, 138);
         private static final int spell_cooldown = Argb.getArgb(255, 255, 153, 51);
         private static final int spell_off_cooldown = Argb.getArgb(255, 102, 255, 102);
+        private static final int spell_on_cooldown_text = Argb.getArgb(255, 204, 51, 0);
+        private static final int spell_off_cooldown_text = Argb.getArgb(255, 51, 204, 51);
+        private static final int essence_number_gray = Argb.getArgb(255, 194, 194, 194);
 
         /**
          * Draws a rectangle on the screen
@@ -115,18 +118,18 @@ public class EssenceStatusHud implements HudRenderCallback {
                                                         + Double.valueOf(ClientInitializer
                                                                         .getClientData().getMaxEssence()),
                                         x + 2 * borderwidth + barwidth,
-                                        y - 1, 0xc2c2c2);
+                                        y - 1, essence_number_gray);
 
                         // spell cooldown bar
                         String spellname = ClientInitializer.getClientData().getSelectedSpellName();
                         if (spellname != null
-                                        && ClientInitializer.getClientData().hasSpell(spellname)) {
+                                        && ClientInitializer.getClientData().knowsSpell(spellname)) {
 
                                 int cooldownLeft = ClientInitializer.getClientData().getCooldownLeftForSpell(spellname);
                                 y += 3 * borderwidth + barheight;
 
                                 int maxCoolDown = ClientInitializer.getClientData().getMaxCooldownForSpell(spellname);
-                                int color = cooldownLeft > 0 ? 0xcc3300 : 0x33cc33;
+                                int color = cooldownLeft > 0 ? spell_on_cooldown_text : spell_off_cooldown_text;
                                 double pxPerTick = 1;
                                 try {
                                         pxPerTick = Double.valueOf(barwidth)
