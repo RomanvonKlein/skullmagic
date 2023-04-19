@@ -629,16 +629,18 @@ public class ServerData extends PersistentState {
         }
     }
 
-    public void tryCastSpell(String spellname, ServerPlayerEntity player, World world) {
+    public boolean tryCastSpell(String spellname, ServerPlayerEntity player, World world) {
         UUID playerID = player.getUuid();
+        boolean result = false;
         if (playerKnowsSpell(playerID, spellname)) {
             if (isSpellOffCoolown(playerID, spellname)) {
                 int essenceCost = getEssenceCostForSpell(playerID, spellname);
                 if (canAffordEssenceCost(playerID, essenceCost)) {
-                    castSpell(player, spellname);
+                    result = castSpell(player, spellname);
                 }
             }
         }
+        return result;
     }
 
     private boolean canAffordEssenceCost(UUID playerID, int essenceCost) {
@@ -657,13 +659,19 @@ public class ServerData extends PersistentState {
         return this.players.get(playerID).knowsSpell(spellname);
     }
 
-    public void castSpell(ServerPlayerEntity player, String spellname) {
+    public boolean castSpell(ServerPlayerEntity player, String spellname) {
+        boolean result = false;
         UUID playerID = player.getUuid();
         double powerLevel = getSpellPowerLevel(playerID, spellname);
         if (spells.get(spellname).action.apply(player, powerLevel)) {
             setSpellOnCooldown(playerID, spellname);
             dischargeSpellcost(playerID, spellname);
+            ServerPackageSender.sendEffectPackageToPlayers(player.getWorld().getPlayers(), spellname, powerLevel,
+                    player.getWorld().getRegistryKey(),
+                    player.getEyePos());
+            result = true;
         }
+        return result;
     }
 
     private void dischargeSpellcost(UUID playerID, String spellname) {

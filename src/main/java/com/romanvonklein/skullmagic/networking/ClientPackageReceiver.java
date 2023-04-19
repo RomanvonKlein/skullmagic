@@ -3,11 +3,15 @@ package com.romanvonklein.skullmagic.networking;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ClientData;
+import com.romanvonklein.skullmagic.effects.CastSpellEffects;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.nbt.NbtCompound;
 
 public class ClientPackageReceiver {
 
@@ -37,5 +41,22 @@ public class ClientPackageReceiver {
     public static void receiveUpdatePlayerDataPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
         ClientInitializer.setClientData(ClientData.fromNbt(buf.readNbt()), true);
+    }
+
+    public static void receiveEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
+            PacketByteBuf buf, PacketSender responseSender) {
+        try {
+            NbtCompound nbt = buf.readNbt();
+            String spellname = nbt.getString("spellname");
+            double spellPower = nbt.getDouble("power");
+            double x = nbt.getDouble("x");
+            double y = nbt.getDouble("y");
+            double z = nbt.getDouble("z");
+            String worldkey = nbt.getString("worldkey");
+            Vec3d pos = new Vec3d(x, y, z);
+            CastSpellEffects.castSpellEffect(client, spellname, worldkey, pos, spellPower);
+        } catch (Exception e) {
+            SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
+        }
     }
 }
