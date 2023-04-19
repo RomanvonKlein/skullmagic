@@ -73,5 +73,6 @@
     "tooltip.skullmagic.spell_learned": "Spell Learned!",
     "tooltip.skullmagic.spelldata_powerlevel": "Power Level: ",
     "tooltip.skullmagic.spelldata_cooldownreductionlevel": "Cooldown Reduction Level: ",
-    "tooltip.skullmagic.spelldata_efficiencylevel": "Efficiency Level: "
+    "tooltip.skullmagic.spelldata_efficiencylevel": "Efficiency Level: ",
+    "skullmagic.gui.essence_pool_too_small": "Insufficient capacity. Needed: %d"
 }

@@ -3,12 +3,14 @@ package com.romanvonklein.skullmagic.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.data.ClientData;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper.Argb;
 
@@ -20,6 +22,9 @@ public class EssenceStatusHud implements HudRenderCallback {
         private static final int spell_on_cooldown_text = Argb.getArgb(255, 204, 51, 0);
         private static final int spell_off_cooldown_text = Argb.getArgb(255, 51, 204, 51);
         private static final int essence_number_gray = Argb.getArgb(255, 194, 194, 194);
+        private static final int essence_pool_too_small_text = Argb.getArgb(255, 204, 51, 0);
+        private static final int deduction_bar_can_afford = Argb.getArgb(255, 0, 255, 0);
+        private static final int deduction_bar_cannot_afford = Argb.getArgb(255, 255, 0, 0);
 
         /**
          * Draws a rectangle on the screen
@@ -35,7 +40,7 @@ public class EssenceStatusHud implements HudRenderCallback {
          * @param color
          *               the color of the rectangle
          */
-        private static void drawRect_2(MatrixStack ms, int posX, int posY, int width, int height, int color) {
+        private static void drawRect(MatrixStack ms, int posX, int posY, int width, int height, int color) {
                 DrawableHelper.fill(ms, posX, posY, posX + width, posY + height,
                                 color);
                 // DrawableHelper.fill(ms, posX, posY,posX+ width,posY+ height, color);
@@ -68,17 +73,19 @@ public class EssenceStatusHud implements HudRenderCallback {
         public void onHudRender(MatrixStack matrixStack, float tickDelta) {
                 // collect data to draw for player
                 MinecraftClient client = MinecraftClient.getInstance();
-                if (client != null && ClientInitializer.getClientData() != null
-                                && ClientInitializer.getClientData().isLinkedToAltar()) {
+                ClientData clientData = ClientInitializer.getClientData();
+                if (client != null && clientData != null
+                                && clientData.isLinkedToAltar()) {
                         // TODO: cleanup - maybe make all sizes and positions cofigurable?
                         int symbolSpace = 16;
                         int borderwidth = 5;
                         int barwidth = 100;
                         int barheight = 5;
                         double pxPerEssence = 1.0;
+                        int deduction_bar_height = 1;
                         int iconWidth = 16;
                         try {
-                                pxPerEssence = ClientInitializer.getClientData().getMaxEssence() == 0 ? 1
+                                pxPerEssence = clientData.getMaxEssence() == 0 ? 1
                                                 : Double.valueOf(barwidth)
                                                                 / Double.valueOf(ClientInitializer
                                                                                 .getClientData().getMaxEssence());
@@ -92,28 +99,42 @@ public class EssenceStatusHud implements HudRenderCallback {
                         int x = 10 + symbolSpace + borderwidth;
                         int y = 10;
                         // essence
-                        drawRect_2(matrixStack, x, y,
+                        drawRect(matrixStack, x, y,
                                         Math.toIntExact(Math.round(Double
-                                                        .valueOf(ClientInitializer.getClientData().getCurrentEssence())
+                                                        .valueOf(clientData.getCurrentEssence())
                                                         * pxPerEssence)),
                                         barheight,
                                         essence_filled);
                         // empty
-                        drawRect_2(matrixStack, x + Math.toIntExact(Math.round(Double
-                                        .valueOf(ClientInitializer.getClientData().getCurrentEssence())
+                        drawRect(matrixStack, x + Math.toIntExact(Math.round(Double
+                                        .valueOf(clientData.getCurrentEssence())
                                         * pxPerEssence)),
                                         y,
                                         barwidth - Math.toIntExact(Math.round(Double
-                                                        .valueOf(ClientInitializer.getClientData().getCurrentEssence())
+                                                        .valueOf(clientData.getCurrentEssence())
                                                         * pxPerEssence)),
                                         barheight, essence_empty);
+                        // spellcost deduction
+                        if (clientData.getSelectedSpellData() != null) {
+
+                                int fullEssenceCost = clientData.getSelectedSpellData().getEssenceCost();
+                                if (fullEssenceCost <= clientData.getMaxEssence()) {
+                                        int deductionBarColor = clientData.getCurrentEssence() >= fullEssenceCost
+                                                        ? deduction_bar_can_afford
+                                                        : deduction_bar_cannot_afford;
+                                        drawRect(matrixStack, x, y + barheight - deduction_bar_height, Math.toIntExact(
+                                                        Math.round(Double.valueOf(fullEssenceCost) * pxPerEssence)),
+                                                        deduction_bar_height, deductionBarColor);
+
+                                }
+                        }
                         // border
                         drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
                                         barheight + 2 * borderwidth, ClientInitializer.ESSENCE_BAR_FRAME_TEXTURE);
 
                         // essence in numbers
                         client.textRenderer.draw(matrixStack,
-                                        Double.valueOf(ClientInitializer.getClientData().getCurrentEssence())
+                                        Double.valueOf(clientData.getCurrentEssence())
                                                         + "/"
                                                         + Double.valueOf(ClientInitializer
                                                                         .getClientData().getMaxEssence()),
@@ -121,14 +142,14 @@ public class EssenceStatusHud implements HudRenderCallback {
                                         y - 1, essence_number_gray);
 
                         // spell cooldown bar
-                        String spellname = ClientInitializer.getClientData().getSelectedSpellName();
+                        String spellname = clientData.getSelectedSpellName();
                         if (spellname != null
-                                        && ClientInitializer.getClientData().knowsSpell(spellname)) {
-
-                                int cooldownLeft = ClientInitializer.getClientData().getCooldownLeftForSpell(spellname);
+                                        && clientData.knowsSpell(spellname)) {
+                                int fullEssenceCost = clientData.getSelectedSpellData().getEssenceCost();
+                                int cooldownLeft = clientData.getCooldownLeftForSpell(spellname);
                                 y += 3 * borderwidth + barheight;
 
-                                int maxCoolDown = ClientInitializer.getClientData().getMaxCooldownForSpell(spellname);
+                                int maxCoolDown = clientData.getMaxCooldownForSpell(spellname);
                                 int color = cooldownLeft > 0 ? spell_on_cooldown_text : spell_off_cooldown_text;
                                 double pxPerTick = 1;
                                 try {
@@ -138,36 +159,45 @@ public class EssenceStatusHud implements HudRenderCallback {
                                         SkullMagic.LOGGER.error(
                                                         "could not calculate dimensions for hud rendering correctly");
                                 }
+                                // Draw cooldown bar if player's essence Pool is large enough
 
-                                // cooldown
-                                int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
-                                int rechargedBarWidth = barwidth - cooldownBarWidth;
-                                drawRect_2(matrixStack, x, y, cooldownBarWidth,
-                                                barheight,
-                                                spell_cooldown);
-                                // empty
-                                drawRect_2(matrixStack, x + cooldownBarWidth, y,
-                                                rechargedBarWidth,
-                                                barheight, spell_off_cooldown);
-                                // border
-                                drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
-                                                barwidth + 2 * borderwidth,
-                                                barheight + 2 * borderwidth,
-                                                ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
-
-                                // cooldown counter
-                                if (cooldownLeft != 0) {
+                                if (fullEssenceCost > clientData.getMaxEssence()) {
                                         client.textRenderer.draw(matrixStack,
-                                                        Integer.toString(cooldownLeft / 20),
-                                                        x + 2 * borderwidth + barwidth,
-                                                        y - 1, color);
+                                                        Text.translatable("skullmagic.gui.essence_pool_too_small",
+                                                                        fullEssenceCost),
+                                                        x,
+                                                        y, essence_pool_too_small_text);
+                                } else {
+                                        // cooldown
+                                        int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
+                                        int rechargedBarWidth = barwidth - cooldownBarWidth;
+                                        drawRect(matrixStack, x, y, cooldownBarWidth,
+                                                        barheight,
+                                                        spell_cooldown);
+                                        // empty
+                                        drawRect(matrixStack, x + cooldownBarWidth, y,
+                                                        rechargedBarWidth,
+                                                        barheight, spell_off_cooldown);
+                                        // border
+                                        drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
+                                                        barwidth + 2 * borderwidth,
+                                                        barheight + 2 * borderwidth,
+                                                        ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
+
+                                        // cooldown counter
+                                        if (cooldownLeft != 0) {
+                                                client.textRenderer.draw(matrixStack,
+                                                                Integer.toString(cooldownLeft / 20),
+                                                                x + 2 * borderwidth + barwidth,
+                                                                y - 1, color);
+                                        }
                                 }
 
                                 String selectedSpellName = ClientInitializer
                                                 .getClientData().getSelectedSpellName();
-                                String nextSpellName = ClientInitializer.getClientData()
+                                String nextSpellName = clientData
                                                 .getNextSpellname();
-                                String prevSpellName = ClientInitializer.getClientData()
+                                String prevSpellName = clientData
                                                 .getPrevSpellname();
 
                                 // icons

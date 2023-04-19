@@ -9,7 +9,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 
-class SpellData extends PersistentState {
+public class SpellData extends PersistentState {
     SpellShrineData spellShrine;
     private int cooldownLeft;
     private int baseCooldown;
