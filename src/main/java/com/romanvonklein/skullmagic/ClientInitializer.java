@@ -23,9 +23,11 @@ import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
+import com.romanvonklein.skullmagic.util.CreativeTabInitializer;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -90,6 +92,10 @@ public class ClientInitializer implements ClientModInitializer {
                     "category.skullmagic.spells")));
         }
 
+        // creative inventory tabs
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            CreativeTabInitializer.init();
+        });
         // register action for keybind
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (primarySpellKeyBinding.wasPressed()) {

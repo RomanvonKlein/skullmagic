@@ -90,7 +90,7 @@ public class KnowledgeOrb extends Item {
         ArrayList<KnowledgeOrb> orbs = new ArrayList<>();
         for (String spellName : ServerData.getSpellNames()) {
             KnowledgeOrb orb =new KnowledgeOrb(new FabricItemSettings(), spellName);
-            CreativeTabLists.addItemToTabs(orb,CreativeTabLists.miscTabList);
+            CreativeTabLists.addItemToTabs(orb,CreativeTabLists.functionalTabList);
             orbs.add(orb);
         }
         return orbs;

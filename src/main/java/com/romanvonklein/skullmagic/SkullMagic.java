@@ -48,7 +48,6 @@ import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreenHandler;
 import com.romanvonklein.skullmagic.structures.SkullMagicStructureTypes;
 import com.romanvonklein.skullmagic.tasks.TaskManager;
-import com.romanvonklein.skullmagic.util.CreativeTabInitializer;
 import com.romanvonklein.skullmagic.util.CreativeTabLists;
 
 import net.fabricmc.api.ModInitializer;
@@ -153,8 +152,9 @@ public class SkullMagic implements ModInitializer {
 
 	// items
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
-	public static final Item SKULLIUM_SHARD = generateItem(new FabricItemSettings(), CreativeTabLists.miscTabList);
-	public static final Item SKULL_WAND = generateItem(new FabricItemSettings(), CreativeTabLists.miscTabList);
+	public static final Item SKULLIUM_SHARD = generateItem(new FabricItemSettings(),
+			CreativeTabLists.functionalTabList);
+	public static final Item SKULL_WAND = generateItem(new FabricItemSettings(), CreativeTabLists.functionalTabList);
 
 	// generation
 	public static final RegistryKey<PlacedFeature> SKULLIUM_ORE_PLACED_FEATURE = RegistryKey
@@ -223,9 +223,6 @@ public class SkullMagic implements ModInitializer {
 		// register commands
 		Commands.registerCommands();
 
-		// initialize items for creative tabs
-		CreativeTabInitializer.init();
-
 		// register blockentities
 		WITHER_ENERGY_CHANNELER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":wither_energy_channeler_block_entity",
@@ -270,25 +267,27 @@ public class SkullMagic implements ModInitializer {
 						SPIDER_HEAD_BLOCK, BLAZE_HEAD_BLOCK).build(null));
 
 		// register blocks
-		registerBlockWithItem(BLOCK_USER_BLOCK, "block_user", CreativeTabLists.miscTabList);
-		registerBlockWithItem(WitherEnergyChanneler, "wither_energy_channeler", CreativeTabLists.miscTabList);
-		registerBlockWithItem(CapacityCrystal, "capacity_crystal", CreativeTabLists.miscTabList);
-		registerBlockWithItem(FireCannon, "fire_cannon", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SkullPedestal, "skull_pedestal", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SkullAltar, "skull_altar", CreativeTabLists.miscTabList);
-		registerBlockWithItem(BlockPlacer, "block_placer", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SPELL_POWER_PEDESTAL, "spell_power_pedestal", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SPELL_EFFICIENCY_PEDESTAL, "spell_efficiency_pedestal", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SPELL_COOLDOWN_PEDESTAL, "spell_cooldown_pedestal", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SIMPLE_SPELL_SHRINE, "simple_spell_shrine", CreativeTabLists.miscTabList);
-		registerBlockWithItem(INTERMEDIATE_SPELL_SHRINE, "intermediate_spell_shrine", CreativeTabLists.miscTabList);
-		registerBlockWithItem(ADVANCED_SPELL_SHRINE, "advanced_spell_shrine", CreativeTabLists.miscTabList);
-		registerBlockWithItem(ENDERMAN_HEAD_BLOCK, "enderman_head", CreativeTabLists.miscTabList);
+		registerBlockWithItem(BLOCK_USER_BLOCK, "block_user", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(WitherEnergyChanneler, "wither_energy_channeler", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(CapacityCrystal, "capacity_crystal", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(FireCannon, "fire_cannon", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SkullPedestal, "skull_pedestal", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SkullAltar, "skull_altar", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(BlockPlacer, "block_placer", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SPELL_POWER_PEDESTAL, "spell_power_pedestal", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SPELL_EFFICIENCY_PEDESTAL, "spell_efficiency_pedestal",
+				CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SPELL_COOLDOWN_PEDESTAL, "spell_cooldown_pedestal", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SIMPLE_SPELL_SHRINE, "simple_spell_shrine", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(INTERMEDIATE_SPELL_SHRINE, "intermediate_spell_shrine",
+				CreativeTabLists.functionalTabList);
+		registerBlockWithItem(ADVANCED_SPELL_SHRINE, "advanced_spell_shrine", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(ENDERMAN_HEAD_BLOCK, "enderman_head", CreativeTabLists.functionalTabList);
 		// registerBlockWithItem(INTERMEDIATE_SPELL_SHRINE,"intermediate_spell_shrine",CreativeTabLists.miscTabList);
-		registerBlockWithItem(SPIDER_HEAD_BLOCK, "spider_head", CreativeTabLists.miscTabList);
-		registerBlockWithItem(BLAZE_HEAD_BLOCK, "blaze_head", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SKULLIUM_ORE, "skullium_ore", CreativeTabLists.miscTabList);
-		registerBlockWithItem(SKULLIUM_BLOCK, "skullium_block", CreativeTabLists.miscTabList);
+		registerBlockWithItem(SPIDER_HEAD_BLOCK, "spider_head", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(BLAZE_HEAD_BLOCK, "blaze_head", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SKULLIUM_ORE, "skullium_ore", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SKULLIUM_BLOCK, "skullium_block", CreativeTabLists.functionalTabList);
 
 		// register spells
 		ServerData.initSpells();
