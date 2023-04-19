@@ -4,22 +4,68 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper.Argb;
 
-public class EssenceStatus {
+public class EssenceStatusHud implements HudRenderCallback {
+        private static final int essence_filled = Argb.getArgb(255, 17, 76, 158);
+        private static final int essence_empty = Argb.getArgb(255, 120, 127, 138);
+        private static final int spell_cooldown = Argb.getArgb(255, 255, 153, 51);
+        private static final int spell_off_cooldown = Argb.getArgb(255, 102, 255, 102);
 
-        public static void drawEssenceStatus(MatrixStack matrixStack, float tickDelta) {
+        /**
+         * Draws a rectangle on the screen
+         * 
+         * @param posX
+         *               the x positon on the screen
+         * @param posY
+         *               the y positon on the screen
+         * @param width
+         *               the width of the rectangle
+         * @param height
+         *               the height of the rectangle
+         * @param color
+         *               the color of the rectangle
+         */
+        private static void drawRect_2(MatrixStack ms, int posX, int posY, int width, int height, int color) {
+                DrawableHelper.fill(ms, posX, posY, posX + width, posY + height,
+                                color);
+                // DrawableHelper.fill(ms, posX, posY,posX+ width,posY+ height, color);
+        }
 
+        /**
+         * Draws a texture on the screen
+         * 
+         * @param posX
+         *                the x positon on the screen
+         * @param posY
+         *                the y positon on the screen
+         * @param width
+         *                the width of the rectangle
+         * @param height
+         *                the height of the rectangle
+         * @param texture
+         *                the texture to draw
+         */
+        private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height,
+                        Identifier texture) {
+                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+                RenderSystem.setShaderTexture(0, texture);
+                DrawableHelper.drawTexture(ms, posX, posY, 0, 0, width, height, width, height);
+
+        }
+
+        @Override
+        public void onHudRender(MatrixStack matrixStack, float tickDelta) {
                 // collect data to draw for player
-                if (ClientInitializer.getClientData() != null
+                MinecraftClient client = MinecraftClient.getInstance();
+                if (client != null && ClientInitializer.getClientData() != null
                                 && ClientInitializer.getClientData().isLinkedToAltar()) {
                         // TODO: cleanup - maybe make all sizes and positions cofigurable?
                         int symbolSpace = 16;
@@ -43,28 +89,26 @@ public class EssenceStatus {
                         int x = 10 + symbolSpace + borderwidth;
                         int y = 10;
                         // essence
-                        drawRect(matrixStack, x, y,
+                        drawRect_2(matrixStack, x, y,
                                         Math.toIntExact(Math.round(Double
                                                         .valueOf(ClientInitializer.getClientData().getCurrentEssence())
                                                         * pxPerEssence)),
                                         barheight,
-                                        0x114c9e);
+                                        essence_filled);
                         // empty
-                        drawRect(matrixStack, x + Math.toIntExact(Math.round(Double
+                        drawRect_2(matrixStack, x + Math.toIntExact(Math.round(Double
                                         .valueOf(ClientInitializer.getClientData().getCurrentEssence())
                                         * pxPerEssence)),
                                         y,
                                         barwidth - Math.toIntExact(Math.round(Double
                                                         .valueOf(ClientInitializer.getClientData().getCurrentEssence())
                                                         * pxPerEssence)),
-                                        barheight, 0x787f8a);
+                                        barheight, essence_empty);
                         // border
                         drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
                                         barheight + 2 * borderwidth, ClientInitializer.ESSENCE_BAR_FRAME_TEXTURE);
 
                         // essence in numbers
-
-                        MinecraftClient client = MinecraftClient.getInstance();
                         client.textRenderer.draw(matrixStack,
                                         Double.valueOf(ClientInitializer.getClientData().getCurrentEssence())
                                                         + "/"
@@ -95,13 +139,13 @@ public class EssenceStatus {
                                 // cooldown
                                 int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
                                 int rechargedBarWidth = barwidth - cooldownBarWidth;
-                                drawRect(matrixStack, x, y, cooldownBarWidth,
+                                drawRect_2(matrixStack, x, y, cooldownBarWidth,
                                                 barheight,
-                                                0xff9933);
+                                                spell_cooldown);
                                 // empty
-                                drawRect(matrixStack, x + cooldownBarWidth, y,
+                                drawRect_2(matrixStack, x + cooldownBarWidth, y,
                                                 rechargedBarWidth,
-                                                barheight, 0x66ff66);
+                                                barheight, spell_off_cooldown);
                                 // border
                                 drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
                                                 barwidth + 2 * borderwidth,
@@ -153,81 +197,5 @@ public class EssenceStatus {
 
                         }
                 }
-        }
-
-        /**
-         * Draws a rectangle on the screen
-         * 
-         * @param posX
-         *               the x positon on the screen
-         * @param posY
-         *               the y positon on the screen
-         * @param width
-         *               the width of the rectangle
-         * @param height
-         *               the height of the rectangle
-         * @param color
-         *               the color of the rectangle
-         */
-        private static void drawRect(MatrixStack ms, int posX, int posY, int width, int height, int color) {
-                if (color == -1)
-                        return;
-                float f3;
-                if (color <= 0xFFFFFF && color >= 0)
-                        f3 = 1.0F;
-                else
-                        f3 = (color >> 24 & 255) / 255.0F;
-                float f = (color >> 16 & 255) / 255.0F;
-                float f1 = (color >> 8 & 255) / 255.0F;
-                float f2 = (color & 255) / 255.0F;
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-                RenderSystem.disableDepthTest();
-                BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
-                vertexbuffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY + height, 0).color(f, f1, f2, f3).next();
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY + height, 0).color(f, f1, f2, f3)
-                                .next();
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).color(f, f1, f2, f3).next();
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).color(f, f1, f2, f3).next();
-                vertexbuffer.end();
-                BufferRenderer.draw(vertexbuffer.end());
-                RenderSystem.disableBlend();
-                RenderSystem.enableDepthTest();
-        }
-
-        /**
-         * Draws a texture on the screen
-         * 
-         * @param posX
-         *               the x positon on the screen
-         * @param posY
-         *               the y positon on the screen
-         * @param width
-         *               the width of the rectangle
-         * @param height
-         *               the height of the rectangle
-         * @param texture
-         *               the texture to draw
-         */
-        private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height,
-                        Identifier texture) {
-                RenderSystem.enableBlend();
-                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                RenderSystem.setShaderTexture(0, texture);
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.disableDepthTest();
-                BufferBuilder vertexbuffer = Tessellator.getInstance().getBuffer();
-                vertexbuffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY + height, 0).texture(0.0f, 1.0f).next();
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY + height, 0).texture(1.0f, 1.0f)
-                                .next();
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX + width, posY, 0).texture(1.0f, 0.0f).next();
-                vertexbuffer.vertex(ms.peek().getPositionMatrix(), posX, posY, 0).texture(0.0f, 0.0f).next();
-                vertexbuffer.end();
-                BufferRenderer.draw(vertexbuffer.end());
-                RenderSystem.disableBlend();
-                RenderSystem.enableDepthTest();
         }
 }

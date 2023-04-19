@@ -88,6 +88,10 @@ public class ClientData extends PlayerData {
         return this.spells.get(spellName).getCooldownLevel();
     }
 
+    public void setSelectedSpellName(String spellName) {
+        this.selectedSpell = spellName;
+    }
+
     public void cycleSpell() {
         if (this.spells.size() > 0) {
 

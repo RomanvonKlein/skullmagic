@@ -36,6 +36,6 @@ public class ClientPackageReceiver {
 
     public static void receiveUpdatePlayerDataPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
-        ClientInitializer.setClientData(ClientData.fromNbt(buf.readNbt()));
+        ClientInitializer.setClientData(ClientData.fromNbt(buf.readNbt()), true);
     }
 }

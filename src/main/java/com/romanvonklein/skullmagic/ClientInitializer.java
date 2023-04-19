@@ -17,7 +17,7 @@ import com.romanvonklein.skullmagic.effects.particles.LinkingParticle;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
-import com.romanvonklein.skullmagic.hud.EssenceStatus;
+import com.romanvonklein.skullmagic.hud.EssenceStatusHud;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
@@ -31,7 +31,8 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+// import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -58,15 +59,15 @@ public class ClientInitializer implements ClientModInitializer {
             new Identifier(SkullMagic.MODID, "effectball"), "main");
     public static final EntityModelLayer MODEL_FIRE_BREATH_LAYER = new EntityModelLayer(
             new Identifier(SkullMagic.MODID, "firebreath"), "main");
-
     // textures
-    public static Identifier ESSENCE_BAR_FRAME_TEXTURE;
-    public static Identifier COOLDOWN_BAR_FRAME_TEXTURE;
+    public static Identifier ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID,
+            "textures/gui/essencebar.png");
+    public static Identifier COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID,
+            "textures/gui/cooldownbar.png");
     public static HashMap<String, Identifier> SPELL_ICONS;
 
     @Override
     public void onInitializeClient() {
-
         // effectcontroller
         effectController = new EffectController();
         // keybinds
@@ -125,24 +126,21 @@ public class ClientInitializer implements ClientModInitializer {
             return new FlyingItemEntityRenderer<WitherBreath>(context, 1.0f, false);
         });
 
-        BlockEntityRendererRegistry.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
 
-        BlockEntityRendererRegistry.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
+        BlockEntityRendererFactories.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
                 PowerSpellPedestalBlockEntityRenderer::new);
 
-        BlockEntityRendererRegistry.register(SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
+        BlockEntityRendererFactories.register(SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
                 CooldownSpellPedestalBlockEntityRenderer::new);
 
-        BlockEntityRendererRegistry.register(SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
+        BlockEntityRendererFactories.register(SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
                 EfficiencySpellPedestalBlockEntityRenderer::new);
 
-        BlockEntityRendererRegistry.register(SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
+        BlockEntityRendererFactories.register(SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
                 ItemHolderBlockEntityRendererShrine::new);
 
-        // register textures
-        ESSENCE_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/essencebar.png");
-        COOLDOWN_BAR_FRAME_TEXTURE = new Identifier(SkullMagic.MODID, "textures/gui/cooldownbar.png");
         SPELL_ICONS = new HashMap<>();
         for (
 
@@ -153,16 +151,18 @@ public class ClientInitializer implements ClientModInitializer {
 
         // register particles
         /*
-        ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE)
-                .register(((atlasTexture, registry) -> {
-                    registry.register(new Identifier(SkullMagic.MODID, "particle/link_particle"));
-                }));
-        */
+         * ClientSpriteRegistryCallback.event(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE)
+         * .register(((atlasTexture, registry) -> {
+         * registry.register(new Identifier(SkullMagic.MODID,
+         * "particle/link_particle"));
+         * }));
+         */
         ParticleFactoryRegistry.getInstance().register(SkullMagic.LINK_PARTICLE, LinkingParticle.Factory::new);
         // screenstuff
         HandledScreens.register(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, BlockPlacerScreen::new);
         // clientside hud render stuff
-        HudRenderCallback.EVENT.register(EssenceStatus::drawEssenceStatus);
+
+        HudRenderCallback.EVENT.register(new EssenceStatusHud());
 
         // Networking
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ESSENCE_CHARGE_UPDATE_ID,
@@ -191,7 +191,11 @@ public class ClientInitializer implements ClientModInitializer {
         return clientData;
     }
 
-    public static void setClientData(ClientData newData) {
+    public static void setClientData(ClientData newData, boolean keepSelectedSpell) {
+        if (keepSelectedSpell && clientData != null && clientData.getSelectedSpellName() != null
+                && newData.knowsSpell(clientData.getSelectedSpellName())) {
+            newData.setSelectedSpellName(clientData.getSelectedSpellName());
+        }
         clientData = newData;
     }
 
