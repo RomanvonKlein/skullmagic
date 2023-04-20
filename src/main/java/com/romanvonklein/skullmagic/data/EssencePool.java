@@ -283,6 +283,7 @@ class EssencePool extends PersistentState {
         }
         if (foundPos != null) {
             this.capacityCrystals.remove(foundPos);
+            this.maxEssence -= Config.getConfig().capacityCrystalStrength;
             SkullMagic.updatePlayer(playerID);
         }
     }

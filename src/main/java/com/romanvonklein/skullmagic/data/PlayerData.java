@@ -210,7 +210,8 @@ class PlayerData extends PersistentState {
         boolean result = false;
         for (String spellname : this.spells.keySet()) {
             SpellData data = this.spells.get(spellname);
-            if (worldBlockPos.worldKey.toString().equals(data.spellShrine.worldKey.toString())
+            if (worldBlockPos.worldKey != null
+                    && worldBlockPos.worldKey.toString().equals(data.spellShrine.worldKey.toString())
                     && worldBlockPos.isEqualTo(data.getShrinePos())) {
                 this.spells.remove(spellname);
                 result = true;
