@@ -34,13 +34,13 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 // import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
@@ -113,8 +113,7 @@ public class ClientInitializer implements ClientModInitializer {
                     ClientPackageSender.sendCastSpellPackage(spellEntry.getKey());
                 }
             }
-            // Draw particles for visualization TODO: check for item held or toggle key
-            // pressed
+            // Draw particles for visualization
             ClientInitializer.getEffectController().tickParticles(client);
 
         });
@@ -184,6 +183,12 @@ public class ClientInitializer implements ClientModInitializer {
                 ClientPackageReceiver::receiveUpdatePlayerDataPackage);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.EFFECT_EVENT,
                 ClientPackageReceiver::receiveEffectPackage);
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (client.world != null && clientData != null) {
+                clientData.tick(client);
+            }
+        });
 
     }
 

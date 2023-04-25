@@ -98,7 +98,6 @@ public class ServerData extends PersistentState {
         for (UUID playerID : this.players.keySet()) {
             PlayerData data = this.players.get(playerID);
             data.tick(server, playerID);
-
         }
         for (UUID playerID : this.playersToUpdate) {
             ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(server.getPlayerManager().getPlayer(playerID));

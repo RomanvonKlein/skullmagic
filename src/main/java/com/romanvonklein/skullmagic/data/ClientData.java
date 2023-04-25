@@ -3,6 +3,10 @@ package com.romanvonklein.skullmagic.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.romanvonklein.skullmagic.spells.Spell;
+import com.romanvonklein.skullmagic.spells.SpellWithHoldAction;
+
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
@@ -190,5 +194,16 @@ public class ClientData extends PlayerData {
 
     public SpellData getSelectedSpellData() {
         return this.spells.get(this.selectedSpell);
+    }
+
+    public void tick(MinecraftClient client) {
+        // tick the active spell if applicable
+        if (this.selectedSpell != null && !this.selectedSpell.equals("")) {
+            Spell selectedSpell = ServerData.getSpells().get(this.selectedSpell);
+            if (selectedSpell instanceof SpellWithHoldAction) {
+                ((SpellWithHoldAction) selectedSpell).clientAction.apply(client.player,
+                        this.getSpellPower(this.selectedSpell));
+            }
+        }
     }
 }

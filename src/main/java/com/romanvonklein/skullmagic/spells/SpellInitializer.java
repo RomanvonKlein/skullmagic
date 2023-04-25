@@ -10,6 +10,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import org.joml.Vector3f;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.effects.Effects;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
@@ -19,6 +20,8 @@ import com.romanvonklein.skullmagic.tasks.DelayedTask;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -108,8 +111,10 @@ public class SpellInitializer {
                                                         angle.y(), angle.z(),
                                                         (int) Math.round(
                                                                 Math.max(1.0,
-                                                                        Math.min(minPower+rand.nextInt(maxPower-minPower)
-                                                                                + (powerlevel - 1) * 0.5,
+                                                                        Math.min(
+                                                                                minPower + rand
+                                                                                        .nextInt(maxPower - minPower)
+                                                                                        + (powerlevel - 1) * 0.5,
                                                                                 5.0))));
                                                 ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
                                                         height, center.z - radius + 2 * rand.nextFloat() * radius);
@@ -373,11 +378,11 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "teleport",
-                new Spell(1000, 800, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new SpellWithHoldAction(1000, 800, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
-                        HitResult result = player.raycast(100, 1, false);
+                        HitResult result = player.raycast(25.0 + powerlevel * 25.0, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
 
@@ -386,6 +391,28 @@ public class SpellInitializer {
                                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
                             player.teleport(center.x, center.y, center.z, true);
                             success = true;
+                        }
+                        return success;
+                    }
+                }, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                    @Override
+                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+                        boolean success = true;
+                        return success;
+                    }
+                }, new BiFunction<ClientPlayerEntity, Double, Boolean>() {
+                    @Override
+                    public Boolean apply(ClientPlayerEntity player, Double powerlevel) {
+                        boolean success = false;
+                        if (player.getWorld().getTime() % 1 == 0) {
+
+                            HitResult result = player.raycast(25.0 + powerlevel * 25.0, 1, false);
+                            if (result != null) {
+                                Vec3d center = result.getPos();
+                                Effects.POSITION_HEIGHLIGH_EFFECT.spawn(MinecraftClient.getInstance(),
+                                        player.getWorld().getRegistryKey().toString(), center, powerlevel);
+                                success = true;
+                            }
                         }
                         return success;
                     }
@@ -512,48 +539,53 @@ public class SpellInitializer {
                         return true;
                     }
                 }));
-        /*spellList.put("dungeonrise",
-                new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
-                    @Override
-                    public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
-                        HitResult result = player.raycast(100, 1, false);
-                        boolean castResult = false;
-                        if (result != null) {
-                            Vec3d center = result.getPos();
-                            BlockPos pos = BlockPos.ofFloored(center);
-                            ServerWorld world = (ServerWorld) player.world;
-                            // Structure structure = StructurePlacer.place(world, false,
-                            // new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"),
-                            // pos);
-                            Optional<StructureTemplate> optional;
-                            StructureTemplateManager structureManager = world.getStructureTemplateManager();
-                            StructureTemplate structure;
-                            try {
-                                optional = structureManager.getTemplate(
-                                        new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"));
-                                structure = optional.get();
-                            } catch (InvalidIdentifierException invalidIdentifierException) {
-                                return false;
-                            }
-
-                            SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos, structure);
-                            world.playSound(null,
-                                        center.x,
-                                        center.y,
-                                        center.z,
-                                        SoundEvents.BLOCK_CONDUIT_AMBIENT,
-                                        SoundCategory.BLOCKS,
-                                        1.5f,
-                                        1f);
-                            // Context<StructurePoolFeatureConfig> context = new
-                            // Context<StructurePoolFeatureConfig>(featureConfig, chunkGenerator,
-                            // structureManager, chunkPos, heightLimitView, chunkRandom, l);
-                            // SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos);
-                        }
-                        return castResult;
-                    }
-                }));
-
+        /*
+         * spellList.put("dungeonrise",
+         * new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double,
+         * Boolean>() {
+         * 
+         * @Override
+         * public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
+         * HitResult result = player.raycast(100, 1, false);
+         * boolean castResult = false;
+         * if (result != null) {
+         * Vec3d center = result.getPos();
+         * BlockPos pos = BlockPos.ofFloored(center);
+         * ServerWorld world = (ServerWorld) player.world;
+         * // Structure structure = StructurePlacer.place(world, false,
+         * // new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"),
+         * // pos);
+         * Optional<StructureTemplate> optional;
+         * StructureTemplateManager structureManager =
+         * world.getStructureTemplateManager();
+         * StructureTemplate structure;
+         * try {
+         * optional = structureManager.getTemplate(
+         * new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"));
+         * structure = optional.get();
+         * } catch (InvalidIdentifierException invalidIdentifierException) {
+         * return false;
+         * }
+         * 
+         * SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos,
+         * structure);
+         * world.playSound(null,
+         * center.x,
+         * center.y,
+         * center.z,
+         * SoundEvents.BLOCK_CONDUIT_AMBIENT,
+         * SoundCategory.BLOCKS,
+         * 1.5f,
+         * 1f);
+         * // Context<StructurePoolFeatureConfig> context = new
+         * // Context<StructurePoolFeatureConfig>(featureConfig, chunkGenerator,
+         * // structureManager, chunkPos, heightLimitView, chunkRandom, l);
+         * // SkullMagicStructurePoolBasedGenerator.generateFreely(world, 11, pos);
+         * }
+         * return castResult;
+         * }
+         * }));
+         * 
          */
         spellList.put("lightningstrike",
                 new Spell(15000, 100, 55, new BiFunction<ServerPlayerEntity, Double, Boolean>() {

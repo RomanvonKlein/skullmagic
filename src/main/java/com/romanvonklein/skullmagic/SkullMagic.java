@@ -141,11 +141,15 @@ public class SkullMagic implements ModInitializer {
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.ENDERMAN,
+	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(
+			SkullMagicSkullBlock.SkullMagicSkullType.ENDERMAN,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
-	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.SPIDER,
+
+	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(
+			SkullMagicSkullBlock.SkullMagicSkullType.SPIDER,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
-	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(SkullMagicSkullBlock.SkullType.BLAZE,
+	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(
+			SkullMagicSkullBlock.SkullMagicSkullType.BLAZE,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.of(Material.STONE).strength(2.0f));
 	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.of(Material.AMETHYST).strength(4.0f));

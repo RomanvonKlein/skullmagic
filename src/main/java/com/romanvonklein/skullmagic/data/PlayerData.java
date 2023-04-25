@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.spells.Spell;
+import com.romanvonklein.skullmagic.spells.SpellWithHoldAction;
 import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.nbt.NbtCompound;
@@ -285,6 +287,14 @@ class PlayerData extends PersistentState {
         }
         for (SpellData data : this.spells.values()) {
             data.tick(playerToUpdate);
+        }
+        // tick active spell serverFunction if exists
+        if (this.selectedSpell != null && !this.selectedSpell.equals("")) {
+            Spell selectedSpell = ServerData.getSpells().get(this.selectedSpell);
+            if (selectedSpell instanceof SpellWithHoldAction) {
+                ((SpellWithHoldAction) selectedSpell).serverAction
+                        .apply(server.getPlayerManager().getPlayer(playerToUpdate), getSpellPower(this.selectedSpell));
+            }
         }
     }
 

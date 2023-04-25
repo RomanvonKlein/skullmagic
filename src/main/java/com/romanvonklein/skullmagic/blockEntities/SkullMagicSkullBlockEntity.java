@@ -1,21 +1,19 @@
 package com.romanvonklein.skullmagic.blockEntities;
 
-import com.romanvonklein.skullmagic.SkullMagic;
-
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SkullMagicSkullBlockEntity
-        extends BlockEntity {
+        extends SkullBlockEntity {
     private int ticksPowered;
     private boolean powered;
 
     public SkullMagicSkullBlockEntity(BlockPos pos, BlockState state) {
-        super(SkullMagic.SKULL_BLOCK_ENTITY, pos, state);
+        super(pos, state);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, SkullMagicSkullBlockEntity blockEntity) {
