@@ -22,7 +22,7 @@ public abstract class ASpellPedestalBlockEntity extends BlockEntity {
     protected String type = "none";
     protected ItemStack scroll = null;
 
-    public ASpellPedestalBlockEntity(BlockEntityType<? extends ASpellPedestalBlockEntity> type, BlockPos pos,
+    protected ASpellPedestalBlockEntity(BlockEntityType<? extends ASpellPedestalBlockEntity> type, BlockPos pos,
             BlockState state) {
         super(type, pos, state);
     }

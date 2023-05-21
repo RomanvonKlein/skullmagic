@@ -6,8 +6,7 @@
   "mixins": [
     "EntityMixin",
     "ZombieVillagerEntityMixin",
-    "PlaceBlockMixin",
-    "HeadModelRegisteringMixin"
+    "PlaceBlockMixin"
   ],
   "client": [],
   "injectors": {

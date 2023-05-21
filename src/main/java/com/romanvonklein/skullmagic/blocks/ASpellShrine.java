@@ -59,7 +59,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
             // check if the socket is empty
             if (opt.isPresent()) {
                 SpellShrineBlockEntity blockEnt = opt.get();
-                SkullMagic.getServerData().updateSpellShrine((ServerWorld)world, player, blockEnt, this);
+                SkullMagic.getServerData().updateSpellShrine((ServerWorld) world, player, blockEnt, this);
             }
         }
         return result;

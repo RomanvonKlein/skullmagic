@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 
 public abstract class AConsumerBlockEntity extends BlockEntity {
 
-    public AConsumerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    protected AConsumerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         // TODO Auto-generated constructor stub
     }

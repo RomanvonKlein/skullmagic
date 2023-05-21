@@ -96,24 +96,6 @@ public class SkullMagic implements ModInitializer {
 	public static String MODID = "skullmagic";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-	// structure feature
-	// public static final StructureContext SKULLMAGIC_CODEC = new FeatureConfig() {
-	// };
-	/*
-	 * RecordCodecBuilder
-	 * .create(instance -> instance
-	 * .group(StructurePool.REGISTRY_CODEC.fieldOf("start_pool")
-	 * .forGetter(t -> ((FeatureConfig) t).getStartPool()),
-	 * Codec.intRange(0, 1000).fieldOf("size")
-	 * .forGetter(FeatureConfig::getSize))
-	 * .apply(instance,
-	 * FeatureConfig::new));
-	 */
-	// public static final Structure DARK_TOWER = Registry.register(
-	// Registries.FEATURE,
-	// MODID + ":dark_tower",
-	// new DarkTowerFeature(SKULLMAGIC_CODEC));
-
 	// blocks
 	public static final Block BLOCK_USER_BLOCK = new BlockUser(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
@@ -142,14 +124,14 @@ public class SkullMagic implements ModInitializer {
 	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(
-			SkullMagicSkullBlock.SkullMagicSkullType.ENDERMAN,
+			SkullMagicSkullBlock.SkullMagicType.ENDERMAN,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 
 	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(
-			SkullMagicSkullBlock.SkullMagicSkullType.SPIDER,
+			SkullMagicSkullBlock.SkullMagicType.SPIDER,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(
-			SkullMagicSkullBlock.SkullMagicSkullType.BLAZE,
+			SkullMagicSkullBlock.SkullMagicType.BLAZE,
 			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
 	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.of(Material.STONE).strength(2.0f));
 	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.of(Material.AMETHYST).strength(4.0f));
