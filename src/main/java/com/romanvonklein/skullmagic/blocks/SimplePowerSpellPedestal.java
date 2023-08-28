@@ -5,7 +5,7 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-public class SimplePowerSpellPedestal extends ASPellPedestal {
+public class SimplePowerSpellPedestal extends ASpellPedestal {
 
     public SimplePowerSpellPedestal(Settings settings) {
         super(settings, "power", 1);

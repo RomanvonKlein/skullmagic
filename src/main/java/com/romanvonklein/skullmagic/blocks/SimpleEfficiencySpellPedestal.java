@@ -5,7 +5,7 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-public class SimpleEfficiencySpellPedestal extends ASPellPedestal {
+public class SimpleEfficiencySpellPedestal extends ASpellPedestal {
 
     public SimpleEfficiencySpellPedestal(Settings settings) {
         super(settings, "efficiency",1);

@@ -28,11 +28,11 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
-public abstract class ASPellPedestal extends BlockWithEntity {
+public abstract class ASpellPedestal extends BlockWithEntity {
     public String type = "none";
     public int level;
 
-    public ASPellPedestal(Settings settings, String type, int level) {
+    public ASpellPedestal(Settings settings, String type, int level) {
         super(settings);
         this.type = type;
         this.level = level;

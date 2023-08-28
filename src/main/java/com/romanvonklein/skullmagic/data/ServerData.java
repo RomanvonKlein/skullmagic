@@ -15,7 +15,7 @@ import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEn
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
-import com.romanvonklein.skullmagic.blocks.ASPellPedestal;
+import com.romanvonklein.skullmagic.blocks.ASpellPedestal;
 import com.romanvonklein.skullmagic.blocks.ASpellShrine;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
@@ -596,7 +596,7 @@ public class ServerData extends PersistentState {
     }
 
     public boolean tryAddSpellPedestal(ServerWorld world, BlockPos pos, UUID placerID, String spellname,
-            ASPellPedestal aSpellPedestal) {
+            ASpellPedestal aSpellPedestal) {
         boolean result = false;
 
         if (playerKnowsSpell(placerID, spellname)) {
@@ -836,7 +836,7 @@ public class ServerData extends PersistentState {
         }
     }
 
-    public void updateSpellPedestal(ASPellPedestal pedestal, ASpellPedestalBlockEntity ent, String type,
+    public void updateSpellPedestal(ASpellPedestal pedestal, ASpellPedestalBlockEntity ent, String type,
             PlayerEntity player, World world,
             BlockPos pos) {
 

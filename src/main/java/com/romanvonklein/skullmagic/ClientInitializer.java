@@ -9,7 +9,6 @@ import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEnti
 import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntityRenderer;
 import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererShrine;
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
-import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntityRenderer;
 import com.romanvonklein.skullmagic.data.ClientData;
 import com.romanvonklein.skullmagic.data.ServerData;
 import com.romanvonklein.skullmagic.effects.particles.EffectController;
@@ -132,7 +131,10 @@ public class ClientInitializer implements ClientModInitializer {
             return new FlyingItemEntityRenderer<WitherBreath>(context, 1.0f, false);
         });
 
-        BlockEntityRendererFactories.register(SkullMagic.SKULL_BLOCK_ENTITY, SkullMagicSkullBlockEntityRenderer::new);
+        // TODO: more rotation steps for skulls?
+        // BlockEntityRendererFactories.register(SkullMagic.SKULL_BLOCK_ENTITY,
+                // SkullMagicSkullBlockEntityRenderer::new);
+
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
 
         BlockEntityRendererFactories.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,

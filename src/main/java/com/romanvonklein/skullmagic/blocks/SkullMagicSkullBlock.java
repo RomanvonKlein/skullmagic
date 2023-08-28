@@ -7,9 +7,9 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationPropertyHelper;
 import net.minecraft.util.shape.VoxelShape;
@@ -21,7 +21,7 @@ public class SkullMagicSkullBlock extends AbstractSkullMagicSkullBlock {
     public static final int MAX_ROTATION_INDEX = RotationPropertyHelper.getMax();
     private static final int MAX_ROTATIONS = MAX_ROTATION_INDEX + 1;
     public static final IntProperty ROTATION = Properties.ROTATION;
-    protected static final VoxelShape SHAPE = Block.createCuboidShape(4.0, 0.0, 4.0, 12.0, 8.0, 12.0);
+    public static final VoxelShape SHAPE = VoxelShapes.cuboid(0.25f, 0f, 0.25f, 0.75f, 0.5f, 0.75f);
 
     public SkullMagicSkullBlock(SkullMagicSkullType skullType, Settings settings) {
         super(skullType, settings);
@@ -30,15 +30,16 @@ public class SkullMagicSkullBlock extends AbstractSkullMagicSkullBlock {
 
     @Deprecated
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return SHAPE;
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
     }
 
+    @Deprecated
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need
-        // to change that!
-        return BlockRenderType.MODEL;
+    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
+        // TODO: read outline shape from model file?
+
+        return SHAPE;
     }
 
     @Deprecated

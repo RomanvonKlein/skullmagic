@@ -103,23 +103,23 @@ public class SkullMagic implements ModInitializer {
 			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).nonOpaque());
 	public static final Block SkullPedestal = new SkullPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block SIMPLE_SPELL_SHRINE = new SimpleSpellShrine(
+	public static final Block SIMPLE_SPELL_SHRINE = new SimpleSpellShrine(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block INTERMEDIATE_SPELL_SHRINE = new IntermediateSpellShrine(
+	public static final Block INTERMEDIATE_SPELL_SHRINE = new IntermediateSpellShrine(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block ADVANCED_SPELL_SHRINE = new AdvancedSpellShrine(
+	public static final Block ADVANCED_SPELL_SHRINE = new AdvancedSpellShrine(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block SPELL_POWER_PEDESTAL = new SimplePowerSpellPedestal(
+	public static final Block SPELL_POWER_PEDESTAL = new SimplePowerSpellPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block SPELL_EFFICIENCY_PEDESTAL = new SimpleEfficiencySpellPedestal(
+	public static final Block SPELL_EFFICIENCY_PEDESTAL = new SimpleEfficiencySpellPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block SPELL_COOLDOWN_PEDESTAL = new SimpleCooldownSpellPedestal(
+	public static final Block SPELL_COOLDOWN_PEDESTAL = new SimpleCooldownSpellPedestal(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block SkullAltar = new SkullAltar(
+	public static final Block SkullAltar = new SkullAltar(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block FireCannon = new FireCannon(
+	public static final Block FireCannon = new FireCannon(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
-	public static Block BlockPlacer = new BlockPlacer(
+	public static final Block BlockPlacer = new BlockPlacer(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
 	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
 			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
