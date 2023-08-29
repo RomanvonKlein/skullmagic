@@ -8,8 +8,8 @@ import com.romanvonklein.skullmagic.spells.SpellWithHoldAction;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public class ClientData extends PlayerData {

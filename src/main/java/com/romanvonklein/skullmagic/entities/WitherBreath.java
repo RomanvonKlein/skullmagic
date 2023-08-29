@@ -5,6 +5,7 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
@@ -57,7 +58,7 @@ public class WitherBreath extends FireBreath {
         if (!this.world.isClient) {
             Entity ent = entityHitResult.getEntity();
             if (ent.getType() != SkullMagic.FIRE_BREATH) {
-                ent.damage(this.world.getDamageSources().wither(), damage);
+                ent.damage(DamageSource.WITHER, damage);
                 if (ent instanceof LivingEntity temp) {
                     temp.addStatusEffect(
                             new StatusEffectInstance(StatusEffects.WITHER, this.witherDuration, 1));

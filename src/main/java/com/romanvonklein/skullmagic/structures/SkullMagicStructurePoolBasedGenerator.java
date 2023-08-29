@@ -3,9 +3,8 @@ package com.romanvonklein.skullmagic.structures;
 import java.util.List;
 
 import net.minecraft.util.math.random.Random;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import org.apache.commons.lang3.mutable.MutableObject;
-
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.StructureTemplate;

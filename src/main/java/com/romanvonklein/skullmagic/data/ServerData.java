@@ -31,8 +31,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -42,6 +41,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
@@ -350,7 +350,7 @@ public class ServerData extends PersistentState {
             BlockPos pos = ent.getPos();
             if (Util.getPedestalSkullIdentifier(world, pos) != null
                     && !pedestalIsLinked(new WorldBlockPos(pos, world.getRegistryKey()))) {
-                results.put(pos, Registries.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString());
+                results.put(pos, Registry.BLOCK.getId(world.getBlockState(pos.up()).getBlock()).toString());
             }
         }
 
@@ -731,7 +731,7 @@ public class ServerData extends PersistentState {
             if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
                     && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.add(new Tuple<BlockPos, String>(pos,
-                        Registries.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
             }
         }
 
@@ -748,7 +748,7 @@ public class ServerData extends PersistentState {
             if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
                     && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.add(new Tuple<BlockPos, String>(pos,
-                        Registries.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
             }
         }
 
@@ -765,7 +765,7 @@ public class ServerData extends PersistentState {
             if (ent.getSpellName() != null && ent.getSpellName().equals(spellname)
                     && isSpellPedestalUnbound(new WorldBlockPos(pos, world.getRegistryKey()))) {
                 results.add(new Tuple<BlockPos, String>(pos,
-                        Registries.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
+                        Registry.BLOCK.getId(ent.getCachedState().getBlock()).toString()));
             }
         }
 

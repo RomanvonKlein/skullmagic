@@ -62,7 +62,7 @@ public class EssenceStatusHud implements HudRenderCallback {
          */
         private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height,
                         Identifier texture) {
-                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                RenderSystem.setShader(GameRenderer::getPositionTexShader);
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
                 RenderSystem.setShaderTexture(0, texture);
                 DrawableHelper.drawTexture(ms, posX, posY, 0, 0, width, height, width, height);

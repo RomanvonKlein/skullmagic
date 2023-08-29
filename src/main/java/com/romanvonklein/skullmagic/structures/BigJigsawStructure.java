@@ -6,13 +6,12 @@ import java.util.function.Function;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolBasedGenerator;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.gen.HeightContext;
@@ -23,26 +22,25 @@ import net.minecraft.world.gen.structure.StructureType;
 public class BigJigsawStructure extends Structure {
 
     public static final int MAX_SIZE = 128;
-    public static final Codec<BigJigsawStructure> CODEC = RecordCodecBuilder.mapCodec((RecordCodecBuilder.Instance<BigJigsawStructure> instance) -> {
-        return instance.group(configCodecBuilder(instance),
-                StructurePool.REGISTRY_CODEC.fieldOf("start_pool").forGetter((BigJigsawStructure structure) -> {
-                    return structure.startPool;
-                }), Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter((structure) -> {
-                    return structure.startJigsawName;
-                }), Codec.intRange(0, 20).fieldOf("size").forGetter((structure) -> {
-                    return structure.size;
-                }), HeightProvider.CODEC.fieldOf("start_height").forGetter((structure) -> {
-                    return structure.startHeight;
-                }), Codec.BOOL.fieldOf("use_expansion_hack").forGetter((structure) -> {
-                    return structure.useExpansionHack;
-                }), Type.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter((structure) -> {
-                    return structure.projectStartToHeightmap;
-                }), Codec.intRange(1, 256).fieldOf("max_distance_from_center").forGetter((structure) -> {
-                    return structure.maxDistanceFromCenter;
-                })).apply(instance, BigJigsawStructure::new);
-    }).flatXmap(createValidator(), createValidator()).codec();
-
-
+    public static final Codec<BigJigsawStructure> CODEC = RecordCodecBuilder
+            .mapCodec((RecordCodecBuilder.Instance<BigJigsawStructure> instance) -> {
+                return instance.group(configCodecBuilder(instance),
+                        StructurePool.REGISTRY_CODEC.fieldOf("start_pool").forGetter((BigJigsawStructure structure) -> {
+                            return structure.startPool;
+                        }), Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter((structure) -> {
+                            return structure.startJigsawName;
+                        }), Codec.intRange(0, 20).fieldOf("size").forGetter((structure) -> {
+                            return structure.size;
+                        }), HeightProvider.CODEC.fieldOf("start_height").forGetter((structure) -> {
+                            return structure.startHeight;
+                        }), Codec.BOOL.fieldOf("use_expansion_hack").forGetter((structure) -> {
+                            return structure.useExpansionHack;
+                        }), Type.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter((structure) -> {
+                            return structure.projectStartToHeightmap;
+                        }), Codec.intRange(1, 256).fieldOf("max_distance_from_center").forGetter((structure) -> {
+                            return structure.maxDistanceFromCenter;
+                        })).apply(instance, BigJigsawStructure::new);
+            }).flatXmap(createValidator(), createValidator()).codec();
 
     private final RegistryEntry<StructurePool> startPool;
     private final Optional<Identifier> startJigsawName;
@@ -69,9 +67,9 @@ public class BigJigsawStructure extends Structure {
             }
 
             int i = heightOnTerrain;
-            return feature.maxDistanceFromCenter + i > 256 ? DataResult.error(() -> {
-                return "Structure size including terrain adaptation must not exceed 256";
-            }) : DataResult.success(feature);
+            return feature.maxDistanceFromCenter + i > 256
+                    ? DataResult.error("Structure size including terrain adaptation must not exceed 256")
+                    : DataResult.success(feature);
         };
     }
 

@@ -10,9 +10,9 @@ import com.romanvonklein.skullmagic.spells.SpellWithHoldAction;
 import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 

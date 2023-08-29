@@ -2,7 +2,6 @@ package com.romanvonklein.skullmagic.util;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,13 +19,13 @@ public class CreativeTabLists {
     private static boolean initialized = false;
 
     private static void init() {
-        decorationsTabList.add(ItemGroups.BUILDING_BLOCKS);
-        materialsTabList.add(ItemGroups.INGREDIENTS);
-        toolsTabList.add(ItemGroups.TOOLS);
-        foodTabList.add(ItemGroups.FOOD_AND_DRINK);
-        combatTabList.add(ItemGroups.COMBAT);
-        functionalTabList.add(ItemGroups.FUNCTIONAL);
-        buildingBlocksTabList.add(ItemGroups.BUILDING_BLOCKS);
+        decorationsTabList.add(ItemGroup.BUILDING_BLOCKS);
+        materialsTabList.add(ItemGroup.MATERIALS);
+        toolsTabList.add(ItemGroup.TOOLS);
+        foodTabList.add(ItemGroup.FOOD);
+        combatTabList.add(ItemGroup.COMBAT);
+        functionalTabList.add(ItemGroup.REDSTONE);
+        buildingBlocksTabList.add(ItemGroup.BUILDING_BLOCKS);
         initialized = true;
     }
 

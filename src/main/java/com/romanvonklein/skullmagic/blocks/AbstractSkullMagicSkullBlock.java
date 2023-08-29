@@ -10,16 +10,15 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.item.Equipment;
+import net.minecraft.item.Wearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class AbstractSkullMagicSkullBlock
         extends BlockWithEntity
-        implements Equipment {
+        implements Wearable {
     private final SkullMagicSkullBlock.SkullMagicSkullType type;
 
     public AbstractSkullMagicSkullBlock(SkullMagicSkullBlock.SkullMagicSkullType type,
@@ -54,10 +53,10 @@ public class AbstractSkullMagicSkullBlock
         return false;
     }
 
-    @Override
-    public EquipmentSlot getSlotType() {
-        return EquipmentSlot.HEAD;
-    }
+    // @Override
+    // public EquipmentSlot getSlotType() {
+    //     return EquipmentSlot.HEAD;
+    // }
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {

@@ -23,7 +23,6 @@ import com.romanvonklein.skullmagic.networking.ClientPackageReceiver;
 import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.networking.NetworkingConstants;
 import com.romanvonklein.skullmagic.screen.BlockPlacerScreen;
-import com.romanvonklein.skullmagic.util.CreativeTabInitializer;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -93,9 +92,9 @@ public class ClientInitializer implements ClientModInitializer {
         }
 
         // creative inventory tabs
-        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            CreativeTabInitializer.init();
-        });
+        // ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+        //     CreativeTabInitializer.init();
+        // });
         // register action for keybind
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (primarySpellKeyBinding.wasPressed()) {

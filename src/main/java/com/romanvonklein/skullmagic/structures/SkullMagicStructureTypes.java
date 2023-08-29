@@ -3,8 +3,7 @@ package com.romanvonklein.skullmagic.structures;
 import com.mojang.serialization.Codec;
 import com.romanvonklein.skullmagic.SkullMagic;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureType;
@@ -17,7 +16,7 @@ public class SkullMagicStructureTypes<S extends Structure> {
     }
 
     private static <S extends BigJigsawStructure> StructureType<S> register(String id, Codec<S> codec) {
-        return Registry.register(Registries.STRUCTURE_TYPE, new Identifier(SkullMagic.MODID, id), () -> {
+        return Registry.register(Registry.STRUCTURE_TYPE, new Identifier(SkullMagic.MODID, id), () -> {
             return codec;
         });
     }

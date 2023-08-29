@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.function.TriFunction;
-import org.joml.Vector3f;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.effects.Effects;
@@ -48,6 +47,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -97,7 +97,7 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            Vector3f angle = Direction.DOWN.getUnitVector();
+                            Vec3f angle = Direction.DOWN.getUnitVector();
                             Random rand = Random.create();
 
                             World world = player.world;
@@ -107,8 +107,8 @@ public class SpellInitializer {
                                         new TriFunction<Object[], Object, Object, Boolean>() {
                                             @Override
                                             public Boolean apply(Object[] data, Object n1, Object n2) {
-                                                FireballEntity ent = new FireballEntity(world, player, angle.x(),
-                                                        angle.y(), angle.z(),
+                                                FireballEntity ent = new FireballEntity(world, player, angle.getX(),
+                                                        angle.getY(), angle.getZ(),
                                                         (int) Math.round(
                                                                 Math.max(1.0,
                                                                         Math.min(
@@ -387,7 +387,7 @@ public class SpellInitializer {
                             Vec3d center = result.getPos();
 
                             World world = player.world;
-                            world.playSound(null, BlockPos.ofFloored(center),
+                            world.playSound(null, new BlockPos(center),
                                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
                             player.teleport(center.x, center.y, center.z, true);
                             success = true;
@@ -449,7 +449,7 @@ public class SpellInitializer {
                                     SpawnReason.CONVERSION, new ZombieData(false, true), null);
                             zombieVillagerEntity.setVillagerData(villager.getVillagerData());
                             zombieVillagerEntity
-                                    .setGossipData(villager.getGossip().serialize(NbtOps.INSTANCE));
+                                    .setGossipData(villager.getGossip().serialize(NbtOps.INSTANCE).getValue());
                             zombieVillagerEntity.setOfferData(villager.getOffers().toNbt());
                             zombieVillagerEntity.setXp(villager.getExperience());
                             success = true;
@@ -533,7 +533,7 @@ public class SpellInitializer {
                                     ent.addVelocity(vel.x, vel.y + 4.0, vel.z);
                                 }
                             }
-                            world.playSound(null, BlockPos.ofFloored(playerpos),
+                            world.playSound(null, new BlockPos(playerpos),
                                     SoundEvents.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.BLOCKS, 1f, 1f);
                         }
                         return true;
