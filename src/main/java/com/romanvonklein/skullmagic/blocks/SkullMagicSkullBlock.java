@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.blocks;
 
+import com.romanvonklein.skullmagic.SkullMagic;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -49,7 +51,10 @@ public class SkullMagicSkullBlock extends AbstractSkullMagicSkullBlock {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(ROTATION, Math.round(ctx.getPlayerYaw()*16));
+        float rotation = (ctx.getPlayerYaw() + 180.0f) / 22.5f;
+        int rotationValue = Math.round(rotation);
+        rotationValue = rotationValue == 16 ? 15 : rotationValue;
+        return this.getDefaultState().with(ROTATION, rotationValue);
     }
 
     @Deprecated
