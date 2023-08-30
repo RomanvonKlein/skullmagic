@@ -10,11 +10,11 @@
     },
     "rotation=2": {
       "model": "skullmagic:block/enderman_head",
-      "y": 0
+      "y": 90
     },
     "rotation=3": {
       "model": "skullmagic:block/enderman_head",
-      "y": 0
+      "y": 90
     },
     "rotation=4": {
       "model": "skullmagic:block/enderman_head",
@@ -26,11 +26,11 @@
     },
     "rotation=6": {
       "model": "skullmagic:block/enderman_head",
-      "y": 90
+      "y": 180
     },
     "rotation=7": {
       "model": "skullmagic:block/enderman_head",
-      "y": 90
+      "y": 180
     },
     "rotation=8": {
       "model": "skullmagic:block/enderman_head",
@@ -42,11 +42,11 @@
     },
     "rotation=10": {
       "model": "skullmagic:block/enderman_head",
-      "y": 180
+      "y": 270
     },
     "rotation=11": {
       "model": "skullmagic:block/enderman_head",
-      "y": 180
+      "y": 270
     },
     "rotation=12": {
       "model": "skullmagic:block/enderman_head",
@@ -58,11 +58,11 @@
     },
     "rotation=14": {
       "model": "skullmagic:block/enderman_head",
-      "y": 270
+      "y": 0
     },
     "rotation=15": {
       "model": "skullmagic:block/enderman_head",
-      "y": 270
+      "y": 0
     }
   }
 }

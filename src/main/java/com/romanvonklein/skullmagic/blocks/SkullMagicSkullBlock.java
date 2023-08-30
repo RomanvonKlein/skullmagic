@@ -51,10 +51,15 @@ public class SkullMagicSkullBlock extends AbstractSkullMagicSkullBlock {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        float rotation = (ctx.getPlayerYaw() + 180.0f) / 22.5f;
-        int rotationValue = Math.round(rotation);
-        rotationValue = rotationValue == 16 ? 15 : rotationValue;
-        return this.getDefaultState().with(ROTATION, rotationValue);
+        if (!ctx.getWorld().isClient()) {
+            float rawrotation = ctx.getPlayerYaw();
+            float rotation = (rawrotation + 180f) / 22.5f;
+            int rotationValue = (int) Math.round(Math.floor(rotation + 0.5f));
+            rotationValue = rotationValue > 15 ? 0 : (rotationValue < 0 ? 15 : rotationValue);
+            rotationValue = 15 - rotationValue;
+            return this.getDefaultState().with(ROTATION, rotationValue);
+        }
+        return this.getDefaultState();
     }
 
     @Deprecated
