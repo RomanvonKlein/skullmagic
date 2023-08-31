@@ -11,7 +11,7 @@ public class Effects {
 
         @Override
         public void spawn(MinecraftClient client, String worldkey, Vec3d pos, double spellPower) {
-            Random rand = Random.create();
+            Random rand = Random.createLocal();
             for (int i = 0; i < particlesPerTick; i++) {
                 client.world.addParticle(ParticleTypes.PORTAL, true, pos.x, pos.y, pos.z, rand.nextDouble() - 0.5,
                         rand.nextDouble() - 0.5,

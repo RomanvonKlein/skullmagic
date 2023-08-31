@@ -152,10 +152,21 @@ public class ServerData extends PersistentState {
     }
 
     public void tryRemoveSpellAltar(ServerWorld world, BlockPos pos) {
-        UUID ownerid = getOwnerForAltar(new WorldBlockPos(pos, world.getRegistryKey()));
+        UUID ownerid = getOwnerForSpellAltar(new WorldBlockPos(pos, world.getRegistryKey()));
         if (ownerid != null) {
             removeSpellShrineForPlayer(world, pos, ownerid);
         }
+    }
+
+    private UUID getOwnerForSpellAltar(WorldBlockPos worldBlockPos) {
+        UUID result = null;
+        for (UUID playerID : this.players.keySet()) {
+            if (this.players.get(playerID).hasSpellShrineAt(worldBlockPos)) {
+                result = playerID;
+                break;
+            }
+        }
+        return result;
     }
 
     private UUID getOwnerForAltar(WorldBlockPos worldBlockPos) {
@@ -686,6 +697,10 @@ public class ServerData extends PersistentState {
         return this.players.get(playerID).getSpellPower(spellname);
     }
 
+    public static SpellData getDefaultSpellData(String spellname) {
+        return new SpellData(spells.get(spellname));
+    }
+
     public void removeSpellShrineForPlayer(ServerWorld world, BlockPos pos, UUID playerid) {
         this.players.get(playerid).removeSpellShrine(pos, playerid);
     }
@@ -849,7 +864,9 @@ public class ServerData extends PersistentState {
                 if (this.tryAddSpellPedestal((ServerWorld) world, pos,
                         player.getGameProfile().getId(), spellname, pedestal)) {
                     ent.setScroll(scrollItemStack.copy());
-                    scrollItemStack.decrement(1);
+                    if (!player.isCreative()) {
+                        scrollItemStack.decrement(1);
+                    }
                     world.playSound((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
                             SoundEvents.BLOCK_END_PORTAL_FRAME_FILL,
                             SoundCategory.BLOCKS, 1.0f, 1.0f, true);
@@ -865,10 +882,12 @@ public class ServerData extends PersistentState {
             }
         } else {
             // if not empty, drop the contained item.
-            ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
-                    ent.getScroll());
-            itemEnt.setPickupDelay(0);
-            world.spawnEntity(itemEnt);
+            if (!player.isCreative()) {
+                ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                        ent.getScroll());
+                itemEnt.setPickupDelay(0);
+                world.spawnEntity(itemEnt);
+            }
             ent.setScroll(null);
             this.tryRemoveSpellPedestal((ServerWorld) world, pos, type);
         }
@@ -897,7 +916,9 @@ public class ServerData extends PersistentState {
                         SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, blockEnt.getPos(),
                                 player.getGameProfile().getId(), spellname);
                         blockEnt.setScroll(itemStack.copy());
-                        itemStack.decrement(1);
+                        if (!player.isCreative()) {
+                            itemStack.decrement(1);
+                        }
                     }
                 } else {
                     player.sendMessage(Text.of("You dont know this spell yet."), true);
@@ -905,11 +926,13 @@ public class ServerData extends PersistentState {
             }
         } else {
             // if not empty, drop the contained item.
-            ItemEntity scroll = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
-                    blockEnt.getScroll());
+            if (!player.isCreative()) {
+                ItemEntity scroll = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
+                        blockEnt.getScroll());
 
-            scroll.setPickupDelay(0);
-            world.spawnEntity(scroll);
+                scroll.setPickupDelay(0);
+                world.spawnEntity(scroll);
+            }
             blockEnt.setScroll(null);
             this.tryRemoveSpellAltar(world, blockEnt.getPos());
         }

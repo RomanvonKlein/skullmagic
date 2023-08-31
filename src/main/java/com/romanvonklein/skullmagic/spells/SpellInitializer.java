@@ -98,26 +98,27 @@ public class SpellInitializer {
                         if (result != null) {
                             Vec3d center = result.getPos();
                             Vec3f angle = Direction.DOWN.getUnitVector();
-                            Random rand = Random.create();
-
+                            Random rand = Random.createLocal();
+                            
                             World world = player.world;
                             for (int i = 0; i < meteoriteCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                        rand.nextInt(maxDelay),
-                                        new TriFunction<Object[], Object, Object, Boolean>() {
-                                            @Override
-                                            public Boolean apply(Object[] data, Object n1, Object n2) {
+                                rand.nextInt(maxDelay),
+                                new TriFunction<Object[], Object, Object, Boolean>() {
+                                    @Override
+                                    public Boolean apply(Object[] data, Object n1, Object n2) {
+                                                Random newRand = Random.createLocal();
                                                 FireballEntity ent = new FireballEntity(world, player, angle.getX(),
                                                         angle.getY(), angle.getZ(),
                                                         (int) Math.round(
                                                                 Math.max(1.0,
                                                                         Math.min(
-                                                                                minPower + rand
+                                                                                minPower + newRand
                                                                                         .nextInt(maxPower - minPower)
                                                                                         + (powerlevel - 1) * 0.5,
                                                                                 5.0))));
-                                                ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
-                                                        height, center.z - radius + 2 * rand.nextFloat() * radius);
+                                                ent.setPos(center.x - radius + 2 * newRand.nextFloat() * radius,
+                                                        height, center.z - radius + 2 * newRand.nextFloat() * radius);
                                                 ent.setVelocity(0, -15, 0);
                                                 world.spawnEntity(ent);
                                                 return true;
@@ -186,7 +187,7 @@ public class SpellInitializer {
                                             int breathLife = ((int[]) data[0])[1];
                                             int burnDuration = ((int[]) data[0])[2];
 
-                                            Random rand = Random.create();
+                                            Random rand = Random.createLocal();
                                             Vec3d dir = player.getRotationVector().normalize();
 
                                             World world = player.world;
@@ -232,7 +233,7 @@ public class SpellInitializer {
                                             int breathLife = ((int[]) data[0])[1];
                                             int witherDuration = ((int[]) data[0])[2];
                                             int damage = ((int[]) data[0])[3];
-                                            Random rand = Random.create();
+                                            Random rand = Random.createLocal();
                                             Vec3d dir = player.getRotationVector().normalize();
 
                                             World world = player.world;
@@ -481,7 +482,7 @@ public class SpellInitializer {
                         if (entityHitResult != null
                                 && entityHitResult.getEntity() instanceof ZombieVillagerEntity zombie) {
                             ((ZombieVillagerEntityMixin) zombie).invokeSetConverting(player.getUuid(),
-                                    Random.create().nextInt(2401) + 3600);
+                                    Random.createLocal().nextInt(2401) + 3600);
                             success = true;
                         }
                         return success;
@@ -636,7 +637,7 @@ public class SpellInitializer {
                                                     // does the tool have enough durability?
                                                     if (!tool.isDamageable() || toolStack.getMaxDamage() > 1
                                                             + toolStack.getDamage()) {
-                                                        toolStack.damage(1, Random.create(), player);
+                                                        toolStack.damage(1, Random.createLocal(), player);
                                                     } else {
                                                         canBreakBlock = false;
                                                     }
@@ -712,19 +713,20 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            Random rand = Random.create();
+                            Random rand = Random.createLocal();
                             for (int i = 0; i < lightningCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                        rand.nextInt(maxDelay),
-                                        new TriFunction<Object[], Object, Object, Boolean>() {
-                                            @Override
-                                            public Boolean apply(Object[] data, Object n1, Object n2) {
+                                rand.nextInt(maxDelay),
+                                new TriFunction<Object[], Object, Object, Boolean>() {
+                                    @Override
+                                    public Boolean apply(Object[] data, Object n1, Object n2) {
+                                                Random newRand = Random.createLocal();
 
                                                 World world = player.world;
                                                 LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,
                                                         world);
-                                                bolt.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
-                                                        center.y, center.z - radius + 2 * rand.nextFloat() * radius);
+                                                bolt.setPos(center.x - radius + 2 * newRand.nextFloat() * radius,
+                                                        center.y, center.z - radius + 2 * newRand.nextFloat() * radius);
                                                 bolt.setVelocity(0, -15, 0);
                                                 world.spawnEntity(bolt);
                                                 return true;

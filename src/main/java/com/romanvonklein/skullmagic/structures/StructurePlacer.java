@@ -30,7 +30,7 @@ public class StructurePlacer {
             // .setMirror(this.mirror).setRotation(this.rotation).setIgnoreEntities(this.ignoreEntities);
 
             structure.place(world, blockPos, blockPos, structurePlacementData,
-                    Random.create(), Block.NOTIFY_LISTENERS);
+                    Random.createLocal(), Block.NOTIFY_LISTENERS);
             return null;
         }
         return structure;

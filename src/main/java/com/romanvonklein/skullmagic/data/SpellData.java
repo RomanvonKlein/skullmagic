@@ -134,7 +134,8 @@ public class SpellData extends PersistentState {
 
     public boolean containsPedestal(WorldBlockPos worldBlockPos) {
         boolean result = false;
-        outer: if (this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
+        outer: if (this.spellShrine.worldKey != null
+                && this.spellShrine.worldKey.toString().equals(worldBlockPos.worldKey.toString())) {
             for (BlockPos pos : this.spellShrine.powerPedestals.keySet()) {
                 if (worldBlockPos.isEqualTo(pos)) {
                     result = true;

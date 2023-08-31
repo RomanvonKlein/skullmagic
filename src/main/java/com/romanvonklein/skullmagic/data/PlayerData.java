@@ -148,7 +148,7 @@ class PlayerData extends PersistentState {
             BlockPos candidatePos = this.spells.get(spellname).getShrinePos();
             if (candidatePos != null && pos.getX() == candidatePos.getX() && pos.getY() == candidatePos.getY()
                     && pos.getZ() == candidatePos.getZ()) {
-                this.spells.remove(spellname);
+                this.spells.put(spellname, ServerData.getDefaultSpellData(spellname));
                 SkullMagic.updatePlayer(playerid);
                 break;
             }
@@ -212,13 +212,27 @@ class PlayerData extends PersistentState {
         boolean result = false;
         for (String spellname : this.spells.keySet()) {
             SpellData data = this.spells.get(spellname);
-            if (worldBlockPos.worldKey != null
+            if (worldBlockPos.worldKey != null && data.spellShrine.worldKey != null
                     && worldBlockPos.worldKey.toString().equals(data.spellShrine.worldKey.toString())
                     && worldBlockPos.isEqualTo(data.getShrinePos())) {
                 this.spells.remove(spellname);
                 result = true;
                 SkullMagic.updatePlayer(playerToUpdate);
                 break;
+            }
+        }
+        return result;
+    }
+
+    public boolean hasSpellShrineAt(WorldBlockPos candidatePos) {
+        boolean result = false;
+        if (candidatePos != null) {
+            for (SpellData data : this.spells.values()) {
+                if (data != null && data.spellShrine != null && data.spellShrine.shrinePos != null
+                        && candidatePos.isEqualTo(data.spellShrine.shrinePos)) {
+                    result = true;
+                    break;
+                }
             }
         }
         return result;
@@ -296,6 +310,10 @@ class PlayerData extends PersistentState {
                         .apply(server.getPlayerManager().getPlayer(playerToUpdate), getSpellPower(this.selectedSpell));
             }
         }
+    }
+
+    public void setSpell(String spellname, SpellData spellData) {
+        this.spells.put(spellname, spellData);
     }
 
 }
