@@ -99,14 +99,14 @@ public class SpellInitializer {
                             Vec3d center = result.getPos();
                             Vec3f angle = Direction.DOWN.getUnitVector();
                             Random rand = Random.createLocal();
-                            
+
                             World world = player.world;
                             for (int i = 0; i < meteoriteCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                rand.nextInt(maxDelay),
-                                new TriFunction<Object[], Object, Object, Boolean>() {
-                                    @Override
-                                    public Boolean apply(Object[] data, Object n1, Object n2) {
+                                        rand.nextInt(maxDelay),
+                                        new TriFunction<Object[], Object, Object, Boolean>() {
+                                            @Override
+                                            public Boolean apply(Object[] data, Object n1, Object n2) {
                                                 Random newRand = Random.createLocal();
                                                 FireballEntity ent = new FireballEntity(world, player, angle.getX(),
                                                         angle.getY(), angle.getZ(),
@@ -716,10 +716,10 @@ public class SpellInitializer {
                             Random rand = Random.createLocal();
                             for (int i = 0; i < lightningCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
-                                rand.nextInt(maxDelay),
-                                new TriFunction<Object[], Object, Object, Boolean>() {
-                                    @Override
-                                    public Boolean apply(Object[] data, Object n1, Object n2) {
+                                        rand.nextInt(maxDelay),
+                                        new TriFunction<Object[], Object, Object, Boolean>() {
+                                            @Override
+                                            public Boolean apply(Object[] data, Object n1, Object n2) {
                                                 Random newRand = Random.createLocal();
 
                                                 World world = player.world;
