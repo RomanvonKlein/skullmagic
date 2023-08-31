@@ -20,12 +20,19 @@ public class CreativeTabLists {
 
     private static void init() {
         decorationsTabList.add(ItemGroup.BUILDING_BLOCKS);
+        decorationsTabList.add(ItemGroup.SEARCH);
         materialsTabList.add(ItemGroup.MATERIALS);
+        materialsTabList.add(ItemGroup.SEARCH);
         toolsTabList.add(ItemGroup.TOOLS);
+        toolsTabList.add(ItemGroup.SEARCH);
         foodTabList.add(ItemGroup.FOOD);
+        foodTabList.add(ItemGroup.SEARCH);
         combatTabList.add(ItemGroup.COMBAT);
+        combatTabList.add(ItemGroup.SEARCH);
         functionalTabList.add(ItemGroup.REDSTONE);
+        functionalTabList.add(ItemGroup.SEARCH);
         buildingBlocksTabList.add(ItemGroup.BUILDING_BLOCKS);
+        buildingBlocksTabList.add(ItemGroup.SEARCH);
         initialized = true;
     }
 

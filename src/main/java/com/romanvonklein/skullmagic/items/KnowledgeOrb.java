@@ -15,6 +15,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -56,7 +57,8 @@ public class KnowledgeOrb extends Item {
         if (world != null && world.isClient) {
             if (ClientInitializer.getClientData().knowsSpell(this.spellName)) {
 
-                tooltip.add(Text.translatable("tooltip.skullmagic.spell_learned","Learned Spell",null).formatted(Formatting.GREEN));
+                tooltip.add(Text.translatable("tooltip.skullmagic.spell_learned", "Learned Spell", null)
+                        .formatted(Formatting.GREEN));
                 // current spell levels
                 double powerlevel = ClientInitializer.getClientData().getPowerLevel(this.spellName);
                 double efficiencylevel = ClientInitializer.getClientData().getEfficiencyLevel(this.spellName);
@@ -89,8 +91,9 @@ public class KnowledgeOrb extends Item {
     public static ArrayList<KnowledgeOrb> generateKnowledgeOrbs() {
         ArrayList<KnowledgeOrb> orbs = new ArrayList<>();
         for (String spellName : ServerData.getSpellNames()) {
-            KnowledgeOrb orb =new KnowledgeOrb(new FabricItemSettings(), spellName);
-            CreativeTabLists.addItemToTabs(orb,CreativeTabLists.functionalTabList);
+            KnowledgeOrb orb = new KnowledgeOrb(new FabricItemSettings().group(ItemGroup.SEARCH).group(ItemGroup.MISC),
+                    spellName);
+            // CreativeTabLists.addItemToTabs(orb,CreativeTabLists.functionalTabList);
             orbs.add(orb);
         }
         return orbs;
