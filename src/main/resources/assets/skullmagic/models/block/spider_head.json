@@ -1,4 +1,5 @@
 {
+	"parent": "skullmagic:block/skullblock",
 	"texture_size": [32, 32],
 	"textures": {
 		"0": "skullmagic:block/spider_head",
