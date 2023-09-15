@@ -12,7 +12,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_03",
@@ -34,6 +34,33 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_02",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_06",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_07",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_08",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }
