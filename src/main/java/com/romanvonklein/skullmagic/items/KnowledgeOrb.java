@@ -56,7 +56,8 @@ public class KnowledgeOrb extends Item {
         if (world != null && world.isClient) {
             if (ClientInitializer.getClientData().knowsSpell(this.spellName)) {
 
-                tooltip.add(Text.translatable("tooltip.skullmagic.spell_learned","Learned Spell",null).formatted(Formatting.GREEN));
+                tooltip.add(Text.translatable("tooltip.skullmagic.spell_learned", "Learned Spell", null)
+                        .formatted(Formatting.GREEN));
                 // current spell levels
                 double powerlevel = ClientInitializer.getClientData().getPowerLevel(this.spellName);
                 double efficiencylevel = ClientInitializer.getClientData().getEfficiencyLevel(this.spellName);

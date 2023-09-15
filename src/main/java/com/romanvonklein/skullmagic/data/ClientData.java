@@ -100,7 +100,12 @@ public class ClientData extends PlayerData {
         if (this.spells.size() > 0) {
 
             int currentIndex = spellnames.indexOf(this.selectedSpell);
-            currentIndex++;
+            if (MinecraftClient.getInstance().player.isSneaking()) {
+                currentIndex--;
+            } else {
+                currentIndex++;
+            }
+
             currentIndex = adjustForListsize(currentIndex);
             this.selectedSpell = spellnames.get(currentIndex);
         }

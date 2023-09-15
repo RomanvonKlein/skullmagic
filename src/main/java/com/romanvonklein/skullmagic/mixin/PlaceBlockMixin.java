@@ -14,7 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -38,10 +38,9 @@ public class PlaceBlockMixin {
 
     @Inject(at = @At("HEAD"), method = "onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable = true)
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfo info) {
-        if (!world.isClient) {
-            if (Util.getPedestalSkullIdentifier(world, pos.down()) != null) {
-                SkullMagic.getServerData().removePedestal((ServerWorld) world, pos.down());
-            }
+        if (!world.isClient && Util.getPedestalSkullIdentifier(world, pos.down()) != null) {
+            SkullMagic.getServerData().removePedestal((ServerWorld) world, pos.down());
+
         }
     }
 }
