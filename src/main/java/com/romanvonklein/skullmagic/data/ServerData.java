@@ -807,7 +807,12 @@ public class ServerData extends PersistentState {
     }
 
     public boolean canConsumerApply(WorldBlockPos pos, int essenceCost) {
-        return getEssencePoolForConsumer(pos.worldKey, pos).canAfford(essenceCost);
+        EssencePool essencePool = getEssencePoolForConsumer(pos.worldKey, pos);
+        if (essencePool != null) {
+            return essencePool.canAfford(essenceCost);
+        } else {
+            return false;
+        }
     }
 
     public void applyConsumer(WorldBlockPos pos, int essenceCost) {

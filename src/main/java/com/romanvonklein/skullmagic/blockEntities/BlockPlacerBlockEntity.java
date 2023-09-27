@@ -128,7 +128,7 @@ public class BlockPlacerBlockEntity extends AConsumerBlockEntity
 
     @Override
     public void onInventoryChanged(Inventory var1) {
-        world.updateListeners(pos, null, null, Block.NOTIFY_LISTENERS);
+        world.updateListeners(pos, this.getCachedState(), this.getCachedState(), Block.NOTIFY_LISTENERS);
     }
 
     public void dropInventory() {
