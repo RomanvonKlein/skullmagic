@@ -5,11 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.util.SpawnerEntry;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
@@ -20,11 +22,15 @@ public class Config {
     private static Gson gson;
     public static ConfigData data;
 
-    public static class ConfigData {
-        public HashMap<String, Map<String, Float>> drops;
+    private Config() {
+    }
 
-        public HashMap<String, Integer> skulls;
-        public HashMap<String, Integer> shrines;
+    public static class ConfigData {
+        public Map<String, Map<String, Float>> drops;
+        public Map<String, ArrayList<SpawnerEntry>> spawnerSpawns;
+
+        public Map<String, Integer> skulls;
+        public Map<String, Integer> shrines;
         public int scanWidth;
         public int scanHeight;
         public int supplyWidth;
@@ -38,9 +44,10 @@ public class Config {
         public int shrineRangePerLevel;
 
         public ConfigData() {
-            this.drops = new HashMap<String, Map<String, Float>>();
-            this.skulls = new HashMap<String, Integer>();
+            this.drops = new HashMap<>();
+            this.skulls = new HashMap<>();
             this.shrines = new HashMap<>();
+            this.spawnerSpawns = new HashMap<>();
         }
     }
 
@@ -56,7 +63,9 @@ public class Config {
 
                 } catch (IOException e) {
                     SkullMagic.LOGGER.info(
-                            "Could not find or read config.json for skullmagic.");
+                            "Could not find or read config.json for skullmagic. Creating new one.");
+                    data = getDefaultConfigData();
+                    saveConfig();
                 }
             } else {
                 // could not find the file, so using default config.
@@ -130,6 +139,14 @@ public class Config {
         defaultData.altarCapacity = 1000;
         defaultData.shrineRangePerLevel = 5;
 
+        // spawner lists
+        defaultData.spawnerSpawns.put("easy", new ArrayList<>());
+        defaultData.spawnerSpawns.put("medium", new ArrayList<>());
+        defaultData.spawnerSpawns.put("hard", new ArrayList<>());
+        SpawnerEntry zombie = new SpawnerEntry("/execute in %s run summon minecraft:zombie %d %d %d", 1, 500, 4, 4);
+        defaultData.spawnerSpawns.get("easy").add(zombie);
+        defaultData.spawnerSpawns.get("medium").add(zombie);
+        defaultData.spawnerSpawns.get("hard").add(zombie);
         return defaultData;
     }
 
@@ -142,4 +159,5 @@ public class Config {
         }
         return output;
     }
+
 }

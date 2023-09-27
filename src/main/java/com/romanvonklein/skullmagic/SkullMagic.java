@@ -19,6 +19,7 @@ import com.romanvonklein.skullmagic.blockEntities.FireCannonBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullMagicSkullBlockEntity;
+import com.romanvonklein.skullmagic.blockEntities.SkullMagicSpawnerBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.WitherEnergyChannelerBlockEntity;
@@ -34,6 +35,7 @@ import com.romanvonklein.skullmagic.blocks.SimplePowerSpellPedestal;
 import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
+import com.romanvonklein.skullmagic.blocks.SkullMagicSpawner;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
 import com.romanvonklein.skullmagic.blocks.WitherEnergyChanneler;
 import com.romanvonklein.skullmagic.commands.Commands;
@@ -62,6 +64,7 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
@@ -83,6 +86,7 @@ import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.YOffset;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -136,6 +140,14 @@ public class SkullMagic implements ModInitializer {
 	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.of(Material.STONE).strength(2.0f));
 	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.of(Material.AMETHYST).strength(4.0f));
 
+	// Spawner Blocks
+	public static final Block SKULLMAGIC_EASY_SPAWNER_BLOCK = new SkullMagicSpawner(
+			FabricBlockSettings.of(Material.STONE).strength(2.0f).nonOpaque(), "easy");
+	public static final Block SKULLMAGIC_MEDIUM_SPAWNER_BLOCK = new SkullMagicSpawner(
+			FabricBlockSettings.of(Material.STONE).strength(2.0f).nonOpaque(), "medium");
+	public static final Block SKULLMAGIC_HARD_SPAWNER_BLOCK = new SkullMagicSpawner(
+			FabricBlockSettings.of(Material.STONE).strength(2.0f).nonOpaque(), "hard");
+
 	// items
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
 	public static final Item SKULLIUM_SHARD = generateItem(new FabricItemSettings(),
@@ -172,6 +184,7 @@ public class SkullMagic implements ModInitializer {
 	public static BlockEntityType<PowerSpellPedestalBlockEntity> POWER_SPELL_PEDESTAL_BLOCK_ENTITY;
 	public static BlockEntityType<EfficiencySpellPedestalBlockEntity> EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY;
 	public static BlockEntityType<CooldownSpellPedestalBlockEntity> COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY;
+	public static BlockEntityType<SkullMagicSpawnerBlockEntity> SKULLMAGIC_SPAWNER_BLOCK_ENTITY;
 
 	// entities
 	public static EntityType<EffectBall> EFFECT_BALL;
@@ -248,6 +261,12 @@ public class SkullMagic implements ModInitializer {
 		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullPedestalBlockEntity::new, SkullPedestal).build(null));
+		SKULLMAGIC_SPAWNER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
+				MODID + ":skullmagic_spawner_block_entity",
+				FabricBlockEntityTypeBuilder
+						.create(SkullMagicSpawnerBlockEntity::new, SKULLMAGIC_EASY_SPAWNER_BLOCK,
+								SKULLMAGIC_MEDIUM_SPAWNER_BLOCK, SKULLMAGIC_HARD_SPAWNER_BLOCK)
+						.build(null));
 
 		SKULL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_block_entity",
@@ -271,11 +290,15 @@ public class SkullMagic implements ModInitializer {
 				CreativeTabLists.functionalTabList);
 		registerBlockWithItem(ADVANCED_SPELL_SHRINE, "advanced_spell_shrine", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(ENDERMAN_HEAD_BLOCK, "enderman_head", CreativeTabLists.functionalTabList);
-		// registerBlockWithItem(INTERMEDIATE_SPELL_SHRINE,"intermediate_spell_shrine",CreativeTabLists.miscTabList);
+
 		registerBlockWithItem(SPIDER_HEAD_BLOCK, "spider_head", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(BLAZE_HEAD_BLOCK, "blaze_head", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(SKULLIUM_ORE, "skullium_ore", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(SKULLIUM_BLOCK, "skullium_block", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SKULLMAGIC_EASY_SPAWNER_BLOCK, "easy_spawner_block", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SKULLMAGIC_MEDIUM_SPAWNER_BLOCK, "medium_spawner_block",
+				CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SKULLMAGIC_HARD_SPAWNER_BLOCK, "hard_spawner_block", CreativeTabLists.functionalTabList);
 
 		// register spells
 		ServerData.initSpells();

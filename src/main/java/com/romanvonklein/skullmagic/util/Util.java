@@ -2,7 +2,10 @@ package com.romanvonklein.skullmagic.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
@@ -15,6 +18,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class Util {
@@ -54,5 +58,28 @@ public class Util {
         BlockPos diff = altarPos.subtract(pos);
         return Math.abs(diff.getX()) <= rangeWidth && Math.abs(diff.getY()) <= rangeHeight
                 && Math.abs(diff.getZ()) <= rangeWidth;
+    }
+
+    @Nullable
+    public static SpawnerEntry getSpawnForSpawnerWithClass(String spawnClass) {
+        Map<String, ArrayList<SpawnerEntry>> spawns = Config.getConfig().spawnerSpawns;
+        SpawnerEntry result = null;
+        if (spawns.containsKey(spawnClass) && !spawns.get(spawnClass).isEmpty()) {
+            ArrayList<SpawnerEntry> entries = spawns.get(spawnClass);
+            int totalWeights = 0;
+            ArrayList<Integer> weights = new ArrayList<>();
+            for (SpawnerEntry entry : entries) {
+                weights.add(totalWeights);
+                totalWeights += entry.weight;
+            }
+            Random rand = Random.createLocal();
+            int chosenWeight = rand.nextBetween(0, totalWeights);
+            int index;
+            for (index = 0; index < weights.size() && weights.get(index) < chosenWeight; index++) {
+            }
+            index = index > 0 ? index - 1 : 0;
+            result = entries.get(index);
+        }
+        return result;
     }
 }

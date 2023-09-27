@@ -4,6 +4,7 @@ import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ClientData;
 import com.romanvonklein.skullmagic.effects.CastSpellEffects;
+import com.romanvonklein.skullmagic.effects.Effects;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -54,6 +55,21 @@ public class ClientPackageReceiver {
             String worldkey = nbt.getString("worldkey");
             Vec3d pos = new Vec3d(x, y, z);
             CastSpellEffects.castSpellEffect(client, spellname, worldkey, pos, spellPower);
+        } catch (Exception e) {
+            SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
+        }
+    }
+
+    public static void receiveParticleEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
+            PacketByteBuf buf, PacketSender responseSender) {
+        try {
+            NbtCompound nbt = buf.readNbt();
+            double x = nbt.getDouble("x");
+            double y = nbt.getDouble("y");
+            double z = nbt.getDouble("z");
+            String particleID = nbt.getString("particleid");// TODO: not yet used.
+            String worldkey = nbt.getString("worldkey");
+            Effects.SPAWNER_FIRE_EFFECT.spawn(client, worldkey, new Vec3d(x, y, z), 0.0);
         } catch (Exception e) {
             SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
         }

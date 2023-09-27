@@ -133,9 +133,12 @@ public class ClientInitializer implements ClientModInitializer {
 
         // TODO: more rotation steps for skulls?
         // BlockEntityRendererFactories.register(SkullMagic.SKULL_BLOCK_ENTITY,
-                // SkullMagicSkullBlockEntityRenderer::new);
+        // SkullMagicSkullBlockEntityRenderer::new);
 
         BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.CapacityCrystal, RenderLayer.getTranslucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.SKULLMAGIC_EASY_SPAWNER_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.SKULLMAGIC_MEDIUM_SPAWNER_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(SkullMagic.SKULLMAGIC_HARD_SPAWNER_BLOCK, RenderLayer.getCutout());
 
         BlockEntityRendererFactories.register(SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
                 PowerSpellPedestalBlockEntityRenderer::new);
@@ -185,6 +188,8 @@ public class ClientInitializer implements ClientModInitializer {
                 ClientPackageReceiver::receiveUpdatePlayerDataPackage);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.EFFECT_EVENT,
                 ClientPackageReceiver::receiveEffectPackage);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PARTICLE_EFFECT_EVENT,
+                ClientPackageReceiver::receiveParticleEffectPackage);
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (client.world != null && clientData != null) {

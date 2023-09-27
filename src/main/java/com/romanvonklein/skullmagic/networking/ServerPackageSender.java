@@ -24,6 +24,23 @@ public class ServerPackageSender {
         }
     }
 
+    public static void sendParticleEffectPackageToPlayers(List<ServerPlayerEntity> players, String particleID,
+            RegistryKey<World> worldKey, Vec3d pos) {
+        for (ServerPlayerEntity player : players) {
+            NbtCompound nbtCompound = new NbtCompound();
+            nbtCompound.putString("worldkey", worldKey.toString());
+            nbtCompound.putString("particleid", particleID);
+            nbtCompound.putDouble("x", pos.getX());
+            nbtCompound.putDouble("y", pos.getY());
+            nbtCompound.putDouble("z", pos.getZ());
+
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeNbt(nbtCompound);
+
+            ServerPlayNetworking.send(player, NetworkingConstants.PARTICLE_EFFECT_EVENT, buf);
+        }
+    }
+
     public static void sendEffectPackageToPlayers(List<ServerPlayerEntity> players, String spellname, double power,
             RegistryKey<World> worldKey, Vec3d pos) {
         for (ServerPlayerEntity player : players) {

@@ -14,8 +14,7 @@ public class Effects {
             Random rand = Random.createLocal();
             for (int i = 0; i < particlesPerTick; i++) {
                 client.world.addParticle(ParticleTypes.PORTAL, true, pos.x, pos.y, pos.z, rand.nextDouble() - 0.5,
-                        rand.nextDouble() - 0.5,
-                        rand.nextDouble() - 0.5);
+                        rand.nextDouble() - 0.5, rand.nextDouble() - 0.5);
             }
         }
 
@@ -23,5 +22,18 @@ public class Effects {
         public void despawn(MinecraftClient client) {
         }
 
+    };
+    public static final Effect SPAWNER_FIRE_EFFECT = new Effect() {
+        @Override
+        public void spawn(MinecraftClient client, String worldkey, Vec3d pos, double spellPower) {
+            Random rand = Random.createLocal();
+            client.world.addParticle(ParticleTypes.FLAME, true, pos.x, pos.y, pos.z,
+                    (rand.nextDouble() - 0.5) * 0.05,
+                    (rand.nextDouble()) * 0.05, (rand.nextDouble() - 0.5) * 0.05);
+        }
+
+        @Override
+        public void despawn(MinecraftClient client) {
+        }
     };
 }
