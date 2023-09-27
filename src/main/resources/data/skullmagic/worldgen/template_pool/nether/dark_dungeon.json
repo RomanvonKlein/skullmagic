@@ -60,7 +60,7 @@
       "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
-        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_08",
+        "location": "skullmagic:nether/dark_dungeon/dark_dungeon_part_07",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }
