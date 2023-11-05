@@ -143,13 +143,27 @@ public class Config {
         defaultData.spawnerSpawns.put("easy", new ArrayList<>());
         defaultData.spawnerSpawns.put("medium", new ArrayList<>());
         defaultData.spawnerSpawns.put("hard", new ArrayList<>());
+        SpawnerEntry shulkerBullet = new SpawnerEntry("/summon shulker_bullet  %d %d %d {Motion:[0d,0d,0d]}", 1, 500, 4,
+                4);
         SpawnerEntry zombie = new SpawnerEntry("/execute in %s run summon minecraft:zombie %d %d %d", 1, 500, 4, 4);
+        SpawnerEntry babyZombieHorde = new SpawnerEntry(
+                "/execute in %s run /summon zombie %d %d %d {IsBaby:1,active_effects:[{id:strength,duration:99999,amplifier:2,ambient:1b,show_particles:1b}],HandItems:[{id:iron_sword,Count:1}],HandDropChances:[f],Attributes:[{Name:\"generic.movement_speed\",Base:0.5f}]}",
+                1, 1000, 12, 5);
+        SpawnerEntry mediumZombie = new SpawnerEntry(
+                "summon zombie %d %d %d {Motion:[0d,0d,0d],active_effects:[{id:strength,duration:999999,amplifier:1,ambient:1b,show_particles:1b}],HandItems:[{id:iron_sword,Count:1},{id:iron_sword,Count:1}],HandDropChances:[f,f],ArmorItems:[{id:iron_boots,Count:1},{id:iron_leggings,Count:1},{id:iron_chestplate,Count:1},{id:iron_helmet,Count:1}],ArmorDropChances:[f,f,f,f]}",
+                1, 500, 5, 5);
         defaultData.spawnerSpawns.get("easy").add(zombie);
-        defaultData.spawnerSpawns.get("medium").add(zombie);
+        defaultData.spawnerSpawns.get("easy").add(shulkerBullet);
+        defaultData.spawnerSpawns.get("medium").add(mediumZombie);
+        defaultData.spawnerSpawns.get("medium").add(babyZombieHorde);
         defaultData.spawnerSpawns.get("hard").add(zombie);
         return defaultData;
     }
 
+    // cool mob spawn commands:
+    // Baby Zombie Horde
+    // /summon zombie ~ ~ ~
+    // {IsBaby:1,active_effects:[{id:strength,duration:99999,amplifier:2,ambient:1b,show_particles:1b}],HandItems:[{id:iron_sword,Count:1}],HandDropChances:[f],Attributes:[{Name:"generic.movement_speed",Base:0.5f}]}
     public static String configToString() {
         String output = "";
         if (data == null) {

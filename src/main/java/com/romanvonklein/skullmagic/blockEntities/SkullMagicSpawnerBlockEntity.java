@@ -61,6 +61,7 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
             if (castedEnt.delayed >= castedEnt.maxDelay) {
                 castedEnt.delayed = 0;
                 castedEnt.lastParticled = 0;
+                SkullMagic.LOGGER.info("Attempting Spawn");
                 Random rand = Random.createLocal();
                 for (int i = 0; i < castedEnt.maxSpawns; i++) {
                     int posX = pos.getX() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
@@ -71,10 +72,13 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
                     if (world.isSpaceEmpty(new Box(posX, posY, posZ, 1, 2, 1))) {
 
                         try {
+                            SkullMagic.LOGGER.info("preparing spawning command from spawning command: %s",
+                                    castedEnt.spawnCommand);
                             command = String.format(castedEnt.spawnCommand,
                                     world.getRegistryKey().getValue().toString(),
                                     posX, posY,
                                     posZ);
+                            SkullMagic.LOGGER.info("Using spawning command: %s", command);
                             world.getServer().getCommandManager().executeWithPrefix(src.withSilent(), command);
                         } catch (Exception e) {
                             SkullMagic.LOGGER.warn("Failed formatting or executing command: %s, formatted command: %s",

@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EntityMixin",
-    "ZombieVillagerEntityMixin",
-    "PlaceBlockMixin"
+    "ZombieVillagerEntityMixin"
   ],
   "client": [],
   "injectors": {

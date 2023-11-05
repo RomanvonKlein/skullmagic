@@ -2,6 +2,7 @@ package com.romanvonklein.skullmagic.blocks;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
+import com.romanvonklein.skullmagic.config.Config;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -11,6 +12,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -30,6 +32,27 @@ public class SkullPedestal extends BlockWithEntity {
         super(settings);
         // TODO: is this state even used anymore?
         setDefaultState(getStateManager().getDefaultState().with(CONNECTED, false));
+    }
+
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos,
+            boolean notify) {
+        if (!world.isClient()) {
+            // is the updated block on top of the pedestal?
+            if (pos.getX() == sourcePos.getX() && pos.getY() + 1 == sourcePos.getY()
+                    && pos.getZ() == sourcePos.getZ()) {
+                // is the updated block a skull?
+                String updatedNeighborBlockIdentifier = Registries.BLOCK.getId(world.getBlockState(sourcePos).getBlock())
+                        .toString();
+                // Is this pedestal already part of an altar with said block?
+                if (Config.getConfig().skulls.containsKey(updatedNeighborBlockIdentifier)) {
+                    // skull placed on pedestal?
+                    SkullMagic.getServerData().tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos.down());
+                } else {
+                    SkullMagic.getServerData().removePedestal(((ServerWorld) world), pos);
+                }
+            }
+        }
     }
 
     @Override
