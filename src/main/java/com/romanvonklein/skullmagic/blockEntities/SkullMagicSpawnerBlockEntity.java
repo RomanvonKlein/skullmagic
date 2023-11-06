@@ -10,6 +10,8 @@ import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -18,6 +20,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -32,6 +35,7 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
     protected int delayed;
     protected int lastParticled;
     private static final int maxTries = 3;
+    private static final int maxCrowd = 4;
 
     public SkullMagicSpawnerBlockEntity(BlockPos pos,
             BlockState state) {
@@ -49,7 +53,6 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
 
     }
 
-    // TODO: dont spawn when there's loads of mobs around already
     public static void tick(World world, BlockPos pos, BlockState state, BlockEntity ent) {
         if (!world.isClient && ent instanceof SkullMagicSpawnerBlockEntity) {
             SkullMagicSpawnerBlockEntity castedEnt = (SkullMagicSpawnerBlockEntity) ent;
@@ -61,45 +64,59 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
             if (castedEnt.delayed >= castedEnt.maxDelay) {
                 castedEnt.delayed = 0;
                 castedEnt.lastParticled = 0;
-                SkullMagic.LOGGER.info("Attempting Spawn");
-                Random rand = Random.createLocal();
-                for (int i = 0; i < castedEnt.maxSpawns; i++) {
-                    ServerCommandSource src = world.getServer().getCommandSource();
-                    String command = "FORMATTING FAILED";
-                    for (int tryNo = 0; tryNo < maxTries; tryNo++) {
-                        int posX = pos.getX() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
-                        int posY = pos.getY() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
-                        int posZ = pos.getZ() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
-                        if (world.isSpaceEmpty(new Box(posX, posY, posZ, posX + 1, posY + 2, posZ + 1))) {
-                            try {
-                                SkullMagic.LOGGER.info("preparing spawning command from spawning command: {}",
-                                        castedEnt.spawnCommand);
-                                command = String.format(castedEnt.spawnCommand,
-                                        world.getRegistryKey().getValue().toString(),
-                                        posX, posY,
+                if (world
+                        .getEntitiesByType(TypeFilter.instanceOf(MobEntity.class),
+                                new Box(pos.getX() - castedEnt.range, pos.getY() - castedEnt.range,
+                                        pos.getZ() - castedEnt.range,
+                                        pos.getX() + castedEnt.range, pos.getY() + castedEnt.range,
+                                        pos.getZ() + castedEnt.range),
+                                (MobEntity test) -> {
+                                    return true;
+                                })
+                        .size() < maxCrowd) {
+
+                    SkullMagic.LOGGER.info("Attempting Spawn");
+                    Random rand = Random.createLocal();
+                    for (int i = 0; i < castedEnt.maxSpawns; i++) {
+                        ServerCommandSource src = world.getServer().getCommandSource();
+                        String command = "FORMATTING FAILED";
+                        for (int tryNo = 0; tryNo < maxTries; tryNo++) {
+                            int posX = pos.getX() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
+                            int posY = pos.getY() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
+                            int posZ = pos.getZ() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
+                            if (world.isSpaceEmpty(new Box(posX, posY, posZ, posX + 1, posY + 2, posZ + 1))) {
+                                try {
+                                    SkullMagic.LOGGER.info("preparing spawning command from spawning command: {}",
+                                            castedEnt.spawnCommand);
+                                    command = String.format(castedEnt.spawnCommand,
+                                            world.getRegistryKey().getValue().toString(),
+                                            posX, posY,
+                                            posZ);
+                                    String.format("%d %s", 5, "test");
+                                    SkullMagic.LOGGER.info("Using spawning command: {}", command);
+                                    world.getServer().getCommandManager().executeWithPrefix(src.withSilent(), command);
+                                } catch (Exception e) {
+                                    SkullMagic.LOGGER.warn(
+                                            "Failed formatting or executing command: {}, formatted command: {}",
+                                            castedEnt.spawnCommand, command);
+                                    SkullMagic.LOGGER.error(e.getMessage());
+                                }
+                                break;
+                            } else {
+                                SkullMagic.LOGGER.info("Could not find any free space at {} {} {}", posX, posY,
                                         posZ);
-                                String.format("%d %s", 5, "test");
-                                SkullMagic.LOGGER.info("Using spawning command: {}", command);
-                                world.getServer().getCommandManager().executeWithPrefix(src.withSilent(), command);
-                            } catch (Exception e) {
-                                SkullMagic.LOGGER.warn(
-                                        "Failed formatting or executing command: {}, formatted command: {}",
-                                        castedEnt.spawnCommand, command);
-                                SkullMagic.LOGGER.error(e.getMessage());
+                                ServerPackageSender.sendParticleEffectPackageToPlayers(
+                                        ((ServerWorld) world).getPlayers(),
+                                        "minecraft:flame",
+                                        world.getRegistryKey(), new Vec3d(0.5 + posX, 0.5 + posY, 0.5 + posZ));
                             }
-                            break;
-                        } else {
-                            SkullMagic.LOGGER.info("Could not find any free space at {} {} {}", posX, posY,
-                                    posZ);
-                            ServerPackageSender.sendParticleEffectPackageToPlayers(((ServerWorld) world).getPlayers(),
-                                    "minecraft:flame",
-                                    world.getRegistryKey(), new Vec3d(0.5 + posX, 0.5 + posY, 0.5 + posZ));
                         }
+
                     }
+                    world.playSound(null, pos,
+                            SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.BLOCKS, 0.5f, 1f);
 
                 }
-                world.playSound(null, pos,
-                        SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.BLOCKS, 0.5f, 1f);
             } else {
                 int remainingTicks = castedEnt.maxDelay - castedEnt.delayed;
                 int siceLastTick = castedEnt.delayed - castedEnt.lastParticled;
