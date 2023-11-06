@@ -65,7 +65,6 @@ import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -100,51 +99,77 @@ public class SkullMagic implements ModInitializer {
 
 	// blocks
 	public static final Block BLOCK_USER_BLOCK = new BlockUser(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block CapacityCrystal = new CapacityCrystal(
-			FabricBlockSettings.of(Material.AMETHYST).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.AMETHYST).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block SkullPedestal = new SkullPedestal(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block SIMPLE_SPELL_SHRINE = new SimpleSpellShrine(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block INTERMEDIATE_SPELL_SHRINE = new IntermediateSpellShrine(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block ADVANCED_SPELL_SHRINE = new AdvancedSpellShrine(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block SPELL_POWER_PEDESTAL = new SimplePowerSpellPedestal(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block SPELL_EFFICIENCY_PEDESTAL = new SimpleEfficiencySpellPedestal(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block SPELL_COOLDOWN_PEDESTAL = new SimpleCooldownSpellPedestal(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block SkullAltar = new SkullAltar(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block FireCannon = new FireCannon(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block BlockPlacer = new BlockPlacer(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
-			FabricBlockSettings.of(Material.METAL).strength(4.0f).nonOpaque());
+			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
 	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(
 			SkullMagicSkullBlock.SkullMagicType.ENDERMAN,
-			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
+			// AbstractBlock.Settings.create(Material.DECORATION).strength(1.0f));
+			AbstractBlock.Settings.create().strength(1.0f));
 
 	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(
 			SkullMagicSkullBlock.SkullMagicType.SPIDER,
-			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
+			// AbstractBlock.Settings.create(Material.DECORATION).strength(1.0f));
+			AbstractBlock.Settings.create().strength(1.0f));
 	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(
 			SkullMagicSkullBlock.SkullMagicType.BLAZE,
-			AbstractBlock.Settings.of(Material.DECORATION).strength(1.0f));
-	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.of(Material.STONE).strength(2.0f));
-	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.of(Material.AMETHYST).strength(4.0f));
+			// AbstractBlock.Settings.create(Material.DECORATION).strength(1.0f));
+			AbstractBlock.Settings.create().strength(1.0f));
+	// public static final Block SKULLIUM_ORE = new
+	// Block(FabricBlockSettings.create(Material.STONE).strength(2.0f));
+	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.create().strength(2.0f));
+	// public static final Block SKULLIUM_BLOCK = new
+	// Block(FabricBlockSettings.create(Material.AMETHYST).strength(4.0f));
+	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.create().strength(4.0f));
 
 	// Spawner Blocks
 	public static final Block SKULLMAGIC_EASY_SPAWNER_BLOCK = new SkullMagicSpawner(
-			FabricBlockSettings.of(Material.STONE).strength(2.0f).nonOpaque(), "easy");
+			// FabricBlockSettings.create(Material.STONE).strength(2.0f).nonOpaque(),
+			// "easy");
+			FabricBlockSettings.create().strength(2.0f).nonOpaque(), "easy");
 	public static final Block SKULLMAGIC_MEDIUM_SPAWNER_BLOCK = new SkullMagicSpawner(
-			FabricBlockSettings.of(Material.STONE).strength(2.0f).nonOpaque(), "medium");
+			// FabricBlockSettings.create(Material.STONE).strength(2.0f).nonOpaque(),
+			// "medium");
+			FabricBlockSettings.create().strength(2.0f).nonOpaque(), "medium");
 	public static final Block SKULLMAGIC_HARD_SPAWNER_BLOCK = new SkullMagicSpawner(
-			FabricBlockSettings.of(Material.STONE).strength(2.0f).nonOpaque(), "hard");
+			// FabricBlockSettings.create(Material.STONE).strength(2.0f).nonOpaque(),
+			// "hard");
+			FabricBlockSettings.create().strength(2.0f).nonOpaque(), "hard");
 
 	// items
 	public static ArrayList<KnowledgeOrb> knowledgeOrbs = new ArrayList<>();
@@ -337,7 +362,7 @@ public class SkullMagic implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Server side data");
 			serverData = (ServerData) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(ServerData::fromNbt, ServerData::new, MODID + "_serverData");
+					.getOrCreate(ServerData.getPersistentStateType(), MODID + "_serverData");
 		});
 		// init structure types
 		SkullMagicStructureTypes.init();
@@ -356,7 +381,7 @@ public class SkullMagic implements ModInitializer {
 					String spellname = buf.readString(100);
 					if (serverData.playerHasAltar(serverPlayerEntity)) {
 						server.execute(() -> {
-							serverData.tryCastSpell(spellname, serverPlayerEntity, serverPlayerEntity.world);
+							serverData.tryCastSpell(spellname, serverPlayerEntity, serverPlayerEntity.getWorld());
 						});
 					}
 				});

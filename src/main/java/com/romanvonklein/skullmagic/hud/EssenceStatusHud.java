@@ -1,15 +1,12 @@
 package com.romanvonklein.skullmagic.hud;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ClientData;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper.Argb;
@@ -40,8 +37,9 @@ public class EssenceStatusHud implements HudRenderCallback {
          * @param color
          *               the color of the rectangle
          */
-        private static void drawRect(MatrixStack ms, int posX, int posY, int width, int height, int color) {
-                DrawableHelper.fill(ms, posX, posY, posX + width, posY + height,
+        private static void drawRect(DrawContext drawContext, int posX, int posY, int width, int height, int color) {
+
+                drawContext.fill(posX, posY, posX + width, posY + height,
                                 color);
                 // DrawableHelper.fill(ms, posX, posY,posX+ width,posY+ height, color);
         }
@@ -60,17 +58,16 @@ public class EssenceStatusHud implements HudRenderCallback {
          * @param texture
          *                the texture to draw
          */
-        private static void drawTextureRect(MatrixStack ms, int posX, int posY, int width, int height,
+        private static void drawTextureRect(DrawContext drawContext, int posX, int posY, int width, int height,
                         Identifier texture) {
-                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-                RenderSystem.setShaderTexture(0, texture);
-                DrawableHelper.drawTexture(ms, posX, posY, 0, 0, width, height, width, height);
-
+                // RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                // RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+                // RenderSystem.setShaderTexture(0, texture);
+                drawContext.drawTexture(texture, posX, posY, 0, 0, width, height, width, height);
         }
 
         @Override
-        public void onHudRender(MatrixStack matrixStack, float tickDelta) {
+        public void onHudRender(DrawContext drawContext, float tickDelta) {
                 // collect data to draw for player
                 MinecraftClient client = MinecraftClient.getInstance();
                 ClientData clientData = ClientInitializer.getClientData();
@@ -99,14 +96,14 @@ public class EssenceStatusHud implements HudRenderCallback {
                         int x = 10 + symbolSpace + borderwidth;
                         int y = 10;
                         // essence
-                        drawRect(matrixStack, x, y,
+                        drawRect(drawContext, x, y,
                                         Math.toIntExact(Math.round(Double
                                                         .valueOf(clientData.getCurrentEssence())
                                                         * pxPerEssence)),
                                         barheight,
                                         essence_filled);
                         // empty
-                        drawRect(matrixStack, x + Math.toIntExact(Math.round(Double
+                        drawRect(drawContext, x + Math.toIntExact(Math.round(Double
                                         .valueOf(clientData.getCurrentEssence())
                                         * pxPerEssence)),
                                         y,
@@ -122,24 +119,24 @@ public class EssenceStatusHud implements HudRenderCallback {
                                         int deductionBarColor = clientData.getCurrentEssence() >= fullEssenceCost
                                                         ? deduction_bar_can_afford
                                                         : deduction_bar_cannot_afford;
-                                        drawRect(matrixStack, x, y + barheight - deduction_bar_height, Math.toIntExact(
+                                        drawRect(drawContext, x, y + barheight - deduction_bar_height, Math.toIntExact(
                                                         Math.round(Double.valueOf(fullEssenceCost) * pxPerEssence)),
                                                         deduction_bar_height, deductionBarColor);
 
                                 }
                         }
                         // border
-                        drawTextureRect(matrixStack, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
+                        drawTextureRect(drawContext, x - borderwidth, y - borderwidth, barwidth + 2 * borderwidth,
                                         barheight + 2 * borderwidth, ClientInitializer.ESSENCE_BAR_FRAME_TEXTURE);
 
                         // essence in numbers
-                        client.textRenderer.draw(matrixStack,
+                        drawContext.drawText(client.textRenderer,
                                         Double.valueOf(clientData.getCurrentEssence())
                                                         + "/"
                                                         + Double.valueOf(ClientInitializer
                                                                         .getClientData().getMaxEssence()),
                                         x + 2 * borderwidth + barwidth,
-                                        y - 1, essence_number_gray);
+                                        y - 1, essence_number_gray, false);
 
                         // spell cooldown bar
                         String spellname = clientData.getSelectedSpellName();
@@ -162,34 +159,34 @@ public class EssenceStatusHud implements HudRenderCallback {
                                 // Draw cooldown bar if player's essence Pool is large enough
 
                                 if (fullEssenceCost > clientData.getMaxEssence()) {
-                                        client.textRenderer.draw(matrixStack,
+                                        drawContext.drawText(client.textRenderer,
                                                         Text.translatable("skullmagic.gui.essence_pool_too_small",
                                                                         fullEssenceCost),
                                                         x,
-                                                        y, essence_pool_too_small_text);
+                                                        y, essence_pool_too_small_text, false);
                                 } else {
                                         // cooldown
                                         int cooldownBarWidth = Math.toIntExact(Math.round(cooldownLeft * pxPerTick));
                                         int rechargedBarWidth = barwidth - cooldownBarWidth;
-                                        drawRect(matrixStack, x, y, cooldownBarWidth,
+                                        drawRect(drawContext, x, y, cooldownBarWidth,
                                                         barheight,
                                                         spell_cooldown);
                                         // empty
-                                        drawRect(matrixStack, x + cooldownBarWidth, y,
+                                        drawRect(drawContext, x + cooldownBarWidth, y,
                                                         rechargedBarWidth,
                                                         barheight, spell_off_cooldown);
                                         // border
-                                        drawTextureRect(matrixStack, x - borderwidth, y - borderwidth,
+                                        drawTextureRect(drawContext, x - borderwidth, y - borderwidth,
                                                         barwidth + 2 * borderwidth,
                                                         barheight + 2 * borderwidth,
                                                         ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
 
                                         // cooldown counter
                                         if (cooldownLeft != 0) {
-                                                client.textRenderer.draw(matrixStack,
+                                                drawContext.drawText(client.textRenderer,
                                                                 Integer.toString(cooldownLeft / 20),
                                                                 x + 2 * borderwidth + barwidth,
-                                                                y - 1, color);
+                                                                y - 1, color, false);
                                         }
                                 }
 
@@ -203,7 +200,7 @@ public class EssenceStatusHud implements HudRenderCallback {
                                 // icons
                                 // previous
                                 if (ClientInitializer.SPELL_ICONS.containsKey(prevSpellName)) {
-                                        drawTextureRect(matrixStack,
+                                        drawTextureRect(drawContext,
                                                         x - iconWidth - borderwidth - iconWidth / 2,
                                                         y - borderwidth - iconWidth / 2,
                                                         iconWidth,
@@ -212,7 +209,7 @@ public class EssenceStatusHud implements HudRenderCallback {
                                 }
                                 // next
                                 if (ClientInitializer.SPELL_ICONS.containsKey(nextSpellName)) {
-                                        drawTextureRect(matrixStack,
+                                        drawTextureRect(drawContext,
                                                         x - iconWidth - borderwidth - iconWidth / 2,
                                                         y - borderwidth + iconWidth / 2,
                                                         iconWidth,
@@ -221,7 +218,7 @@ public class EssenceStatusHud implements HudRenderCallback {
                                 }
                                 // current
                                 if (ClientInitializer.SPELL_ICONS.containsKey(selectedSpellName)) {
-                                        drawTextureRect(matrixStack, x - iconWidth - borderwidth,
+                                        drawTextureRect(drawContext, x - iconWidth - borderwidth,
                                                         y - borderwidth,
                                                         iconWidth,
                                                         iconWidth,
@@ -231,4 +228,5 @@ public class EssenceStatusHud implements HudRenderCallback {
                         }
                 }
         }
+
 }

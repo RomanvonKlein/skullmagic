@@ -63,7 +63,7 @@ public class SpellInitializer {
                         Vec3d angle = player.getRotationVector().normalize()
                                 .multiply(powerlevel / 2 + 1.5);
                         Vec3d pos = player.getPos();
-                        World world = player.world;
+                        World world = player.getWorld();
                         FireballEntity ent = new FireballEntity(world, player,
                                 angle.getX(),
                                 angle.getY(),
@@ -100,7 +100,7 @@ public class SpellInitializer {
                             Vector3f angle = Direction.DOWN.getUnitVector();
                             Random rand = Random.create();
 
-                            World world = player.world;
+                            World world = player.getWorld();
                             for (int i = 0; i < meteoriteCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
                                         rand.nextInt(maxDelay),
@@ -139,7 +139,7 @@ public class SpellInitializer {
                         int wolfLifeTime = 20 * 60;// ~one minute of lifetime
                         ArrayList<WolfEntity> wolfesSpawned = new ArrayList<>();
                         for (int i = 0; i < wolfCount; i++) {
-                            World world = player.world;
+                            World world = player.getWorld();
                             WolfEntity wolf = new WolfEntity(EntityType.WOLF, world);
 
                             world.spawnEntity(wolf);
@@ -190,7 +190,7 @@ public class SpellInitializer {
                                             Random rand = Random.createLocal();
                                             Vec3d dir = player.getRotationVector().normalize();
 
-                                            World world = player.world;
+                                            World world = player.getWorld();
                                             world.playSound(null, player.getBlockPos(),
                                                     SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
                                             for (int i = 0; i < shotsPerTick; i++) {
@@ -236,7 +236,7 @@ public class SpellInitializer {
                                             Random rand = Random.createLocal();
                                             Vec3d dir = player.getRotationVector().normalize();
 
-                                            World world = player.world;
+                                            World world = player.getWorld();
                                             world.playSound(null, player.getBlockPos(),
                                                     SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
                                             for (int i = 0; i < shotsPerTick; i++) {
@@ -263,7 +263,7 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
-                        World world = player.world;
+                        World world = player.getWorld();
                         if (!world.isClient) {
                             Vec3d velocity = player.getRotationVector().multiply(8.0 + powerlevel * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
@@ -282,7 +282,7 @@ public class SpellInitializer {
                 new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
-                        if (!player.world.isClient) {
+                        if (!player.getWorld().isClient) {
                             Vec3d velocity = player.getRotationVector().multiply(4.0 + powerlevel * 2);
                             player.addVelocity(velocity.x, velocity.y, velocity.z);
                             player.velocityModified = true;
@@ -296,7 +296,7 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
-                        World world = player.world;
+                        World world = player.getWorld();
                         if (!world.isClient) {
                             Vec3d velocity = player.getRotationVector().multiply(8.0 + powerlevel * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
@@ -387,7 +387,7 @@ public class SpellInitializer {
                         if (result != null) {
                             Vec3d center = result.getPos();
 
-                            World world = player.world;
+                            World world = player.getWorld();
                             world.playSound(null, BlockPos.ofFloored(center),
                                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.BLOCKS, 1f, 1f);
                             player.teleport(center.x, center.y, center.z, true);
@@ -440,7 +440,7 @@ public class SpellInitializer {
                                 (entityx) -> !entityx.isSpectator() && entityx.canHit(),
                                 reachDistance * reachDistance);
                         if (entityHitResult != null && entityHitResult.getEntity() instanceof VillagerEntity villager) {
-                            ServerWorld world = (ServerWorld) player.world;
+                            ServerWorld world = (ServerWorld) player.getWorld();
                             ZombieVillagerEntity zombieVillagerEntity = villager.convertTo(EntityType.ZOMBIE_VILLAGER,
                                     false);
 
@@ -494,7 +494,7 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
-                        World world = player.world;
+                        World world = player.getWorld();
                         if (!world.isClient) {
                             Vec3d velocity = player.getRotationVector().multiply(8.0 + powerlevel * 2);
                             EffectBall ball = EffectBall.createEffectBall(world, player, velocity.x, velocity.y,
@@ -513,7 +513,7 @@ public class SpellInitializer {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
-                        World world = player.world;
+                        World world = player.getWorld();
                         if (!world.isClient) {
                             int range = 7 + (int) Math.round(powerlevel);
                             int angle = 30;
@@ -552,7 +552,7 @@ public class SpellInitializer {
          * if (result != null) {
          * Vec3d center = result.getPos();
          * BlockPos pos = BlockPos.ofFloored(center);
-         * ServerWorld world = (ServerWorld) player.world;
+         * ServerWorld world = (ServerWorld) player.getWorld();
          * // Structure structure = StructurePlacer.place(world, false,
          * // new Identifier("skullmagic:overworld/dark_tower/dark_tower_base"),
          * // pos);
@@ -595,7 +595,7 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            World world = player.world;
+                            World world = player.getWorld();
                             LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT, world);
                             bolt.setPos(center.x, center.y, center.z);
 
@@ -611,7 +611,7 @@ public class SpellInitializer {
                         int radius = (int) (1 + powerlevel * 2);
                         HitResult result = player.raycast(100, 1, false);
                         Vec3d center = result.getPos();
-                        World world = player.world;
+                        World world = player.getWorld();
                         for (int x = (int) Math.round(center.getX() - radius); x < center.getX() + radius; x++) {
                             for (int y = (int) Math.round(center.getY() - radius); y < center.getY()
                                     + radius; y++) {
@@ -666,7 +666,7 @@ public class SpellInitializer {
                         if (result != null) {
                             int radius = (int) (1 + powerlevel * 2);
                             Vec3d center = result.getPos();
-                            World world = player.world;
+                            World world = player.getWorld();
                             boolean placedAnything = false;
                             for (int x = (int) Math.round(center.getX() - radius); x < center.getX() + radius; x++) {
                                 for (int y = (int) Math.round(center.getY() - radius); y < center.getY()
@@ -722,7 +722,7 @@ public class SpellInitializer {
                                             public Boolean apply(Object[] data, Object n1, Object n2) {
                                                 Random newRand = Random.createLocal();
 
-                                                World world = player.world;
+                                                World world = player.getWorld();
                                                 LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,
                                                         world);
                                                 bolt.setPos(center.x - radius + 2 * newRand.nextFloat() * radius,

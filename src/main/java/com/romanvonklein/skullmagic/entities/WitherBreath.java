@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.entities;
 
+import java.io.IOException;
+
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.entity.Entity;
@@ -43,27 +45,31 @@ public class WitherBreath extends FireBreath {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        if (!this.world.isClient) {
+        try (World world = this.getWorld()) {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 this.onBlockHit((BlockHitResult) hitResult);
             } else if (hitResult.getType() == HitResult.Type.ENTITY) {
                 this.onEntityHit((EntityHitResult) hitResult);
             }
+        } catch (IOException e) {
+            SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (!this.world.isClient) {
+        try (World world = this.getWorld()) {
             Entity ent = entityHitResult.getEntity();
             if (ent.getType() != SkullMagic.FIRE_BREATH) {
-                ent.damage(this.world.getDamageSources().wither(), damage);
+                ent.damage(world.getDamageSources().wither(), damage);
                 if (ent instanceof LivingEntity temp) {
                     temp.addStatusEffect(
                             new StatusEffectInstance(StatusEffects.WITHER, this.witherDuration, 1));
                 }
                 this.discard();
             }
+        } catch (IOException e) {
+            SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 

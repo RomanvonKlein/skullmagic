@@ -11,6 +11,8 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
@@ -19,9 +21,11 @@ public class EffectBall extends AbstractFireballEntity {
     private float radius;
     private StatusEffect effect;
     private int power;
+    protected World myWorld;
 
     public EffectBall(EntityType<? extends AbstractFireballEntity> type, World world) {
         super(type, world);
+        this.myWorld = world;
         this.radius = 3.0f;
         this.effect = StatusEffects.POISON;
     }
@@ -51,7 +55,7 @@ public class EffectBall extends AbstractFireballEntity {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        if (!this.world.isClient) {
+        if (!this.myWorld.isClient) {
             spawnLingeringEffect();
             this.discard();
         }
@@ -60,16 +64,16 @@ public class EffectBall extends AbstractFireballEntity {
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (!this.world.isClient) {
+        if (!this.myWorld.isClient) {
             spawnLingeringEffect();
             this.discard();
         }
     }
 
     private void spawnLingeringEffect() {
-        if (!this.world.isClient) {
+        if (!this.myWorld.isClient) {
             SkullMagic.LOGGER.info("Spawning lingering effect: " + this.effect.toString());
-            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(this.world, this.getX(),
+            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(this.myWorld, this.getX(),
                     this.getY() + 1.0f, this.getZ());
             Entity entity = this.getOwner();
             if (entity instanceof LivingEntity) {
@@ -82,14 +86,15 @@ public class EffectBall extends AbstractFireballEntity {
             areaEffectCloudEntity
                     .setRadiusGrowth(-areaEffectCloudEntity.getRadius() / (float) areaEffectCloudEntity.getDuration());
             areaEffectCloudEntity.addEffect(new StatusEffectInstance(effect, 400, this.power));
-            this.world.spawnEntity(areaEffectCloudEntity);
+            this.myWorld.spawnEntity(areaEffectCloudEntity);
         }
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         nbt.putByte("radius", (byte) this.radius);
-        nbt.putInt("statuseffect", StatusEffect.getRawId(this.effect));
+
+        nbt.putString("statuseffect", Registries.STATUS_EFFECT.getId(this.effect).toString());
         super.writeCustomDataToNbt(nbt);
     }
 
@@ -99,7 +104,7 @@ public class EffectBall extends AbstractFireballEntity {
             this.radius = nbt.getByte("radius");
         }
         if (nbt.contains("statuseffect")) {
-            this.effect = StatusEffect.byRawId(nbt.getInt("statuseffect"));
+            this.effect = Registries.STATUS_EFFECT.get(Identifier.tryParse(nbt.getString("statuseffect")));
         }
         super.readCustomDataFromNbt(nbt);
     }

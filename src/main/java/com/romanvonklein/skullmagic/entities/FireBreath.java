@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.entities;
 
+import java.io.IOException;
+
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.block.Blocks;
@@ -38,35 +40,45 @@ public class FireBreath extends AbstractFireballEntity {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.world.isClient) {
+        try (World world = this.getWorld()) {
             Direction direction = blockHitResult.getSide();
             BlockPos pos = blockHitResult.getBlockPos().offset(direction);
-            if (this.world.getBlockState(pos) == Blocks.AIR.getDefaultState()) {
-                this.world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+            if (world.getBlockState(pos) == Blocks.AIR.getDefaultState()) {
+                world.setBlockState(pos, Blocks.FIRE.getDefaultState());
             }
             this.discard();
+        } catch (IOException e) {
+            SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        if (!this.world.isClient) {
-            if (hitResult.getType() == HitResult.Type.BLOCK) {
-                this.onBlockHit((BlockHitResult) hitResult);
-            } else if (hitResult.getType() == HitResult.Type.ENTITY) {
-                this.onEntityHit((EntityHitResult) hitResult);
+        try (World world = this.getWorld()) {
+            if (!world.isClient) {
+                if (hitResult.getType() == HitResult.Type.BLOCK) {
+                    this.onBlockHit((BlockHitResult) hitResult);
+                } else if (hitResult.getType() == HitResult.Type.ENTITY) {
+                    this.onEntityHit((EntityHitResult) hitResult);
+                }
             }
+        } catch (IOException e) {
+            SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (!this.world.isClient) {
-            Entity ent = entityHitResult.getEntity();
-            if (ent.getType() != SkullMagic.FIRE_BREATH) {
-                entityHitResult.getEntity().setOnFireFor(this.burnDuration);
-                this.discard();
+        try (World world = this.getWorld()) {
+            if (!world.isClient) {
+                Entity ent = entityHitResult.getEntity();
+                if (ent.getType() != SkullMagic.FIRE_BREATH) {
+                    entityHitResult.getEntity().setOnFireFor(this.burnDuration);
+                    this.discard();
+                }
             }
+        } catch (IOException e) {
+            SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 

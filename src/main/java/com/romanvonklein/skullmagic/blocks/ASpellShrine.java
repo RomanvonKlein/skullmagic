@@ -69,7 +69,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return checkType(type, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
+        return validateTicker(type, SkullMagic.SPELL_SHRINE_BLOCK_ENTITY,
                 (world1, pos, state1, be) -> SpellShrineBlockEntity.tick(world1, pos, state1, be));
     }
 }

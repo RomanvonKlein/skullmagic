@@ -3,6 +3,7 @@ package com.romanvonklein.skullmagic.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.SkullMagic;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -24,20 +25,21 @@ public class BlockPlacerScreen extends HandledScreen<BlockPlacerScreenHandler> {
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    protected void drawBackground(DrawContext drawContext, float var2, int var3, int var4) {
+        // RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        // RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        // RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
-        drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        drawContext.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
     }
 
-    @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
-        drawMouseoverTooltip(matrices, mouseX, mouseY);
-    }
+    // @Override
+    // public void render(MatrixStack matrices, int mouseX, int mouseY, float delta)
+    // {
+    // renderBackground(matrices);
+    // super.render(matrices, mouseX, mouseY, delta);
+    // drawMouseoverTooltip(matrices, mouseX, mouseY);
+    // }
 
 }

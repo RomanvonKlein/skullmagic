@@ -26,6 +26,7 @@ import com.romanvonklein.skullmagic.util.Parsing;
 import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -50,6 +51,11 @@ public class ServerData extends PersistentState {
     private ArrayList<UUID> playersToUpdate = new ArrayList<>();
     HashMap<UUID, PlayerData> players;
     static private Map<String, ? extends Spell> spells;
+
+    public static PersistentState.Type<ServerData> getPersistentStateType() {
+        return new PersistentState.Type<>(ServerData::new, ServerData::fromNbt,
+                DataFixTypes.SAVED_DATA_MAP_INDEX);
+    }
 
     public ServerData() {
         this.players = new HashMap<UUID, PlayerData>();
@@ -676,7 +682,8 @@ public class ServerData extends PersistentState {
         if (spells.get(spellname).action.apply(player, powerLevel)) {
             setSpellOnCooldown(playerID, spellname);
             dischargeSpellcost(playerID, spellname);
-            ServerPackageSender.sendEffectPackageToPlayers(player.getWorld().getPlayers(), spellname, powerLevel,
+            ServerPackageSender.sendEffectPackageToPlayers((List<ServerPlayerEntity>) player.getWorld().getPlayers(),
+                    spellname, powerLevel,
                     player.getWorld().getRegistryKey(),
                     player.getEyePos());
             result = true;

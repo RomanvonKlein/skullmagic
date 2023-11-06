@@ -70,7 +70,7 @@ public class LinkingParticle extends AbstractSlowingParticle {
         }
 
         this.move(this.velocityX, this.velocityY, this.velocityZ);
-        if (this.field_28787 && this.y == this.prevPosY) {// not sure i want this...
+        if (this.ascending && this.y == this.prevPosY) {// not sure i want this...
             this.velocityX *= 1.1;
             this.velocityZ *= 1.1;
         }
