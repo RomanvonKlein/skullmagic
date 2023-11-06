@@ -42,12 +42,13 @@ public class SkullPedestal extends BlockWithEntity {
             if (pos.getX() == sourcePos.getX() && pos.getY() + 1 == sourcePos.getY()
                     && pos.getZ() == sourcePos.getZ()) {
                 // is the updated block a skull?
-                String updatedNeighborBlockIdentifier = Registries.BLOCK.getId(world.getBlockState(sourcePos).getBlock())
+                String updatedNeighborBlockIdentifier = Registries.BLOCK
+                        .getId(world.getBlockState(sourcePos).getBlock())
                         .toString();
                 // Is this pedestal already part of an altar with said block?
                 if (Config.getConfig().skulls.containsKey(updatedNeighborBlockIdentifier)) {
                     // skull placed on pedestal?
-                    SkullMagic.getServerData().tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos.down());
+                    SkullMagic.getServerData().tryLinkSkullPedestalToNearbyAltar((ServerWorld) world, pos);
                 } else {
                     SkullMagic.getServerData().removePedestal(((ServerWorld) world), pos);
                 }
