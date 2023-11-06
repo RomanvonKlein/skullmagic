@@ -2,6 +2,7 @@ package com.romanvonklein.skullmagic.blockEntities;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.datafixers.types.templates.Check;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSpawner;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
@@ -36,6 +37,7 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
     protected int lastParticled;
     private static final int maxTries = 3;
     private static final int maxCrowd = 4;
+    private static final int CheckPlayerRange = 20;
 
     public SkullMagicSpawnerBlockEntity(BlockPos pos,
             BlockState state) {
@@ -73,7 +75,9 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
                                 (MobEntity test) -> {
                                     return true;
                                 })
-                        .size() < maxCrowd) {
+                        .size() < maxCrowd
+                        && world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), CheckPlayerRange,
+                                false) != null) {
 
                     SkullMagic.LOGGER.info("Attempting Spawn");
                     Random rand = Random.createLocal();
