@@ -2,7 +2,6 @@ package com.romanvonklein.skullmagic.blockEntities;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.datafixers.types.templates.Check;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSpawner;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
@@ -11,7 +10,6 @@ import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -37,7 +35,9 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
     protected int lastParticled;
     private static final int maxTries = 3;
     private static final int maxCrowd = 4;
-    private static final int CheckPlayerRange = 20;
+    // TODO: maybe have a seperate vertical range?
+    // private static final int CheckPlayerRangeVertical = 10;
+    private static final int CheckPlayerRange = 15;
 
     public SkullMagicSpawnerBlockEntity(BlockPos pos,
             BlockState state) {
@@ -78,61 +78,66 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
                         .size() < maxCrowd
                         && world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), CheckPlayerRange,
                                 false) != null) {
-
-                    SkullMagic.LOGGER.info("Attempting Spawn");
-                    Random rand = Random.createLocal();
-                    for (int i = 0; i < castedEnt.maxSpawns; i++) {
-                        ServerCommandSource src = world.getServer().getCommandSource();
-                        String command = "FORMATTING FAILED";
-                        for (int tryNo = 0; tryNo < maxTries; tryNo++) {
-                            int posX = pos.getX() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
-                            int posY = pos.getY() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
-                            int posZ = pos.getZ() + rand.nextBetween(-castedEnt.range, +castedEnt.range);
-                            if (world.isSpaceEmpty(new Box(posX, posY, posZ, posX + 1, posY + 2, posZ + 1))) {
-                                try {
-                                    SkullMagic.LOGGER.info("preparing spawning command from spawning command: {}",
-                                            castedEnt.spawnCommand);
-                                    command = String.format(castedEnt.spawnCommand,
-                                            world.getRegistryKey().getValue().toString(),
-                                            posX, posY,
-                                            posZ);
-                                    String.format("%d %s", 5, "test");
-                                    SkullMagic.LOGGER.info("Using spawning command: {}", command);
-                                    world.getServer().getCommandManager().executeWithPrefix(src.withSilent(), command);
-                                } catch (Exception e) {
-                                    SkullMagic.LOGGER.warn(
-                                            "Failed formatting or executing command: {}, formatted command: {}",
-                                            castedEnt.spawnCommand, command);
-                                    SkullMagic.LOGGER.error(e.getMessage());
-                                }
-                                break;
-                            } else {
-                                SkullMagic.LOGGER.info("Could not find any free space at {} {} {}", posX, posY,
-                                        posZ);
-                                ServerPackageSender.sendParticleEffectPackageToPlayers(
-                                        ((ServerWorld) world).getPlayers(),
-                                        "minecraft:flame",
-                                        world.getRegistryKey(), new Vec3d(0.5 + posX, 0.5 + posY, 0.5 + posZ));
-                            }
-                        }
-
+                    castedEnt.startSpawnProcess(world, pos);
+                } else {
+                    int remainingTicks = castedEnt.maxDelay - castedEnt.delayed;
+                    int siceLastTick = castedEnt.delayed - castedEnt.lastParticled;
+                    if (siceLastTick >= remainingTicks / 10) {
+                        Random rand = Random.createLocal();
+                        castedEnt.lastParticled = castedEnt.delayed;
+                        ServerPackageSender.sendParticleEffectPackageToPlayers(((ServerWorld) world).getPlayers(),
+                                "minecraft:flame",
+                                world.getRegistryKey(), pos.toCenterPos().add((rand.nextDouble() - 0.5) * 0.25,
+                                        (rand.nextDouble() - 0.5) * 0.2, (rand.nextDouble() - 0.5) * 0.25));
                     }
-                    world.playSound(null, pos,
-                            SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.BLOCKS, 0.5f, 1f);
-
-                }
-            } else {
-                int remainingTicks = castedEnt.maxDelay - castedEnt.delayed;
-                int siceLastTick = castedEnt.delayed - castedEnt.lastParticled;
-                if (siceLastTick >= remainingTicks / 10) {
-                    Random rand = Random.createLocal();
-                    castedEnt.lastParticled = castedEnt.delayed;
-                    ServerPackageSender.sendParticleEffectPackageToPlayers(((ServerWorld) world).getPlayers(),
-                            "minecraft:flame",
-                            world.getRegistryKey(), pos.toCenterPos().add((rand.nextDouble() - 0.5) * 0.25,
-                                    (rand.nextDouble() - 0.5) * 0.2, (rand.nextDouble() - 0.5) * 0.25));
                 }
             }
+        }
+    }
+
+    private void startSpawnProcess(World world, BlockPos pos) {
+        SkullMagic.LOGGER.info("Attempting Spawn");
+        Random rand = Random.createLocal();
+        boolean success = false;
+        for (int i = 0; i < this.maxSpawns; i++) {
+            ServerCommandSource src = world.getServer().getCommandSource();
+            String command = "FORMATTING FAILED";
+            for (int tryNo = 0; tryNo < maxTries; tryNo++) {
+                int posX = pos.getX() + rand.nextBetween(-this.range, +this.range);
+                int posY = pos.getY() + rand.nextBetween(-this.range, +this.range);
+                int posZ = pos.getZ() + rand.nextBetween(-this.range, +this.range);
+                if (world.isSpaceEmpty(new Box(posX, posY, posZ, posX + 1, posY + 2, posZ + 1))) {
+                    try {
+                        SkullMagic.LOGGER.info("preparing spawning command from spawning command: {}",
+                                this.spawnCommand);
+                        command = String.format(this.spawnCommand,
+                                world.getRegistryKey().getValue().toString(),
+                                posX, posY,
+                                posZ);
+                        String.format("%d %s", 5, "test");
+                        SkullMagic.LOGGER.info("Using spawning command: {}", command);
+                        success = true;
+                        world.getServer().getCommandManager().executeWithPrefix(src.withSilent(), command);
+                    } catch (Exception e) {
+                        SkullMagic.LOGGER.warn(
+                                "Failed formatting or executing command: {}, formatted command: {}",
+                                this.spawnCommand, command);
+                        SkullMagic.LOGGER.error(e.getMessage());
+                    }
+                    break;
+                } else {
+                    SkullMagic.LOGGER.info("Could not find any free space at {} {} {}", posX, posY,
+                            posZ);
+                    ServerPackageSender.sendParticleEffectPackageToPlayers(
+                            ((ServerWorld) world).getPlayers(),
+                            "minecraft:flame",
+                            world.getRegistryKey(), new Vec3d(0.5 + posX, 0.5 + posY, 0.5 + posZ));
+                }
+            }
+        }
+        if (success) {
+            world.playSound(null, pos,
+                    SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.BLOCKS, 0.5f, 1f);
         }
     }
 
