@@ -100,7 +100,11 @@ public class ClientData extends PlayerData {
         if (this.spells.size() > 0) {
 
             int currentIndex = spellnames.indexOf(this.selectedSpell);
-            if (MinecraftClient.getInstance().player.isSneaking()) {
+            boolean isSneaking = false;
+            try (MinecraftClient clt = MinecraftClient.getInstance()) {
+                isSneaking = clt.player.isSneaking();
+            }
+            if (isSneaking) {
                 currentIndex--;
             } else {
                 currentIndex++;
@@ -113,7 +117,7 @@ public class ClientData extends PlayerData {
 
     public String getPrevSpellname() {
         String result = null;
-        if (spellnames.size() > 0) {
+        if (!spellnames.isEmpty()) {
             int currentIndex = adjustForListsize(spellnames.indexOf(this.selectedSpell) - 1);
             result = spellnames.get(currentIndex);
         }
@@ -122,7 +126,7 @@ public class ClientData extends PlayerData {
 
     public String getNextSpellname() {
         String result = null;
-        if (spellnames.size() > 0) {
+        if (!spellnames.isEmpty()) {
             int currentIndex = adjustForListsize(spellnames.indexOf(this.selectedSpell) + 1);
             result = spellnames.get(currentIndex);
         }

@@ -11,6 +11,7 @@ import com.romanvonklein.skullmagic.util.Util;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -35,9 +36,8 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
     protected int lastParticled;
     private static final int maxTries = 3;
     private static final int maxCrowd = 4;
-    // TODO: maybe have a seperate vertical range?
-    // private static final int CheckPlayerRangeVertical = 10;
-    private static final int CheckPlayerRange = 15;
+    private static final double CheckPlayerRangeVertical = 10.0;
+    private static final double CheckPlayerRangeHorizontal = 15.0;
 
     public SkullMagicSpawnerBlockEntity(BlockPos pos,
             BlockState state) {
@@ -72,12 +72,17 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
                                         pos.getZ() - castedEnt.range,
                                         pos.getX() + castedEnt.range, pos.getY() + castedEnt.range,
                                         pos.getZ() + castedEnt.range),
-                                (MobEntity test) -> {
-                                    return true;
-                                })
+                                (MobEntity test) -> true)
                         .size() < maxCrowd
-                        && world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), CheckPlayerRange,
-                                false) != null) {
+                        && !world.getEntitiesByType(TypeFilter.instanceOf(PlayerEntity.class),
+                                        new Box(pos.getX() - CheckPlayerRangeHorizontal,
+                                                pos.getY() - CheckPlayerRangeVertical,
+                                                pos.getZ() - CheckPlayerRangeHorizontal,
+                                                pos.getX() + CheckPlayerRangeHorizontal,
+                                                pos.getY() + CheckPlayerRangeVertical,
+                                                pos.getZ() + CheckPlayerRangeHorizontal),
+                                        (PlayerEntity test) -> true)
+                                .isEmpty()) {
                     castedEnt.startSpawnProcess(world, pos);
                 } else {
                     int remainingTicks = castedEnt.maxDelay - castedEnt.delayed;
