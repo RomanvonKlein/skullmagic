@@ -103,7 +103,7 @@ public class ClientInitializer implements ClientModInitializer {
             }
             while (cycleSpellKeyBinding.wasPressed()) {
                 if (ClientInitializer.getClientData() != null) {
-                    clientData.cycleSpell();
+                    clientData.cycleSpell(client);
                     client.player.sendMessage(Text.of(clientData.getSelectedSpellName()), true);
                 }
             }

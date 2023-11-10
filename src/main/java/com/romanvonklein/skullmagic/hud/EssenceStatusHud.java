@@ -1,5 +1,6 @@
 package com.romanvonklein.skullmagic.hud;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ClientData;
@@ -7,6 +8,7 @@ import com.romanvonklein.skullmagic.data.ClientData;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper.Argb;
@@ -60,8 +62,8 @@ public class EssenceStatusHud implements HudRenderCallback {
          */
         private static void drawTextureRect(DrawContext drawContext, int posX, int posY, int width, int height,
                         Identifier texture) {
-                // RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                // RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
                 // RenderSystem.setShaderTexture(0, texture);
                 drawContext.drawTexture(texture, posX, posY, 0, 0, width, height, width, height);
         }

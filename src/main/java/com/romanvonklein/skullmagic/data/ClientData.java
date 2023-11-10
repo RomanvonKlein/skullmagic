@@ -96,20 +96,14 @@ public class ClientData extends PlayerData {
         this.selectedSpell = spellName;
     }
 
-    public void cycleSpell() {
+    public void cycleSpell(MinecraftClient clt) {
         if (this.spells.size() > 0) {
-
             int currentIndex = spellnames.indexOf(this.selectedSpell);
-            boolean isSneaking = false;
-            try (MinecraftClient clt = MinecraftClient.getInstance()) {
-                isSneaking = clt.player.isSneaking();
-            }
-            if (isSneaking) {
+            if (clt.player.isSneaking()) {
                 currentIndex--;
             } else {
                 currentIndex++;
             }
-
             currentIndex = adjustForListsize(currentIndex);
             this.selectedSpell = spellnames.get(currentIndex);
         }
