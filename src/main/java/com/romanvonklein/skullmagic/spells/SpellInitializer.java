@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.function.TriFunction;
@@ -38,6 +39,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -104,26 +106,29 @@ public class SpellInitializer {
                             for (int i = 0; i < meteoriteCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
                                         rand.nextInt(maxDelay),
-                                        new TriFunction<Object[], Object, Object, Boolean>() {
+                                        new TriFunction<Object[], MinecraftServer, UUID, Boolean>() {
                                             @Override
-                                            public Boolean apply(Object[] data, Object n1, Object n2) {
+                                            public Boolean apply(Object[] data, MinecraftServer server,
+                                                    UUID playerID) {
+                                                ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
+                                                        .getPlayer(playerID);
                                                 Random newRand = Random.createLocal();
-                                                FireballEntity ent = new FireballEntity(world, player, angle.x(),
+                                                FireballEntity ent = new FireballEntity(world, taskPlayerEnt, angle.x(),
                                                         angle.y(), angle.z(),
                                                         (int) Math.round(
                                                                 Math.max(1.0,
                                                                         Math.min(
-                                                                                minPower + rand
+                                                                                minPower + newRand
                                                                                         .nextInt(maxPower - minPower)
                                                                                         + (powerlevel - 1) * 0.5,
                                                                                 5.0))));
-                                                ent.setPos(center.x - radius + 2 * rand.nextFloat() * radius,
-                                                        height, center.z - radius + 2 * rand.nextFloat() * radius);
+                                                ent.setPos(center.x - radius + 2 * newRand.nextFloat() * radius,
+                                                        height, center.z - radius + 2 * newRand.nextFloat() * radius);
                                                 ent.setVelocity(0, -15, 0);
                                                 world.spawnEntity(ent);
                                                 return true;
                                             }
-                                        }, null);
+                                        }, null, player.getUuid());
                                 SkullMagic.taskManager.queueTask(tsk);
                             }
                         }
@@ -149,9 +154,9 @@ public class SpellInitializer {
                             wolfesSpawned.add(wolf);
                         }
                         SkullMagic.taskManager.queueTask(new DelayedTask("wolfpack_spell_kill_wolfes", wolfLifeTime,
-                                new TriFunction<Object[], Object, Object, Boolean>() {
+                                new TriFunction<Object[], MinecraftServer, UUID, Boolean>() {
                                     @Override
-                                    public Boolean apply(Object[] data, Object n1, Object n2) {
+                                    public Boolean apply(Object[] data, MinecraftServer server, UUID playerID) {
                                         @SuppressWarnings("unchecked")
                                         ArrayList<WolfEntity> wolfes = (ArrayList<WolfEntity>) data[0];
                                         for (WolfEntity wolf : wolfes) {
@@ -163,7 +168,7 @@ public class SpellInitializer {
                                         return true;
                                     }
                                 },
-                                new Object[] { wolfesSpawned }));
+                                new Object[] { wolfesSpawned }, player.getUuid()));
                         return true;
                     }
                 }));
@@ -180,34 +185,43 @@ public class SpellInitializer {
                                                                 // memory
                                                                 // efficient.
                             SkullMagic.taskManager.queueTask(new DelayedTask("spawn_fire_breath_task", i,
-                                    new TriFunction<Object[], Object, Object, Boolean>() {
+                                    new TriFunction<Object[], MinecraftServer, UUID, Boolean>() {
                                         @Override
-                                        public Boolean apply(Object[] data, Object n1, Object n2) {
+                                        public Boolean apply(Object[] data, MinecraftServer server, UUID playerID) {
                                             int shotsPerTick = ((int[]) data[0])[0];
                                             int breathLife = ((int[]) data[0])[1];
                                             int burnDuration = ((int[]) data[0])[2];
-
+                                            int taskTickNo = ((int[]) data[0])[3];
+                                            int lasttaskTickNo = ((int[]) data[0])[4];
                                             Random rand = Random.createLocal();
-                                            Vec3d dir = player.getRotationVector().normalize();
 
-                                            World world = player.getWorld();
-                                            world.playSound(null, player.getBlockPos(),
+                                            ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
+                                                    .getPlayer(playerID);
+                                            Vec3d dir = taskPlayerEnt.getRotationVector().normalize();
+
+                                            World world = taskPlayerEnt.getWorld();
+                                            world.playSound(null, taskPlayerEnt.getBlockPos(),
                                                     SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
-                                            for (int i = 0; i < shotsPerTick; i++) {
-                                                FireBreath entity = FireBreath.createFireBreath(world, player,
+
+                                            for (int j = 0; j < shotsPerTick; j++) {
+                                                FireBreath entity = FireBreath.createFireBreath(world, taskPlayerEnt,
                                                         dir.x + rand.nextFloat() - 0.5,
                                                         dir.y + rand.nextFloat() - 0.5, dir.z + rand.nextFloat() - 0.5,
                                                         burnDuration, breathLife);
                                                 entity.setPosition(
-                                                        player.getPos().add(dir.multiply(0.5))
-                                                                .add(0, player.getEyeHeight(player.getPose()), 0));
+                                                        taskPlayerEnt.getPos().add(dir.multiply(0.5))
+                                                                .add(0, taskPlayerEnt
+                                                                        .getEyeHeight(taskPlayerEnt.getPose()), 0));
                                                 world.spawnEntity(entity);
 
                                             }
+
                                             return true;
                                         }
                                     },
-                                    new Object[] { new int[] { shotsPerTick, breathLife, burnDuration } }));
+                                    new Object[] {
+                                            new int[] { shotsPerTick, breathLife, burnDuration, i, tickDuration } },
+                                    player.getUuid()));
                         }
                         return true;
                     }
@@ -226,33 +240,46 @@ public class SpellInitializer {
                                                                 // memory
                                                                 // efficient.
                             SkullMagic.taskManager.queueTask(new DelayedTask("spawn_wither_breath_task", i,
-                                    new TriFunction<Object[], Object, Object, Boolean>() {
+                                    new TriFunction<Object[], MinecraftServer, UUID, Boolean>() {
                                         @Override
-                                        public Boolean apply(Object[] data, Object n1, Object n2) {
-                                            int shotsPerTick = ((int[]) data[0])[0];
-                                            int breathLife = ((int[]) data[0])[1];
-                                            int witherDuration = ((int[]) data[0])[2];
-                                            int damage = ((int[]) data[0])[3];
-                                            Random rand = Random.createLocal();
-                                            Vec3d dir = player.getRotationVector().normalize();
+                                        public Boolean apply(Object[] data, MinecraftServer server, UUID playerID) {
+                                            ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
+                                                    .getPlayer(playerID);
+                                            if (taskPlayerEnt != null) {
+                                                int shotsPerTick = ((int[]) data[0])[0];
+                                                int breathLife = ((int[]) data[0])[1];
+                                                int witherDuration = ((int[]) data[0])[2];
+                                                int damage = ((int[]) data[0])[3];
+                                                Random rand = Random.createLocal();
+                                                Vec3d dir = taskPlayerEnt.getRotationVector().normalize();
 
-                                            World world = player.getWorld();
-                                            world.playSound(null, player.getBlockPos(),
-                                                    SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
-                                            for (int i = 0; i < shotsPerTick; i++) {
-                                                WitherBreath entity = WitherBreath.createWitherBreath(world, player,
-                                                        dir.x + rand.nextFloat() * 0.5,
-                                                        dir.y + rand.nextFloat() * 0.5, dir.z + rand.nextFloat() * 0.5,
-                                                        witherDuration, breathLife, damage);
-                                                entity.setPosition(
-                                                        player.getPos().add(dir.multiply(0.5))
-                                                                .add(0, player.getEyeHeight(player.getPose()), 0));
-                                                world.spawnEntity(entity);
+                                                World world = taskPlayerEnt.getWorld();
+                                                world.playSound(null, taskPlayerEnt.getBlockPos(),
+                                                        SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.BLOCKS, 1f, 1f);
+                                                for (int j = 0; j < shotsPerTick; j++) {
+                                                    WitherBreath entity = WitherBreath.createWitherBreath(world,
+                                                            taskPlayerEnt,
+                                                            dir.x + rand.nextFloat() * 0.5,
+                                                            dir.y + rand.nextFloat() * 0.5,
+                                                            dir.z + rand.nextFloat() * 0.5,
+                                                            witherDuration, breathLife, damage);
+                                                    entity.setPosition(
+                                                            taskPlayerEnt.getPos().add(dir.multiply(0.5))
+                                                                    .add(0, taskPlayerEnt
+                                                                            .getEyeHeight(taskPlayerEnt.getPose()), 0));
+                                                    world.spawnEntity(entity);
+                                                }
+                                                return true;
+                                            } else {
+                                                SkullMagic.LOGGER
+                                                        .warn("Tried to execute Task " + "spawn_wither_breath_task"
+                                                                + " for non existing player.");
+                                                return false;
                                             }
-                                            return true;
                                         }
                                     },
-                                    new Object[] { new int[] { shotsPerTick, breathLife, witherDuration, damage } }));
+                                    new Object[] { new int[] { shotsPerTick, breathLife, witherDuration, damage } },
+                                    player.getUuid()));
                         }
                         return true;
                     }
@@ -717,12 +744,15 @@ public class SpellInitializer {
                             for (int i = 0; i < lightningCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
                                         rand.nextInt(maxDelay),
-                                        new TriFunction<Object[], Object, Object, Boolean>() {
+                                        new TriFunction<Object[], MinecraftServer, UUID, Boolean>() {
                                             @Override
-                                            public Boolean apply(Object[] data, Object n1, Object n2) {
+                                            public Boolean apply(Object[] data, MinecraftServer server,
+                                                    UUID playerID) {
+                                                ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
+                                                        .getPlayer(playerID);
                                                 Random newRand = Random.createLocal();
 
-                                                World world = player.getWorld();
+                                                World world = taskPlayerEnt.getWorld();
                                                 LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,
                                                         world);
                                                 bolt.setPos(center.x - radius + 2 * newRand.nextFloat() * radius,
@@ -731,7 +761,7 @@ public class SpellInitializer {
                                                 world.spawnEntity(bolt);
                                                 return true;
                                             }
-                                        }, null);
+                                        }, null, player.getUuid());
                                 SkullMagic.taskManager.queueTask(tsk);
                             }
                         }

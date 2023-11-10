@@ -4,17 +4,19 @@ import java.util.ArrayList;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 
+import net.minecraft.server.MinecraftServer;
+
 public class TaskManager {
     private ArrayList<DelayedTask> queued = new ArrayList<>();
 
-    public void tick() {
+    public void tick(MinecraftServer server) {
         ArrayList<DelayedTask> done = new ArrayList<>();
         for (DelayedTask task : this.queued) {
             if (task.delayRemaining > 0) {
                 task.delayRemaining--;
             } else {
                 try {
-                    if (task.action()) {
+                    if (task.action(server)) {
                         done.add(task);
                     }
                 } catch (Exception e) {

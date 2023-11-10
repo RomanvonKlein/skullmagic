@@ -369,7 +369,7 @@ public class SkullMagic implements ModInitializer {
 
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			serverData.tick(server);
-			getTaskManager().tick();
+			getTaskManager().tick(server);
 		});
 		ServerPlayConnectionEvents.JOIN.register((serverPlayNetworkHandler, packetSender, server) -> {
 			getServerData().createPlayerEntryIfNotExists(serverPlayNetworkHandler.player);
@@ -380,9 +380,8 @@ public class SkullMagic implements ModInitializer {
 				(server, serverPlayerEntity, handler, buf, packetSender) -> {
 					String spellname = buf.readString(100);
 					if (serverData.playerHasAltar(serverPlayerEntity)) {
-						server.execute(() -> {
-							serverData.tryCastSpell(spellname, serverPlayerEntity, serverPlayerEntity.getWorld());
-						});
+						server.execute(() -> serverData.tryCastSpell(spellname, serverPlayerEntity,
+								serverPlayerEntity.getWorld()));
 					}
 				});
 
