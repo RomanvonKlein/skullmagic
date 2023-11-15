@@ -616,7 +616,7 @@ public class SpellInitializer {
          * 
          */
         spellList.put("lightningstrike",
-                new Spell(15000, 100, 55, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1000, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         HitResult result = player.raycast(100, 1, false);
