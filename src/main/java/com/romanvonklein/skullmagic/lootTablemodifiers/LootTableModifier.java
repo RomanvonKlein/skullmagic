@@ -22,29 +22,29 @@ public class LootTableModifier {
             if (source.isBuiltin()) {
                 if (ZOMBIE_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(0.0f, 1.0f))
+                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
                             .with(ItemEntry.builder(Blocks.ZOMBIE_HEAD).weight(1));
                     tableBuilder.pool(poolBuilder);
                 } else if (SKELETON_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(0.0f, 1.0f))
+                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
                             .with(ItemEntry.builder(Blocks.SKELETON_SKULL).weight(1));
                     tableBuilder.pool(poolBuilder);
                 } else if (ENDERMAN_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(0.0f, 1.0f))
+                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
                             .with(ItemEntry.builder(SkullMagic.ENDERMAN_HEAD_BLOCK).weight(1));
                     tableBuilder.pool(poolBuilder);
 
                 } else if (SPIDER_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(0.0f, 1.0f))
+                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
                             .with(ItemEntry.builder(SkullMagic.SPIDER_HEAD_BLOCK).weight(1));
                     tableBuilder.pool(poolBuilder);
 
                 } else if (BLAZE_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(0.0f, 1.0f))
+                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
                             .with(ItemEntry.builder(SkullMagic.BLAZE_HEAD_BLOCK).weight(1));
                     tableBuilder.pool(poolBuilder);
                 }
