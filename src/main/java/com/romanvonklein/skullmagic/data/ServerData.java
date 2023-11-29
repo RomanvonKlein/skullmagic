@@ -40,8 +40,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -679,13 +681,28 @@ public class ServerData extends PersistentState {
         boolean result = false;
         UUID playerID = player.getUuid();
         double powerLevel = getSpellPowerLevel(playerID, spellname);
-        if (spells.get(spellname).action.apply(player, powerLevel)) {
+        Spell spell = spells.get(spellname);
+        if (spell.action.apply(player, powerLevel)) {
             setSpellOnCooldown(playerID, spellname);
             dischargeSpellcost(playerID, spellname);
-            ServerPackageSender.sendEffectPackageToPlayers((List<ServerPlayerEntity>) player.getWorld().getPlayers(),
-                    spellname, powerLevel,
-                    player.getWorld().getRegistryKey(),
-                    player.getEyePos());
+            if (spell.isTargeted) {
+                HitResult hitResult = player.raycast(100, 1, false);
+                if (hitResult != null) {
+                    Vec3d center = hitResult.getPos();
+                    ServerPackageSender.sendTargetedEffectPackageToPlayers(
+                            (List<ServerPlayerEntity>) player.getWorld().getPlayers(),
+                            spellname, powerLevel,
+                            player.getWorld().getRegistryKey(),
+                            player.getEyePos(), center);
+                }
+            } else {
+
+                ServerPackageSender.sendEffectPackageToPlayers(
+                        (List<ServerPlayerEntity>) player.getWorld().getPlayers(),
+                        spellname, powerLevel,
+                        player.getWorld().getRegistryKey(),
+                        player.getEyePos());
+            }
             result = true;
         }
         return result;

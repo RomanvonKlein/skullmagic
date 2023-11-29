@@ -58,4 +58,26 @@ public class ServerPackageSender {
             ServerPlayNetworking.send(player, NetworkingConstants.EFFECT_EVENT, buf);
         }
     }
+
+    public static void sendTargetedEffectPackageToPlayers(List<ServerPlayerEntity> players, String spellname,
+            double power,
+            RegistryKey<World> worldKey, Vec3d castPos, Vec3d targetPos) {
+        for (ServerPlayerEntity player : players) {
+            NbtCompound nbtCompound = new NbtCompound();
+            nbtCompound.putString("worldkey", worldKey.toString());
+            nbtCompound.putDouble("power", power);
+            nbtCompound.putString("spellname", spellname);
+            nbtCompound.putDouble("castX", castPos.getX());
+            nbtCompound.putDouble("castY", castPos.getY());
+            nbtCompound.putDouble("castZ", castPos.getZ());
+            nbtCompound.putDouble("targetX", targetPos.getX());
+            nbtCompound.putDouble("targetY", targetPos.getY());
+            nbtCompound.putDouble("targetZ", targetPos.getZ());
+
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeNbt(nbtCompound);
+
+            ServerPlayNetworking.send(player, NetworkingConstants.TARGETED_EFFECT_EVENT, buf);
+        }
+    }
 }

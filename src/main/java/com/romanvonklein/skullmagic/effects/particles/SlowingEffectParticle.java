@@ -6,20 +6,16 @@ import net.minecraft.client.particle.AbstractSlowingParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
 
 @Environment(value = EnvType.CLIENT)
-public class SimpleEffectParticle extends SpriteBillboardParticle {
+public class SlowingEffectParticle extends AbstractSlowingParticle {
 
-    protected SimpleEffectParticle(ClientWorld clientWorld, double spawnPosX, double spawnPosY, double spawnPosZ,
+    protected SlowingEffectParticle(ClientWorld clientWorld, double spawnPosX, double spawnPosY, double spawnPosZ,
             double speedX, double speedY, double speedZ) {
         super(clientWorld, spawnPosX, spawnPosY, spawnPosZ, speedX, speedY, speedZ);
-        this.velocityX = speedX;
-        this.velocityY = speedY;
-        this.velocityZ = speedZ;
         this.collidesWithWorld = true;
         this.maxAge = 60;
     }
@@ -46,6 +42,9 @@ public class SimpleEffectParticle extends SpriteBillboardParticle {
 
         this.move(this.velocityX, this.velocityY, this.velocityZ);
 
+        this.velocityX *= 0.9;
+        this.velocityY *= 0.9;
+        this.velocityZ *= 0.9;
     }
 
     @Environment(value = EnvType.CLIENT)
@@ -60,7 +59,7 @@ public class SimpleEffectParticle extends SpriteBillboardParticle {
         @Override
         public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d,
                 double e, double f, double g, double h, double i) {
-            SimpleEffectParticle effectParticle = new SimpleEffectParticle(clientWorld, d, e, f, g, h, i);
+            SlowingEffectParticle effectParticle = new SlowingEffectParticle(clientWorld, d, e, f, g, h, i);
             effectParticle.setSprite(this.spriteProvider);
             return effectParticle;
         }

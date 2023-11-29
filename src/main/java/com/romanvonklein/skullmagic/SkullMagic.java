@@ -235,6 +235,8 @@ public class SkullMagic implements ModInitializer {
 	// particles
 	public static final DefaultParticleType LINK_PARTICLE = FabricParticleTypes
 			.simple();
+	public static final DefaultParticleType SLOWING_EFFECT_PARTICLE = FabricParticleTypes
+			.simple();
 	public static final DefaultParticleType SIMPLE_EFFECT_PARTICLE = FabricParticleTypes
 			.simple();
 
@@ -347,6 +349,8 @@ public class SkullMagic implements ModInitializer {
 
 		// register particles
 		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "link_particle"), LINK_PARTICLE);
+		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "slowing_effect_particle"),
+				SLOWING_EFFECT_PARTICLE);
 		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "simple_effect_particle"),
 				SIMPLE_EFFECT_PARTICLE);
 		FeatureManager.Builder builder = new FeatureManager.Builder("skullmagic");

@@ -1,5 +1,7 @@
 package com.romanvonklein.skullmagic.networking;
 
+import java.util.Arrays;
+
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.data.ClientData;
@@ -60,6 +62,27 @@ public class ClientPackageReceiver {
         }
     }
 
+    public static void receiveTargetedEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
+            PacketByteBuf buf, PacketSender responseSender) {
+        try {
+            NbtCompound nbt = buf.readNbt();
+            String spellname = nbt.getString("spellname");
+            double spellPower = nbt.getDouble("power");
+            double castX = nbt.getDouble("castX");
+            double castY = nbt.getDouble("castY");
+            double castZ = nbt.getDouble("castZ");
+            double targetX = nbt.getDouble("targetX");
+            double targetY = nbt.getDouble("targetY");
+            double targetZ = nbt.getDouble("targetZ");
+            String worldkey = nbt.getString("worldkey");
+            Vec3d castPos = new Vec3d(castX, castY, castZ);
+            Vec3d targetPos = new Vec3d(targetX, targetY, targetZ);
+            CastSpellEffects.castTargetedSpellEffect(client, spellname, worldkey, castPos, targetPos, spellPower);
+        } catch (Exception e) {
+            SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
+        }
+    }
+
     public static void receiveParticleEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
         try {
@@ -69,7 +92,7 @@ public class ClientPackageReceiver {
             double z = nbt.getDouble("z");
             String particleID = nbt.getString("particleid");// TODO: not yet used.
             String worldkey = nbt.getString("worldkey");
-            Effects.SPAWNER_FIRE_EFFECT.spawn(client, worldkey, new Vec3d(x, y, z), 0.0);
+            Effects.SPAWNER_FIRE_EFFECT.spawn(client, worldkey, Arrays.asList(new Vec3d(x, y, z)), 0.0);
         } catch (Exception e) {
             SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
         }

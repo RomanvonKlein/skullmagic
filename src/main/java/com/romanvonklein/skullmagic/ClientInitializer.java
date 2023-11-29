@@ -14,6 +14,7 @@ import com.romanvonklein.skullmagic.data.ServerData;
 import com.romanvonklein.skullmagic.effects.particles.EffectController;
 import com.romanvonklein.skullmagic.effects.particles.LinkingParticle;
 import com.romanvonklein.skullmagic.effects.particles.SimpleEffectParticle;
+import com.romanvonklein.skullmagic.effects.particles.SlowingEffectParticle;
 import com.romanvonklein.skullmagic.entities.EffectBall;
 import com.romanvonklein.skullmagic.entities.FireBreath;
 import com.romanvonklein.skullmagic.entities.WitherBreath;
@@ -169,6 +170,8 @@ public class ClientInitializer implements ClientModInitializer {
          * }));
          */
         ParticleFactoryRegistry.getInstance().register(SkullMagic.LINK_PARTICLE, LinkingParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(SkullMagic.SLOWING_EFFECT_PARTICLE,
+                SlowingEffectParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(SkullMagic.SIMPLE_EFFECT_PARTICLE,
                 SimpleEffectParticle.Factory::new);
         // screenstuff
@@ -188,6 +191,8 @@ public class ClientInitializer implements ClientModInitializer {
                 ClientPackageReceiver::receiveUpdatePlayerDataPackage);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.EFFECT_EVENT,
                 ClientPackageReceiver::receiveEffectPackage);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TARGETED_EFFECT_EVENT,
+                ClientPackageReceiver::receiveTargetedEffectPackage);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PARTICLE_EFFECT_EVENT,
                 ClientPackageReceiver::receiveParticleEffectPackage);
 

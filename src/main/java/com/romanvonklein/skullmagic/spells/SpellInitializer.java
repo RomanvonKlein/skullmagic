@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic.spells;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class SpellInitializer {
 
         Map<String, Spell> spellList = new HashMap<>();
         spellList.put("fireball",
-                new Spell(1000, 100, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1000, 100, 15, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         Vec3d angle = player.getRotationVector().normalize()
@@ -77,7 +78,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("selfheal",
-                new Spell(500, 100, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 100, 15, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.heal(2.0f + (float) (2 * powerlevel));
@@ -86,7 +87,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "meteoritestorm",
-                new Spell(6500, 600, 45, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(6500, 600, 45, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int meteoriteCount = 10 + (int) Math.round(2.0 * powerlevel);
@@ -137,7 +138,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "wolfpack",
-                new Spell(2500, 500, 25, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(2500, 500, 25, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int wolfCount = 2 + (int) Math.round((powerlevel - 1));
@@ -174,7 +175,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "firebreath",
-                new Spell(500, 150, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 15, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int shotsPerTick = 2;
@@ -228,7 +229,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "witherbreath",
-                new Spell(750, 150, 25, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(750, 150, 25, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int shotsPerTick = 2 + (int) Math.floor(powerlevel / 2);
@@ -286,7 +287,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "slowball",
-                new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 5, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
@@ -306,7 +307,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "lunge",
-                new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 5, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         if (!player.getWorld().isClient) {
@@ -319,7 +320,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "weakball",
-                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 10, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
@@ -339,7 +340,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "speedbuff",
-                new Spell(500, 150, 5, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 5, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(
@@ -351,7 +352,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "resistancebuff",
-                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 10, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,
@@ -362,7 +363,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "strengthbuff",
-                new Spell(750, 150, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(750, 150, 15, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH,
@@ -373,7 +374,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "fireresistance",
-                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 10, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE,
@@ -384,7 +385,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "waterbreathing",
-                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 10, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING,
@@ -395,7 +396,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "hastebuff",
-                new Spell(1500, 150, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1500, 150, 20, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE,
@@ -406,7 +407,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "teleport",
-                new SpellWithHoldAction(1000, 800, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new SpellWithHoldAction(1000, 800, 30, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
@@ -438,7 +439,8 @@ public class SpellInitializer {
                             if (result != null) {
                                 Vec3d center = result.getPos();
                                 Effects.POSITION_HEIGHLIGH_EFFECT.spawn(MinecraftClient.getInstance(),
-                                        player.getWorld().getRegistryKey().toString(), center, powerlevel);
+                                        player.getWorld().getRegistryKey().toString(), Arrays.asList(center),
+                                        powerlevel);
                                 success = true;
                             }
                         }
@@ -447,7 +449,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "infect",
-                new Spell(1500, 2400, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1500, 2400, 30, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
@@ -487,7 +489,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "cure",
-                new Spell(1500, 2400, 30, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1500, 2400, 30, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         boolean success = false;
@@ -517,7 +519,7 @@ public class SpellInitializer {
                 }));
         spellList.put(
                 "poisonball",
-                new Spell(500, 150, 10, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(500, 150, 10, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
@@ -536,7 +538,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("shockwave",
-                new Spell(1000, 100, 15, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1000, 100, 15, false, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
 
@@ -569,7 +571,7 @@ public class SpellInitializer {
                 }));
         /*
          * spellList.put("dungeonrise",
-         * new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double,
+         * new Spell(1500, 100, 20,true, new BiFunction<ServerPlayerEntity, Double,
          * Boolean>() {
          * 
          * @Override
@@ -616,7 +618,7 @@ public class SpellInitializer {
          * 
          */
         spellList.put("lightningstrike",
-                new Spell(1000, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1000, 100, 20, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         HitResult result = player.raycast(100, 1, false);
@@ -632,7 +634,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("excavation",
-                new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1500, 100, 20, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int radius = (int) (1 + powerlevel * 2);
@@ -685,7 +687,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("moundsummon",
-                new Spell(1500, 100, 20, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(1500, 100, 20, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
 
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
@@ -730,7 +732,7 @@ public class SpellInitializer {
                     }
                 }));
         spellList.put("lightningstorm",
-                new Spell(5000, 450, 40, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
+                new Spell(5000, 450, 40, true, new BiFunction<ServerPlayerEntity, Double, Boolean>() {
                     @Override
                     public Boolean apply(ServerPlayerEntity player, Double powerlevel) {
                         int lightningCount = (int) Math.round(Math.min(10 + powerlevel * 3, 50));
@@ -771,7 +773,8 @@ public class SpellInitializer {
         /*
          * ,
          * "invisibility",
-         * new Spell(500, 150, new TriFunction<ServerPlayerEntity, World, EssencePool,
+         * new Spell(500, 150, new,false TriFunction<ServerPlayerEntity, World,
+         * EssencePool,
          * Boolean>() {
          * 
          * @Override
