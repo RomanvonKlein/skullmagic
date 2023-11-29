@@ -21,11 +21,9 @@ public class EffectBall extends AbstractFireballEntity {
     private float radius;
     private StatusEffect effect;
     private int power;
-    protected World myWorld;
 
     public EffectBall(EntityType<? extends AbstractFireballEntity> type, World world) {
         super(type, world);
-        this.myWorld = world;
         this.radius = 3.0f;
         this.effect = StatusEffects.POISON;
     }
@@ -55,7 +53,7 @@ public class EffectBall extends AbstractFireballEntity {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        if (!this.myWorld.isClient) {
+        if (!this.getWorld().isClient) {
             spawnLingeringEffect();
             this.discard();
         }
@@ -64,16 +62,16 @@ public class EffectBall extends AbstractFireballEntity {
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (!this.myWorld.isClient) {
+        if (!this.getWorld().isClient) {
             spawnLingeringEffect();
             this.discard();
         }
     }
 
     private void spawnLingeringEffect() {
-        if (!this.myWorld.isClient) {
+        if (!this.getWorld().isClient) {
             SkullMagic.LOGGER.info("Spawning lingering effect: " + this.effect.toString());
-            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(this.myWorld, this.getX(),
+            AreaEffectCloudEntity areaEffectCloudEntity = new AreaEffectCloudEntity(this.getWorld(), this.getX(),
                     this.getY() + 1.0f, this.getZ());
             Entity entity = this.getOwner();
             if (entity instanceof LivingEntity) {
@@ -86,7 +84,7 @@ public class EffectBall extends AbstractFireballEntity {
             areaEffectCloudEntity
                     .setRadiusGrowth(-areaEffectCloudEntity.getRadius() / (float) areaEffectCloudEntity.getDuration());
             areaEffectCloudEntity.addEffect(new StatusEffectInstance(effect, 400, this.power));
-            this.myWorld.spawnEntity(areaEffectCloudEntity);
+            this.getWorld().spawnEntity(areaEffectCloudEntity);
         }
     }
 

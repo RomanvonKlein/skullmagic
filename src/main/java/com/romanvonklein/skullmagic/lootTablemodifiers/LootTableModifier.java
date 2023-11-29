@@ -6,6 +6,9 @@ import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.loot.LootPool;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionTypes;
+import net.minecraft.loot.condition.RandomChanceWithLootingLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
@@ -22,29 +25,34 @@ public class LootTableModifier {
             if (source.isBuiltin()) {
                 if (ZOMBIE_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
+                            .conditionally(RandomChanceWithLootingLootCondition.builder(0.03f, 0.02f))
+                            .rolls(UniformLootNumberProvider.create(0f, 1.0f))
                             .with(ItemEntry.builder(Blocks.ZOMBIE_HEAD).weight(1));
                     tableBuilder.pool(poolBuilder);
                 } else if (SKELETON_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
+                            .conditionally(RandomChanceWithLootingLootCondition.builder(0.03f, 0.02f))
+                            .rolls(UniformLootNumberProvider.create(0f, 1.0f))
                             .with(ItemEntry.builder(Blocks.SKELETON_SKULL).weight(1));
                     tableBuilder.pool(poolBuilder);
                 } else if (ENDERMAN_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
+                            .conditionally(RandomChanceWithLootingLootCondition.builder(0.03f, 0.02f))
+                            .rolls(UniformLootNumberProvider.create(0f, 1.0f))
                             .with(ItemEntry.builder(SkullMagic.ENDERMAN_HEAD_BLOCK).weight(1));
                     tableBuilder.pool(poolBuilder);
 
                 } else if (SPIDER_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
+                            .conditionally(RandomChanceWithLootingLootCondition.builder(0.03f, 0.02f))
+                            .rolls(UniformLootNumberProvider.create(0f, 1.0f))
                             .with(ItemEntry.builder(SkullMagic.SPIDER_HEAD_BLOCK).weight(1));
                     tableBuilder.pool(poolBuilder);
 
                 } else if (BLAZE_ENTITY_IDENTIFIER.equals(id)) {
                     LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(UniformLootNumberProvider.create(9f, 10.0f))
+                            .conditionally(RandomChanceWithLootingLootCondition.builder(0.03f, 0.02f))
+                            .rolls(UniformLootNumberProvider.create(0f, 1.0f))
                             .with(ItemEntry.builder(SkullMagic.BLAZE_HEAD_BLOCK).weight(1));
                     tableBuilder.pool(poolBuilder);
                 }
