@@ -254,7 +254,6 @@ public class ServerData extends PersistentState {
                 // altar is unlinked => bind the altar
                 linkAltar(player, pos);
                 player.sendMessage(Text.translatable("skullmagic.message.linked_altar_to_player"), true);
-
             }
         } else {
             // player already has an altar
@@ -287,6 +286,9 @@ public class ServerData extends PersistentState {
         this.players.get(player.getUuid())
                 .setEssencePool(new EssencePool(pos, pos.worldKey, pedestals, consumers, capacityCrystals, 0),
                         player.getUuid());
+        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE,
+                SoundCategory.BLOCKS,
+                1.0f, 1.0f);
     }
 
     private ArrayList<BlockPos> getUnlinkedCapacityCrystalsInBox(ServerWorld world, Box box) {
@@ -395,7 +397,11 @@ public class ServerData extends PersistentState {
     }
 
     public void unlinkAltar(ServerPlayerEntity player) {
+        BlockPos pos = this.players.get(player.getUuid()).essencePool.getAltarPos();
         this.players.get(player.getUuid()).essencePool = new EssencePool();
+        player.getServerWorld().playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE,
+                SoundCategory.BLOCKS,
+                1.0f, 1.0f);
         ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(player);
     }
 
@@ -467,20 +473,18 @@ public class ServerData extends PersistentState {
                             Config.getConfig().scanWidth))),
                             pedPos.add(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
                                     Config.getConfig().scanWidth))));
-            for (WorldBlockPos altarPos : activeAltars.keySet()) {
-                linkSkullPedestalToPlayerAltar(world, activeAltars.get(altarPos), pedPos, skullIdentifier);
-                break;
+            if (activeAltars.size() > 0) {
+                linkSkullPedestalToPlayerAltar(world, activeAltars.values().iterator().next(), pedPos, skullIdentifier);
             }
-
         }
     }
 
     private void linkSkullPedestalToPlayerAltar(ServerWorld world, UUID playerID, BlockPos pedPos,
             String skullIdentifier) {
         this.players.get(playerID).getEssencePool().addPedestal(pedPos, skullIdentifier, playerID);
-        world.playSound(pedPos.getX(), pedPos.getY(), pedPos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE,
+        world.playSound(null, pedPos, SoundEvents.BLOCK_BEACON_ACTIVATE,
                 SoundCategory.BLOCKS,
-                1.0f, 1.0f, true);
+                1.0f, 1.0f);
     }
 
     private HashMap<WorldBlockPos, UUID> getActiveAltarsInBox(ServerWorld world, Box box) {
