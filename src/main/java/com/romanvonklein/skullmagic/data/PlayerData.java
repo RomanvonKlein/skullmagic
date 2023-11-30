@@ -317,4 +317,8 @@ class PlayerData extends PersistentState {
         this.spells.put(spellname, spellData);
     }
 
+    public void toggleSpellAutoCast(String spellname) {
+        this.spells.get(spellname).toggleAutoCast();
+    }
+
 }

@@ -15,6 +15,7 @@ public class SpellData extends PersistentState {
     private int baseCooldown;
     private double powerLevel;
     private int baseCost;
+    private boolean autoCast;
 
     public SpellData(Spell spell) {
         this.spellShrine = new SpellShrineData();
@@ -24,11 +25,21 @@ public class SpellData extends PersistentState {
         this.efficiencyLevel = 1.0;
         this.cooldownLevel = 1.0;
         this.baseCost = spell.essenceCost;
+        this.autoCast = false;
     }
 
     public void setPowerLevel(double powerLevel, UUID playerToUpdate) {
         this.powerLevel = powerLevel;
         SkullMagic.updatePlayer(playerToUpdate);
+    }
+
+    public void toggleAutoCast() {
+        // TODO: notify Player
+        this.autoCast = !this.autoCast;
+    }
+
+    public boolean autoCast() {
+        return this.autoCast;
     }
 
     private double efficiencyLevel;
@@ -46,7 +57,7 @@ public class SpellData extends PersistentState {
     }
 
     SpellData(String spellname, SpellShrineData spellShrine, int cooldownLeft, double powerLevel2,
-            double efficiencyLevel2, double cooldownLevel2) {
+            double efficiencyLevel2, double cooldownLevel2, boolean autoCast) {
         this.spellShrine = spellShrine;
         this.cooldownLeft = cooldownLeft;
         this.powerLevel = powerLevel2;
@@ -54,6 +65,7 @@ public class SpellData extends PersistentState {
         this.cooldownLevel = cooldownLevel2;
         this.baseCooldown = ServerData.getSpells().get(spellname).cooldownTicks;
         this.baseCost = ServerData.getSpells().get(spellname).essenceCost;
+        this.autoCast = autoCast;
     }
 
     public boolean isDirty() {
@@ -73,7 +85,9 @@ public class SpellData extends PersistentState {
         double efficiencyLevel = spellShrineData.getEfficiencyLevel();
         double cooldownLevel = spellShrineData.getCooldownLevel();
 
-        return new SpellData(spellname, spellShrineData, cooldownLeft, powerLevel, efficiencyLevel, cooldownLevel);
+        boolean autoCast = tag.contains("autoCast") ? tag.getBoolean("autoCast") : false;
+        return new SpellData(spellname, spellShrineData, cooldownLeft, powerLevel, efficiencyLevel, cooldownLevel,
+                autoCast);
     }
 
     @Override
@@ -82,7 +96,7 @@ public class SpellData extends PersistentState {
         NbtCompound spellShrineNbt = new NbtCompound();
         spellShrine.writeNbt(spellShrineNbt);
         tag.put("spellShrine", spellShrineNbt);
-
+        tag.putBoolean("autoCast", this.autoCast);
         // cooldownLeft
         tag.putInt("cooldownLeft", this.cooldownLeft);
 

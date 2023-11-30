@@ -369,7 +369,7 @@ public class ServerData extends PersistentState {
     }
 
     private HashMap<BlockPos, String> getUnlinkedSkullPedestalsInBox(ServerWorld world, Box box) {
-        HashMap<BlockPos, String> results = new HashMap<BlockPos, String>();
+        HashMap<BlockPos, String> results = new HashMap<>();
 
         for (BlockEntity ent : Util.getBlockEntitiesOfTypeInBox(world, box,
                 SkullMagic.SKULL_PEDESTAL_BLOCK_ENTITY)) {
@@ -986,5 +986,15 @@ public class ServerData extends PersistentState {
             blockEnt.setScroll(null);
             this.tryRemoveSpellAltar(world, blockEnt.getPos());
         }
+    }
+
+    public boolean toggleAutocastForSpell(String spellname, ServerPlayerEntity player, World world) {
+        UUID playerID = player.getUuid();
+        boolean result = false;
+        if (playerKnowsSpell(playerID, spellname)) {
+            this.players.get(playerID).toggleSpellAutoCast(spellname);
+            result = true;
+        }
+        return result;
     }
 }

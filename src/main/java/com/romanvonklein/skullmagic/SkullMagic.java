@@ -396,6 +396,14 @@ public class SkullMagic implements ModInitializer {
 								serverPlayerEntity.getWorld()));
 					}
 				});
+		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.TOGGLE_AUTOCAST,
+				(server, serverPlayerEntity, handler, buf, packetSender) -> {
+					String spellname = buf.readString(100);
+					if (serverData.playerHasAltar(serverPlayerEntity)) {
+						server.execute(() -> serverData.toggleAutocastForSpell(spellname, serverPlayerEntity,
+								serverPlayerEntity.getWorld()));
+					}
+				});
 
 		// feature initialization
 		// Registry.register(Registries.FEATURE, new Identifier(MODID,

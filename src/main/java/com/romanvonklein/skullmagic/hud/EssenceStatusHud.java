@@ -183,6 +183,14 @@ public class EssenceStatusHud implements HudRenderCallback {
                                                         barheight + 2 * borderwidth,
                                                         ClientInitializer.COOLDOWN_BAR_FRAME_TEXTURE);
 
+                                        // autocast indicator
+                                        if (clientData.shouldAutocastSpell(spellname)) {
+                                                drawTextureRect(drawContext, x + borderwidth + barwidth,
+                                                                y - borderwidth,
+                                                                iconWidth,
+                                                                iconWidth,
+                                                                ClientInitializer.AUTOCAST_INDICATOR);
+                                        }
                                         // cooldown counter
                                         if (cooldownLeft != 0) {
                                                 drawContext.drawText(client.textRenderer,

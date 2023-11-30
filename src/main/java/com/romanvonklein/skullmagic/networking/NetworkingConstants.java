@@ -22,4 +22,6 @@ public class NetworkingConstants {
                         SkullMagic.MODID + "connecting_effect_event");
         public static final Identifier DISCONNECTING_EFFECT_EVENT = new Identifier(
                         SkullMagic.MODID + "disconnecting_effect_event");
+        public static final Identifier TOGGLE_AUTOCAST = new Identifier(
+                        SkullMagic.MODID + "toggle_autocast_event");
 }

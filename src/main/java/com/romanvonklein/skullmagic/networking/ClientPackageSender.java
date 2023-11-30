@@ -12,4 +12,12 @@ public class ClientPackageSender {
             ClientPlayNetworking.send(NetworkingConstants.SPELL_CAST_ID, buf);
         }
     }
+
+    public static void sendToggleAutoCastPackage(String spellName) {
+        if (spellName != null) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeString(spellName);
+            ClientPlayNetworking.send(NetworkingConstants.TOGGLE_AUTOCAST, buf);
+        }
+    }
 }

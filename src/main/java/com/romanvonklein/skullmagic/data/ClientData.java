@@ -2,7 +2,9 @@ package com.romanvonklein.skullmagic.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import com.romanvonklein.skullmagic.networking.ClientPackageSender;
 import com.romanvonklein.skullmagic.spells.Spell;
 import com.romanvonklein.skullmagic.spells.SpellWithHoldAction;
 
@@ -208,5 +210,18 @@ public class ClientData extends PlayerData {
                         this.getSpellPower(this.selectedSpell));
             }
         }
+    }
+
+    public void checkAutoCasts() {
+        for (Map.Entry<String, SpellData> entry : this.spells.entrySet()) {
+            if (entry.getValue().autoCast() && !entry.getValue().isOnCooldown()
+                    && this.canAfford(entry.getValue().getEssenceCost())) {
+                ClientPackageSender.sendCastSpellPackage(entry.getKey());
+            }
+        }
+    }
+
+    public boolean shouldAutocastSpell(String spellname) {
+        return this.spells.get(spellname).autoCast();
     }
 }
