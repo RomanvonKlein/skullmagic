@@ -239,6 +239,10 @@ public class SkullMagic implements ModInitializer {
 			.simple();
 	public static final DefaultParticleType SIMPLE_EFFECT_PARTICLE = FabricParticleTypes
 			.simple();
+	public static final DefaultParticleType CONNECTING_EFFECT_PARTICLE = FabricParticleTypes
+			.simple();
+	public static final DefaultParticleType DISCONNECTING_EFFECT_PARTICLE = FabricParticleTypes
+			.simple();
 
 	// custom managers
 	private static ServerData serverData;
@@ -353,6 +357,10 @@ public class SkullMagic implements ModInitializer {
 				SLOWING_EFFECT_PARTICLE);
 		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "simple_effect_particle"),
 				SIMPLE_EFFECT_PARTICLE);
+		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "connecting_effect_particle"),
+				CONNECTING_EFFECT_PARTICLE);
+		Registry.register(Registries.PARTICLE_TYPE, new Identifier(MODID, "disconnecting_effect_particle"),
+				DISCONNECTING_EFFECT_PARTICLE);
 		FeatureManager.Builder builder = new FeatureManager.Builder("skullmagic");
 		FeatureFlag base = builder.addFlag(new Identifier(MODID, "block_player_screen"));
 

@@ -131,6 +131,7 @@ public class ServerData extends PersistentState {
         // TODO: old code - refactor
         boolean result = false;
         UUID playerid = null;
+        Vec3d disconnectedAltarPos = null;
         for (UUID candidateID : this.players.keySet()) {
             PlayerData data = this.players.get(candidateID);
             if (data.getEssencePool().getWorldKey() != null && data.getEssencePool().getAltarPos() != null
@@ -145,17 +146,20 @@ public class ServerData extends PersistentState {
                 }
                 if (remPos != null) {
                     data.essencePool.removePedestal(remPos, candidateID);
+                    disconnectedAltarPos = data.essencePool.getAltarPos().toCenterPos();
                     playerid = candidateID;
                     break;
                 }
             }
         }
         if (result) {
-            world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_DEACTIVATE,
+            world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE,
                     SoundCategory.BLOCKS,
-                    1.0f, 1.0f, true);
+                    1.0f, 1.0f);
             ServerPackageSender
                     .sendUpdatePlayerDataPackageForPlayer(world.getServer().getPlayerManager().getPlayer(playerid));
+            ServerPackageSender.sendDisconnectingEffectPackageToPlayers(world.getPlayers(), world.getRegistryKey(),
+                    pos.toCenterPos(), disconnectedAltarPos);
         }
     }
 
@@ -289,6 +293,7 @@ public class ServerData extends PersistentState {
         world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE,
                 SoundCategory.BLOCKS,
                 1.0f, 1.0f);
+
     }
 
     private ArrayList<BlockPos> getUnlinkedCapacityCrystalsInBox(ServerWorld world, Box box) {
@@ -419,12 +424,17 @@ public class ServerData extends PersistentState {
         return result;
     }
 
-    public void removeCapacityCrystal(RegistryKey<World> registryKey, BlockPos pos) {
-
+    public void removeCapacityCrystal(ServerWorld world, BlockPos pos) {
+        RegistryKey<World> registryKey = world.getRegistryKey();
         for (UUID playerID : this.players.keySet()) {
             PlayerData data = this.players.get(playerID);
             if (data.hasCapacityCrystal(registryKey, pos)) {
                 data.removeCapacityCrystal(pos, playerID);
+                world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE,
+                        SoundCategory.BLOCKS,
+                        1.0f, 1.0f);
+                ServerPackageSender.sendDisconnectingEffectPackageToPlayers(world.getPlayers(), world.getRegistryKey(),
+                        pos.toCenterPos(), data.getAltarPos().toCenterPos());
                 break;
             }
         }
@@ -437,6 +447,11 @@ public class ServerData extends PersistentState {
             if (Util.inRange(data.getAltarPos(), pos, Config.getConfig().scanWidth,
                     Config.getConfig().scanHeight)) {
                 data.getEssencePool().addCapacityCrystal(pos, playerID);
+                world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE,
+                        SoundCategory.BLOCKS,
+                        1.0f, 1.0f);
+                ServerPackageSender.sendConnectingEffectPackageToPlayers(world.getPlayers(), world.getRegistryKey(),
+                        pos.toCenterPos(), data.getEssencePool().getAltarPos().toCenterPos());
             }
         }
     }
@@ -485,6 +500,8 @@ public class ServerData extends PersistentState {
         world.playSound(null, pedPos, SoundEvents.BLOCK_BEACON_ACTIVATE,
                 SoundCategory.BLOCKS,
                 1.0f, 1.0f);
+        ServerPackageSender.sendConnectingEffectPackageToPlayers(world.getPlayers(), world.getRegistryKey(),
+                pedPos.toCenterPos(), this.players.get(playerID).getEssencePool().getAltarPos().toCenterPos());
     }
 
     private HashMap<WorldBlockPos, UUID> getActiveAltarsInBox(ServerWorld world, Box box) {

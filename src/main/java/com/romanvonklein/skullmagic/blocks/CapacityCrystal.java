@@ -58,7 +58,7 @@ public class CapacityCrystal extends BlockWithEntity {
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         if (!world.isClient) {
-            SkullMagic.getServerData().removeCapacityCrystal(world.getRegistryKey(), pos);
+            SkullMagic.getServerData().removeCapacityCrystal((ServerWorld) world, pos);
         }
         super.onBreak(world, pos, state, player);
     }
@@ -75,7 +75,7 @@ public class CapacityCrystal extends BlockWithEntity {
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         if (!world.isClient) {
-            SkullMagic.getServerData().removeCapacityCrystal(world.getRegistryKey(), pos);
+            SkullMagic.getServerData().removeCapacityCrystal((ServerWorld) world, pos);
         }
         super.onDestroyedByExplosion(world, pos, explosion);
     }

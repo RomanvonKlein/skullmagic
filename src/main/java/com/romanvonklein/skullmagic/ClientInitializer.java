@@ -11,6 +11,7 @@ import com.romanvonklein.skullmagic.blockEntities.ItemHolderBlockEntityRendererS
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntityRenderer;
 import com.romanvonklein.skullmagic.data.ClientData;
 import com.romanvonklein.skullmagic.data.ServerData;
+import com.romanvonklein.skullmagic.effects.particles.ConnectingEffectParticle;
 import com.romanvonklein.skullmagic.effects.particles.EffectController;
 import com.romanvonklein.skullmagic.effects.particles.LinkingParticle;
 import com.romanvonklein.skullmagic.effects.particles.SimpleEffectParticle;
@@ -174,6 +175,10 @@ public class ClientInitializer implements ClientModInitializer {
                 SlowingEffectParticle.Factory::new);
         ParticleFactoryRegistry.getInstance().register(SkullMagic.SIMPLE_EFFECT_PARTICLE,
                 SimpleEffectParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(SkullMagic.CONNECTING_EFFECT_PARTICLE,
+                ConnectingEffectParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(SkullMagic.DISCONNECTING_EFFECT_PARTICLE,
+                ConnectingEffectParticle.Factory::new);
         // screenstuff
         HandledScreens.register(SkullMagic.BLOCK_PLACER_SCREEN_HANDLER, BlockPlacerScreen::new);
         // clientside hud render stuff
@@ -195,6 +200,10 @@ public class ClientInitializer implements ClientModInitializer {
                 ClientPackageReceiver::receiveTargetedEffectPackage);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PARTICLE_EFFECT_EVENT,
                 ClientPackageReceiver::receiveParticleEffectPackage);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.CONNECTING_EFFECT_EVENT,
+                ClientPackageReceiver::receiveConnectingEffectPackage);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.DISCONNECTING_EFFECT_EVENT,
+                ClientPackageReceiver::receiveDisconnectingEffectPackage);
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (client.world != null && clientData != null) {

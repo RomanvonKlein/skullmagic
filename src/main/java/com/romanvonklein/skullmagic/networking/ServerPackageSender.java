@@ -80,4 +80,42 @@ public class ServerPackageSender {
             ServerPlayNetworking.send(player, NetworkingConstants.TARGETED_EFFECT_EVENT, buf);
         }
     }
+
+    public static void sendConnectingEffectPackageToPlayers(List<ServerPlayerEntity> players,
+            RegistryKey<World> worldKey, Vec3d targetPos, Vec3d altarPos) {
+        for (ServerPlayerEntity player : players) {
+            NbtCompound nbtCompound = new NbtCompound();
+            nbtCompound.putString("worldkey", worldKey.toString());
+            nbtCompound.putDouble("altarX", altarPos.getX());
+            nbtCompound.putDouble("altarY", altarPos.getY());
+            nbtCompound.putDouble("altarZ", altarPos.getZ());
+            nbtCompound.putDouble("targetX", targetPos.getX());
+            nbtCompound.putDouble("targetY", targetPos.getY());
+            nbtCompound.putDouble("targetZ", targetPos.getZ());
+
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeNbt(nbtCompound);
+
+            ServerPlayNetworking.send(player, NetworkingConstants.CONNECTING_EFFECT_EVENT, buf);
+        }
+    }
+
+    public static void sendDisconnectingEffectPackageToPlayers(List<ServerPlayerEntity> players,
+            RegistryKey<World> worldKey, Vec3d targetPos, Vec3d altarPos) {
+        for (ServerPlayerEntity player : players) {
+            NbtCompound nbtCompound = new NbtCompound();
+            nbtCompound.putString("worldkey", worldKey.toString());
+            nbtCompound.putDouble("altarX", altarPos.getX());
+            nbtCompound.putDouble("altarY", altarPos.getY());
+            nbtCompound.putDouble("altarZ", altarPos.getZ());
+            nbtCompound.putDouble("targetX", targetPos.getX());
+            nbtCompound.putDouble("targetY", targetPos.getY());
+            nbtCompound.putDouble("targetZ", targetPos.getZ());
+
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeNbt(nbtCompound);
+
+            ServerPlayNetworking.send(player, NetworkingConstants.DISCONNECTING_EFFECT_EVENT, buf);
+        }
+    }
 }

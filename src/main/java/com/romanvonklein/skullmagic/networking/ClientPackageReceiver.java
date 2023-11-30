@@ -83,6 +83,42 @@ public class ClientPackageReceiver {
         }
     }
 
+    public static void receiveConnectingEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
+            PacketByteBuf buf, PacketSender responseSender) {
+        try {
+            NbtCompound nbt = buf.readNbt();
+            double altarX = nbt.getDouble("altarX");
+            double altarY = nbt.getDouble("altarY");
+            double altarZ = nbt.getDouble("altarZ");
+            double targetX = nbt.getDouble("targetX");
+            double targetY = nbt.getDouble("targetY");
+            double targetZ = nbt.getDouble("targetZ");
+            String worldkey = nbt.getString("worldkey");
+            Effects.CONNECTING_EFFECT.spawn(client, worldkey,
+                    Arrays.asList(new Vec3d(altarX, altarY, altarZ), new Vec3d(targetX, targetY, targetZ)), 0.0);
+        } catch (Exception e) {
+            SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
+        }
+    }
+
+    public static void receiveDisconnectingEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
+            PacketByteBuf buf, PacketSender responseSender) {
+        try {
+            NbtCompound nbt = buf.readNbt();
+            double altarX = nbt.getDouble("altarX");
+            double altarY = nbt.getDouble("altarY");
+            double altarZ = nbt.getDouble("altarZ");
+            double targetX = nbt.getDouble("targetX");
+            double targetY = nbt.getDouble("targetY");
+            double targetZ = nbt.getDouble("targetZ");
+            String worldkey = nbt.getString("worldkey");
+            Effects.DISCONNECTING_EFFECT.spawn(client, worldkey,
+                    Arrays.asList(new Vec3d(altarX, altarY, altarZ), new Vec3d(targetX, targetY, targetZ)), 0.0);
+        } catch (Exception e) {
+            SkullMagic.LOGGER.error("Failed parsing effect Package!", e);
+        }
+    }
+
     public static void receiveParticleEffectPackage(MinecraftClient client, ClientPlayNetworkHandler handler,
             PacketByteBuf buf, PacketSender responseSender) {
         try {

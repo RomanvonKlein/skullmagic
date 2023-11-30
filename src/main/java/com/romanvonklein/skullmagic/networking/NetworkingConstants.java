@@ -18,4 +18,8 @@ public class NetworkingConstants {
                         SkullMagic.MODID + "targeted_effect_event");
         public static final Identifier PARTICLE_EFFECT_EVENT = new Identifier(
                         SkullMagic.MODID + "particle_effect_event");
+        public static final Identifier CONNECTING_EFFECT_EVENT = new Identifier(
+                        SkullMagic.MODID + "connecting_effect_event");
+        public static final Identifier DISCONNECTING_EFFECT_EVENT = new Identifier(
+                        SkullMagic.MODID + "disconnecting_effect_event");
 }
