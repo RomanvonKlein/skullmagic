@@ -38,6 +38,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 // import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
@@ -260,7 +261,10 @@ public class ClientInitializer implements ClientModInitializer {
                 }
                 clientData = newData;
                 // Cast spells on autocast
-                clientData.checkAutoCasts();
+                MinecraftClient client = MinecraftClient.getInstance();
+                if (client.world != null) {
+                        clientData.checkAutoCasts();
+                }
         }
 
 }
