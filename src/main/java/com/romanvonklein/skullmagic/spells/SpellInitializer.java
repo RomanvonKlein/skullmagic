@@ -260,9 +260,9 @@ public class SpellInitializer {
                                                 for (int j = 0; j < shotsPerTick; j++) {
                                                     WitherBreath entity = WitherBreath.createWitherBreath(world,
                                                             taskPlayerEnt,
-                                                            dir.x + rand.nextFloat() * 0.5,
-                                                            dir.y + rand.nextFloat() * 0.5,
-                                                            dir.z + rand.nextFloat() * 0.5,
+                                                            dir.x + (rand.nextFloat() - 0.5),
+                                                            dir.y + (rand.nextFloat() - 0.5),
+                                                            dir.z + (rand.nextFloat() - 0.5),
                                                             witherDuration, breathLife, damage);
                                                     entity.setPosition(
                                                             taskPlayerEnt.getPos().add(dir.multiply(0.5))

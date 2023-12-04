@@ -119,7 +119,8 @@ public class FireBreath extends AbstractFireballEntity {
         if (this.isBurning()) {
             this.setOnFireFor(1);
         }
-        if ((hitResult = ProjectileUtil.getCollision(this, this::canHit)).getType() != HitResult.Type.MISS) {
+        hitResult = ProjectileUtil.getCollision(this, this::canHit);
+        if (hitResult.getType() != HitResult.Type.MISS) {
             this.onCollision(hitResult);
         }
         this.checkBlockCollision();

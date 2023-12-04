@@ -56,6 +56,7 @@ public class ClientPackageReceiver {
             double z = nbt.getDouble("z");
             String worldkey = nbt.getString("worldkey");
             Vec3d pos = new Vec3d(x, y, z);
+            // if(client.world.isChunkLoaded(pos.x., 0))
             CastSpellEffects.castSpellEffect(client, spellname, worldkey, pos, spellPower);
         } catch (Exception e) {
             SkullMagic.LOGGER.error("Failed parsing effect Package!", e);

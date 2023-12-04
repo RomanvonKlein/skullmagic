@@ -7,6 +7,7 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
@@ -45,31 +46,33 @@ public class WitherBreath extends FireBreath {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        try (World world = this.getWorld()) {
+        try {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 this.onBlockHit((BlockHitResult) hitResult);
             } else if (hitResult.getType() == HitResult.Type.ENTITY) {
                 this.onEntityHit((EntityHitResult) hitResult);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        try (World world = this.getWorld()) {
-            Entity ent = entityHitResult.getEntity();
-            if (ent.getType() != SkullMagic.FIRE_BREATH) {
-                ent.damage(world.getDamageSources().wither(), damage);
-                if (ent instanceof LivingEntity temp) {
-                    temp.addStatusEffect(
-                            new StatusEffectInstance(StatusEffects.WITHER, this.witherDuration, 1));
+        if (!this.getWorld().isClient) {
+            DamageSource damageSrc = null;
+            damageSrc = this.getWorld().getDamageSources().wither();
+            if (damageSrc != null) {
+                Entity ent = entityHitResult.getEntity();
+                if (ent.getType() != SkullMagic.FIRE_BREATH) {
+                    ent.damage(damageSrc, damage);
+                    if (ent instanceof LivingEntity temp) {
+                        temp.addStatusEffect(
+                                new StatusEffectInstance(StatusEffects.WITHER, this.witherDuration, 1));
+                    }
+                    this.discard();
                 }
-                this.discard();
             }
-        } catch (IOException e) {
-            SkullMagic.LOGGER.error(e.getMessage());
         }
     }
 
