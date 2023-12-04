@@ -123,7 +123,7 @@ public class ClientInitializer implements ClientModInitializer {
                                         ClientPackageSender
                                                         .sendToggleAutoCastPackage(clientData.getSelectedSpellName());
                                         client.player.sendMessage(
-                                                        Text.of(Text.translatable("skullmagic.message.toggled_autocast")
+                                                        Text.of(Text.translatable("skullmagic.message.toggled_autocast").getString()
                                                                         + clientData.getSelectedSpellName()),
                                                         true);
                                         ClientInitializer.getClientData().toggleSpellAutoCast(
