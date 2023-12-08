@@ -5,33 +5,49 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.util.SpawnerEntry;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 
 public class Config {
     private static String configPath = "./Config/skullmagic.json";
     private static Gson gson;
     public static ConfigData data;
 
-    public static class ConfigData {
-        public HashMap<String, Map<String, Float>> drops;
+    private Config() {
+    }
 
-        public HashMap<String, Integer> skulls;
+    public static class ConfigData {
+        public Map<String, Map<String, Float>> drops;
+        public Map<String, ArrayList<SpawnerEntry>> spawnerSpawns;
+
+        public Map<String, Integer> skulls;
+        public Map<String, Integer> shrines;
         public int scanWidth;
         public int scanHeight;
         public int supplyWidth;
         public int supplyHeight;
 
+        public String[] defaultSpells;
+
+        public int capacityCrystalStrength;
+        public int altarCapacity;
+
+        public int shrineRangePerLevel;
+
         public ConfigData() {
-            this.drops = new HashMap<String, Map<String, Float>>();
-            this.skulls = new HashMap<String, Integer>();
+            this.drops = new HashMap<>();
+            this.skulls = new HashMap<>();
+            this.shrines = new HashMap<>();
+            this.spawnerSpawns = new HashMap<>();
         }
     }
 
@@ -47,7 +63,9 @@ public class Config {
 
                 } catch (IOException e) {
                     SkullMagic.LOGGER.info(
-                            "Could not find or read config.json for skullmagic.");
+                            "Could not find or read config.json for skullmagic. Creating new one.");
+                    data = getDefaultConfigData();
+                    saveConfig();
                 }
             } else {
                 // could not find the file, so using default config.
@@ -72,35 +90,81 @@ public class Config {
     }
 
     private static ConfigData getDefaultConfigData() {
+        //TODO: load this from data configs?
         ConfigData defaultData = new ConfigData();
 
-        //mobdrops
+        // mobdrops
         HashMap<String, Float> zombieDrops = new HashMap<>();
-        zombieDrops.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 0.1f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
+        zombieDrops.put(Registries.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.ZOMBIE).toString(), zombieDrops);
         HashMap<String, Float> skeletonDrops = new HashMap<>();
-        skeletonDrops.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 0.1f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
+        skeletonDrops.put(Registries.ITEM.getId(Items.SKELETON_SKULL).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.SKELETON).toString(), skeletonDrops);
         HashMap<String, Float> creeperDrops = new HashMap<>();
-        creeperDrops.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 0.1f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
+        creeperDrops.put(Registries.ITEM.getId(Items.CREEPER_HEAD).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.CREEPER).toString(), creeperDrops);
         HashMap<String, Float> enderDragonDrops = new HashMap<>();
-        enderDragonDrops.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 1.0f);
-        defaultData.drops.put(Registry.ENTITY_TYPE.getId(EntityType.ENDER_DRAGON).toString(), enderDragonDrops);
+        enderDragonDrops.put(Registries.ITEM.getId(Items.DRAGON_HEAD).toString(), 1.0f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.ENDER_DRAGON).toString(), enderDragonDrops);
+        HashMap<String, Float> spiderDrops = new HashMap<>();
+        spiderDrops.put(Registries.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.SPIDER).toString(), spiderDrops);
+        HashMap<String, Float> blazeDrops = new HashMap<>();
+        blazeDrops.put(Registries.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.BLAZE).toString(), blazeDrops);
+        HashMap<String, Float> endermanDrops = new HashMap<>();
+        endermanDrops.put(Registries.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 0.025f);
+        defaultData.drops.put(Registries.ENTITY_TYPE.getId(EntityType.ENDERMAN).toString(), endermanDrops);
 
-        //skull values
-        defaultData.skulls.put(Registry.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.CREEPER_HEAD).toString(), 3);
-        defaultData.skulls.put(Registry.ITEM.getId(Items.DRAGON_HEAD).toString(), 30);
+        // skull values
+        defaultData.skulls.put(Registries.ITEM.getId(Items.ZOMBIE_HEAD).toString(), 1);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.SKELETON_SKULL).toString(), 1);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.CREEPER_HEAD).toString(), 2);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.DRAGON_HEAD).toString(), 15);
+        defaultData.skulls.put(Registries.ITEM.getId(SkullMagic.SPIDER_HEAD_BLOCK.asItem()).toString(), 1);
+        defaultData.skulls.put(Registries.ITEM.getId(SkullMagic.ENDERMAN_HEAD_BLOCK.asItem()).toString(), 3);
+        defaultData.skulls.put(Registries.ITEM.getId(SkullMagic.BLAZE_HEAD_BLOCK.asItem()).toString(), 4);
+        defaultData.skulls.put(Registries.ITEM.getId(Items.WITHER_SKELETON_SKULL.asItem()).toString(), 4);
+
+        // shrine values
+        defaultData.shrines.put(Registries.ITEM.getId(SkullMagic.SIMPLE_SPELL_SHRINE.asItem()).toString(), 3);
+
         defaultData.scanHeight = 2;
         defaultData.scanWidth = 5;
         defaultData.supplyWidth = 32;
         defaultData.supplyHeight = 16;
+        defaultData.defaultSpells = new String[] {};
 
+        // other values
+        defaultData.capacityCrystalStrength = 500;
+        defaultData.altarCapacity = 1000;
+        defaultData.shrineRangePerLevel = 5;
+
+        // spawner lists
+        defaultData.spawnerSpawns.put("easy", new ArrayList<>());
+        defaultData.spawnerSpawns.put("medium", new ArrayList<>());
+        defaultData.spawnerSpawns.put("hard", new ArrayList<>());
+        SpawnerEntry shulkerBullet = new SpawnerEntry("/execute in %s run summon shulker_bullet  %d %d %d {Motion:[0d,0d,0d]}", 1, 500, 4,
+                4);
+        SpawnerEntry zombie = new SpawnerEntry("/execute in %s run summon minecraft:zombie %d %d %d", 1, 500, 4, 4);
+        SpawnerEntry babyZombieHorde = new SpawnerEntry(
+                "/execute in %s run summon zombie %d %d %d {IsBaby:1,active_effects:[{id:strength,duration:99999,amplifier:2,ambient:1b,show_particles:1b}],HandItems:[{id:iron_sword,Count:1}],HandDropChances:[f],Attributes:[{Name:\"generic.movement_speed\",Base:0.5f}]}",
+                1, 1000, 12, 5);
+        SpawnerEntry mediumZombie = new SpawnerEntry(
+                "/execute in %s run summon zombie %d %d %d {Motion:[0d,0d,0d],active_effects:[{id:strength,duration:999999,amplifier:1,ambient:1b,show_particles:1b}],HandItems:[{id:iron_sword,Count:1},{id:iron_sword,Count:1}],HandDropChances:[f,f],ArmorItems:[{id:iron_boots,Count:1},{id:iron_leggings,Count:1},{id:iron_chestplate,Count:1},{id:iron_helmet,Count:1}],ArmorDropChances:[f,f,f,f]}",
+                1, 500, 5, 5);
+        defaultData.spawnerSpawns.get("easy").add(zombie);
+        defaultData.spawnerSpawns.get("easy").add(shulkerBullet);
+        defaultData.spawnerSpawns.get("medium").add(mediumZombie);
+        defaultData.spawnerSpawns.get("medium").add(babyZombieHorde);
+        defaultData.spawnerSpawns.get("hard").add(zombie);
         return defaultData;
     }
 
+    // cool mob spawn commands:
+    // Baby Zombie Horde
+    // /summon zombie ~ ~ ~
+    // {IsBaby:1,active_effects:[{id:strength,duration:99999,amplifier:2,ambient:1b,show_particles:1b}],HandItems:[{id:iron_sword,Count:1}],HandDropChances:[f],Attributes:[{Name:"generic.movement_speed",Base:0.5f}]}
     public static String configToString() {
         String output = "";
         if (data == null) {
@@ -110,4 +174,5 @@ public class Config {
         }
         return output;
     }
+
 }

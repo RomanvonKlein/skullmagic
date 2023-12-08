@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "DWD",
+        "DDD"
+    ],
+    "key": {
+        "W": {
+            "item": "minecraft:iron_block"
+        },
+        "D": {
+            "item": "minecraft:cobblestone"
+        }
+    },
+    "result": {
+        "item": "skullmagic:spell_cooldown_pedestal",
+        "count": 1
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "skullmagic:overworld/dark_tower",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_base",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    }
+  ]
+}

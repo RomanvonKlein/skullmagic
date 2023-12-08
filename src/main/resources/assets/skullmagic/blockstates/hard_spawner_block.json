@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "skullmagic:block/hard_spawner_block"
+        }
+    }
+}

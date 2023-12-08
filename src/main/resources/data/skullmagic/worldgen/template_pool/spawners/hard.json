@@ -1,0 +1,33 @@
+{
+  "name": "skullmagic:spawners/hard",
+  "fallback": "skullmagic:spawners/hard",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:spawners/hard/spider_swarm",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:spawners/hard/pillager_spawner",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:spawners/hard/vindicator_spawner",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

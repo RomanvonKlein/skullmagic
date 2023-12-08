@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "WWW",
+        "WWW",
+        "WWW"
+    ],
+    "key": {
+        "W": {
+            "item": "skullmagic:skullium_shard"
+        }
+    },
+    "result": {
+        "item": "skullmagic:skullium_block",
+        "count": 1
+    }
+}

@@ -1,0 +1,202 @@
+{
+    "processors": [
+        {
+            "rules": [
+                {
+                    "output_state": {
+                        "Name": "minecraft:purple_concrete"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:cyan_concrete",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_block"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_tiles",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:end_stone_bricks"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_bricks",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:end_stone_brick_stairs"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_brick_stairs",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:end_stone_brick_slab"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_brick_slab",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_pillar"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_basalt",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_stairs"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_tile_stairs",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_slab"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_tile_slab",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:end_stone_brick_wall"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:deepslate_tile_wall",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purple_stained_glass"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:cyan_stained_glass",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purple_stained_glass_pane"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:cyan_stained_glass_pane",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purple_bed"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:cyan_bed",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purple_candle"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:cyan_candle",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_slab"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_deepslate_slab",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_stairs"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_deepslate_stairs",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                
+                },
+                {
+                    "output_state": {
+                        "Name": "minecraft:purpur_block"
+                    },
+                    "input_predicate": {
+                        "block": "minecraft:polished_deepslate",
+                        "predicate_type": "minecraft:block_match"
+                    },
+                    "location_predicate": {
+                        "predicate_type": "minecraft:always_true"
+                    }
+                }
+            ],
+            "processor_type": "minecraft:rule"
+        }
+    ]
+}

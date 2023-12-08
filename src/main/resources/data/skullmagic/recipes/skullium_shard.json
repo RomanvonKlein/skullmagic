@@ -1,0 +1,12 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "skullmagic:skullium_block"
+        }
+    ],
+    "result": {
+        "item": "skullmagic:skullium_shard",
+        "count": 9
+    }
+}

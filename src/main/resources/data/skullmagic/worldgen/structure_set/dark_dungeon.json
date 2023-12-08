@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "skullmagic:dark_dungeon",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 2374877,
+    "separation": 18,
+    "spacing": 22,
+    "spread_type": "triangular"
+  }
+}

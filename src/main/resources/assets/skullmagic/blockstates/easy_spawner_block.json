@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "skullmagic:block/easy_spawner_block"
+        }
+    }
+}

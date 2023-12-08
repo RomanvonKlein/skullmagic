@@ -1,0 +1,78 @@
+{
+  "name": "skullmagic:overworld/dark_tower",
+  "fallback": "skullmagic:overworld/dark_tower_terminators",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_01",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_02",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_03",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_04",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_05",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_06",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_07",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_08",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    }
+  ]
+}

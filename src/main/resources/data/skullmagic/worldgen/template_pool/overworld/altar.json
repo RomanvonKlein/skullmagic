@@ -1,0 +1,15 @@
+{
+  "name": "skullmagic:overworld/small_ruin",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/small_ruin/small_ruin_01",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

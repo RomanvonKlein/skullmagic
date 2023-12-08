@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "skullmagic:dark_tower_end",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 2374877,
+    "separation": 20,
+    "spacing": 25,
+    "spread_type": "triangular"
+  }
+}

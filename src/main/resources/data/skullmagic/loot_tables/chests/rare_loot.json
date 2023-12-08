@@ -1,0 +1,63 @@
+{
+    "pools": [
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:meteoritestorm_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:teleport_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:shockwave_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:witherbreath_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:lightningstorm_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:excavation_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:diamond_block"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:gold_block"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:emerald_block"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "skullmagic:chests/common_loot"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "skullmagic:chests/uncommon_loot"
+                }
+            ]
+        }
+    ]
+}

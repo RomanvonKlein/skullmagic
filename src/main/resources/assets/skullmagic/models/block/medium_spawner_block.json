@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/cube_bottom_top",
+    "textures": {
+        "bottom": "skullmagic:block/medium_spawner_block_bottom",
+        "side": "skullmagic:block/medium_spawner_block_side",
+        "top": "skullmagic:block/medium_spawner_block_top"
+    }
+}

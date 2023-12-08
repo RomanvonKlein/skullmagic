@@ -1,0 +1,74 @@
+{
+    "pools": [
+        {
+            "rolls": {
+                "min": 0,
+                "max": 2
+            },
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:fireball_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:poisonball_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:lightningstrike_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:wolfpack_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:moundsummon_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:cure_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:hastebuff_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:waterbreathing_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:lapis_lazuli"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:redstone"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:diamond"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "skullmagic:chests/common_loot"
+                }
+            ]
+        },
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:loot_table",
+                    "name": "minecraft:chests/village/village_weaponsmith"
+                }
+            ]
+        }
+    ]
+}

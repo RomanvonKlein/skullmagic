@@ -1,0 +1,36 @@
+{
+    "variants": {
+        "facing=north": {
+            "model": "skullmagic:block/block_user",
+            "x": 90,
+            "uvlock": false
+        },
+        "facing=east": {
+            "model": "skullmagic:block/block_user",
+            "x": 90,
+            "y": 90,
+            "uvlock": false
+        },
+        "facing=south": {
+            "model": "skullmagic:block/block_user",
+            "x": 90,
+            "y": 180,
+            "uvlock": false
+        },
+        "facing=west": {
+            "model": "skullmagic:block/block_user",
+            "x": 90,
+            "y": 270,
+            "uvlock": false
+        },
+        "facing=up": {
+            "model": "skullmagic:block/block_user",
+            "uvlock": false
+        },
+        "facing=down": {
+            "model": "skullmagic:block/block_user",
+            "x": 180,
+            "uvlock": false
+        }
+    }
+}
