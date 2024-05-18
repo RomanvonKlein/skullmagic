@@ -58,7 +58,7 @@ public class SkullAltar extends BlockWithEntity {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return validateTicker(type, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY,
+        return checkType(type, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY,
                 (world1, pos, state1, be) -> SkullAltarBlockEntity.tick(world1, pos, state1, be));
     }
 

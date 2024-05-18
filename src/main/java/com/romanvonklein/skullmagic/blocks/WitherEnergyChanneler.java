@@ -54,7 +54,7 @@ public class WitherEnergyChanneler extends AConsumerBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return validateTicker(type, SkullMagic.WITHER_ENERGY_CHANNELER_BLOCK_ENTITY,
+        return checkType(type, SkullMagic.WITHER_ENERGY_CHANNELER_BLOCK_ENTITY,
                 (world1, pos, state1, be) -> WitherEnergyChannelerBlockEntity.tick(world1, pos, state1, be));
     }
 

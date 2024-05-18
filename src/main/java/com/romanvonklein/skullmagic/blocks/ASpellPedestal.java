@@ -126,21 +126,21 @@ public abstract class ASpellPedestal extends BlockWithEntity {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
         if (this.type.equals("power")) {
-            return validateTicker(type, SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
+            return checkType(type, SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
                     (world1, pos, state1, be) -> {
                     });
             // (world1, pos, state1, be) -> PowerSpellPedestalBlockEntity.tick(world1, pos,
             // state1, be));
 
         } else if (this.type.equals("efficiency")) {
-            return validateTicker(type, SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
+            return checkType(type, SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
                     (world1, pos, state1, be) -> {
                     });
             // (world1, pos, state1, be) -> EfficiencySpellPedestalBlockEntity.tick(world1,
             // pos, state1, be));
 
         } else {
-            return validateTicker(type, SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
+            return checkType(type, SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
                     (world1, pos, state1, be) -> {
                     });
             // (world1, pos, state1, be) -> CooldownSpellPedestalBlockEntity.tick(world1,

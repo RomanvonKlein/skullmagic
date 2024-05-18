@@ -61,7 +61,7 @@ public class BlockPlacer extends AConsumerBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return validateTicker(type, SkullMagic.BLOCK_PLACER_BLOCK_ENTITY,
+        return checkType(type, SkullMagic.BLOCK_PLACER_BLOCK_ENTITY,
                 (world1, pos, state1, be) -> BlockPlacerBlockEntity.tick(world1, pos, state1, be));
     }
 

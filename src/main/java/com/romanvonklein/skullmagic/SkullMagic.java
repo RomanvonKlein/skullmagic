@@ -374,7 +374,7 @@ public class SkullMagic implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			LOGGER.info("Initializing Server side data");
 			serverData = (ServerData) server.getWorld(World.OVERWORLD).getPersistentStateManager()
-					.getOrCreate(ServerData.getPersistentStateType(), MODID + "_serverData");
+					.getOrCreate(ServerData::fromNbt, ServerData::new, MODID + "_serverData");
 		});
 		// init structure types
 		SkullMagicStructureTypes.init();

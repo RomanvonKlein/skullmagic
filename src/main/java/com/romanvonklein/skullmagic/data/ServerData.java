@@ -26,7 +26,6 @@ import com.romanvonklein.skullmagic.util.Parsing;
 import com.romanvonklein.skullmagic.util.Util;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -54,13 +53,14 @@ public class ServerData extends PersistentState {
     HashMap<UUID, PlayerData> players;
     static private Map<String, ? extends Spell> spells;
 
-    public static PersistentState.Type<ServerData> getPersistentStateType() {
-        return new PersistentState.Type<>(ServerData::new, ServerData::fromNbt,
-                DataFixTypes.SAVED_DATA_MAP_INDEX);
-    }
+    // From 1.20.2
+    // public static PersistentState.Type<ServerData> getPersistentStateType() {
+    //     return new PersistentState.Type<>(ServerData::new, ServerData::fromNbt,
+    //             DataFixTypes.SAVED_DATA_MAP_INDEX);
+    // }
 
     public ServerData() {
-        this.players = new HashMap<UUID, PlayerData>();
+        this.players = new HashMap<>();
     }
 
     public ServerData(HashMap<UUID, PlayerData> players) {

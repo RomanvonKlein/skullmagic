@@ -54,7 +54,7 @@ public class FireCannon extends AConsumerBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
-        return validateTicker(type, SkullMagic.FIRE_CANNON_BLOCK_ENTITY,
+        return checkType(type, SkullMagic.FIRE_CANNON_BLOCK_ENTITY,
                 (world1, pos, state1, be) -> FireCannonBlockEntity.tick(world1, pos, state1, be));
     }
 }
