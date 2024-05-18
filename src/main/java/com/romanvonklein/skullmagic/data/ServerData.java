@@ -621,6 +621,7 @@ public class ServerData extends PersistentState {
         for (UUID playerToUpdate : this.players.keySet()) {
             PlayerData data = this.players.get(playerToUpdate);
             if (data.tryRemoveSpellShrine(worldBlockPos, playerToUpdate)) {
+                SkullMagic.updatePlayer(playerToUpdate);
                 break;
             }
         }
@@ -750,7 +751,8 @@ public class ServerData extends PersistentState {
         this.players.get(playerid).removeSpellShrine(pos, playerid);
     }
 
-    public void addNewSpellShrineForPlayer(ServerWorld world, BlockPos pos, UUID playerid, String spellname) {
+    public void addNewSpellShrineForPlayer(ServerWorld world, BlockPos pos, UUID playerid, String spellname,
+            int shrineLevel) {
         if (playerKnowsSpell(playerid, spellname) && !playerHasSpellShrine(playerid, spellname)) {
             PlayerData data = this.players.get(playerid);
             Vec3i rangevec = new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
@@ -777,7 +779,7 @@ public class ServerData extends PersistentState {
             }
 
             data.addSpellShrine(spellname, world.getRegistryKey(), pos, powerPedestals, efficiencyPedestals,
-                    cooldownPedestals, playerid);
+                    cooldownPedestals, playerid, shrineLevel);
         }
     }
 
@@ -913,7 +915,7 @@ public class ServerData extends PersistentState {
                 String spellname = ((KnowledgeOrb) scrollItemStack.getItem()).spellName;
                 if (this.tryAddSpellPedestal((ServerWorld) world, pos,
                         player.getGameProfile().getId(), spellname, pedestal)) {
-                    ent.setScroll(scrollItemStack.copy());
+                    ent.setScroll(scrollItemStack.copy(), player);
                     if (!player.isCreative()) {
                         scrollItemStack.decrement(1);
                     }
@@ -932,13 +934,7 @@ public class ServerData extends PersistentState {
             }
         } else {
             // if not empty, drop the contained item.
-            if (!player.isCreative()) {
-                ItemEntity itemEnt = new ItemEntity(world, player.getPos().x, player.getPos().y, player.getPos().z,
-                        ent.getScroll());
-                itemEnt.setPickupDelay(0);
-                world.spawnEntity(itemEnt);
-            }
-            ent.setScroll(null);
+            ent.setScroll(null, player);
             this.tryRemoveSpellPedestal((ServerWorld) world, pos, type);
         }
     }
@@ -964,7 +960,7 @@ public class ServerData extends PersistentState {
                                 true);
                     } else {
                         SkullMagic.getServerData().addNewSpellShrineForPlayer((ServerWorld) world, blockEnt.getPos(),
-                                player.getGameProfile().getId(), spellname);
+                                player.getGameProfile().getId(), spellname, blockEnt.level);
                         blockEnt.setScroll(itemStack.copy());
                         if (!player.isCreative()) {
                             itemStack.decrement(1);

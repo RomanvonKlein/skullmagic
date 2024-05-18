@@ -1,11 +1,14 @@
 package com.romanvonklein.skullmagic.data;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.spells.Spell;
+import com.romanvonklein.skullmagic.spells.SpellInitializer;
 import com.romanvonklein.skullmagic.spells.SpellWithHoldAction;
 import com.romanvonklein.skullmagic.util.Util;
 
@@ -144,11 +147,11 @@ class PlayerData extends PersistentState {
     }
 
     public void removeSpellShrine(BlockPos pos, UUID playerid) {
-        for (String spellname : this.spells.keySet()) {
-            BlockPos candidatePos = this.spells.get(spellname).getShrinePos();
+        for (Entry<String, SpellData> entry : this.spells.entrySet()) {
+            BlockPos candidatePos = entry.getValue().getShrinePos();
             if (candidatePos != null && pos.getX() == candidatePos.getX() && pos.getY() == candidatePos.getY()
                     && pos.getZ() == candidatePos.getZ()) {
-                this.spells.put(spellname, ServerData.getDefaultSpellData(spellname));
+                this.spells.put(entry.getKey(), ServerData.getDefaultSpellData(entry.getKey()));
                 SkullMagic.updatePlayer(playerid);
                 break;
             }
@@ -162,9 +165,9 @@ class PlayerData extends PersistentState {
     public void addSpellShrine(String spellname, RegistryKey<World> registryKey, BlockPos pos,
             HashMap<BlockPos, Integer> powerPedestals,
             HashMap<BlockPos, Integer> efficiencyPedestals, HashMap<BlockPos, Integer> cooldownPedestals,
-            UUID playerToUpdate) {
+            UUID playerToUpdate, int shrineLevel) {
         this.spells.get(spellname).spellShrine = new SpellShrineData(registryKey, pos, powerPedestals,
-                efficiencyPedestals, cooldownPedestals);
+                efficiencyPedestals, cooldownPedestals, shrineLevel);
         SkullMagic.updatePlayer(playerToUpdate);
     }
 
@@ -185,21 +188,20 @@ class PlayerData extends PersistentState {
             UUID playerToUpdate) {
         boolean result = false;
         SpellData data = this.spells.get(spellname);
-        if (data != null && data.getShrinePos() != null) {
+        if (data != null && data.getShrinePos() != null
+                && Util.inRange(worldBlockPos, data.getShrinePos(), Config.getConfig().shrineRangePerLevel * 1,
+                        Config.getConfig().shrineRangePerLevel * shrineLevel)) {
+            data.addSpellPedestal(worldBlockPos, playerToUpdate, shrineType, shrineLevel);
+            result = true;
 
-            if (Util.inRange(worldBlockPos, data.getShrinePos(), Config.getConfig().shrineRangePerLevel * 1,
-                    Config.getConfig().shrineRangePerLevel * shrineLevel)) {// TODO: implement shrine levels here!
-                data.addSpellPedestal(worldBlockPos, playerToUpdate, shrineType, shrineLevel);
-                result = true;
-            }
         }
         return result;
+
     }
 
     public boolean tryRemoveSpellPedestal(WorldBlockPos worldBlockPos, UUID playerToUpdate) {
         boolean result = false;
         for (SpellData data : this.spells.values()) {
-
             if (data.tryRemoveSpellPedestal(worldBlockPos, playerToUpdate)) {
                 result = true;
                 break;
@@ -215,9 +217,10 @@ class PlayerData extends PersistentState {
             if (worldBlockPos.worldKey != null && data.spellShrine.worldKey != null
                     && worldBlockPos.worldKey.toString().equals(data.spellShrine.worldKey.toString())
                     && worldBlockPos.isEqualTo(data.getShrinePos())) {
-                this.spells.remove(spellname);
-                result = true;
-                SkullMagic.updatePlayer(playerToUpdate);
+                if (this.spells.containsKey(spellname)) {
+                    this.spells.get(spellname).removeSpellShrine();
+                    result = true;
+                }
                 break;
             }
         }

@@ -8,6 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -56,18 +58,33 @@ public abstract class ASpellPedestalBlockEntity extends BlockEntity {
         return result;
     }
 
-    public void setScroll(ItemStack newScroll) {
+    public void setScroll(ItemStack newScroll, PlayerEntity player) {
         this.scroll = newScroll;
         this.markDirty();
         if (newScroll == null) {
             world.playSound(null, this.getPos(),
                     SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 1f, 1f);
+            if (!player.isCreative()) {
+                this.dropScroll(player.getX(), player.getY(), player.getZ());
+            }
         } else {
             world.playSound(null, this.getPos(),
                     SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1f, 1f);
         }
         world.updateListeners(this.getPos(), this.getCachedState(), world.getBlockState(this.getPos()),
                 Block.NOTIFY_LISTENERS);
+    }
+
+    public void dropScroll() {
+        this.dropScroll(this.pos.getX() + 0.5, this.pos.getY() + 1.0, this.pos.getZ() + 0.5);
+    }
+
+    public void dropScroll(double x, double y, double z) {
+        if (this.getScroll() != null) {
+            ItemEntity itemEnt = new ItemEntity(world, x, y, z, this.getScroll());
+            itemEnt.setPickupDelay(0);
+            world.spawnEntity(itemEnt);
+        }
     }
 
     @Override

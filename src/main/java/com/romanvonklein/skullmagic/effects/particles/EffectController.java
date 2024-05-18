@@ -2,10 +2,14 @@ package com.romanvonklein.skullmagic.effects.particles;
 
 import com.romanvonklein.skullmagic.ClientInitializer;
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.config.Config;
+import com.romanvonklein.skullmagic.data.SpellShrineData;
 import com.romanvonklein.skullmagic.data.WorldBlockPos;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.util.thread.TaskQueue.Simple;
 
 public class EffectController {
     private int sinceLastTick = 0;
@@ -53,6 +57,41 @@ public class EffectController {
                     }
                 }
             }
+            // Effects to show without wand
+            // Visualize the player's shrines' and altars' range
+            for (WorldBlockPos shrinePos : ClientInitializer.getClientData()
+                    .getActiveSpellShrinesWorldBlockPos()) {
+                if (client.world.getRegistryKey().equals(shrinePos.worldKey)) {
+                    SpellShrineData shrineData = ClientInitializer.getClientData().getSpellShrineAt(shrinePos);
+
+                    if (shrineData != null) {
+
+                        int shrineLevel = shrineData.getShrineLevel();
+                        Random rand = Random.createLocal();
+                        double targetX = rand.nextBoolean()
+                                ? shrinePos.getX() + 0.5 + Config.getConfig().shrineRangePerLevel * shrineLevel
+                                : shrinePos.getX() + 0.5 - Config.getConfig().shrineRangePerLevel * shrineLevel;
+                        double targetY = rand.nextBoolean()
+                                ? shrinePos.getY() + 0.5 + Config.getConfig().shrineRangePerLevel * shrineLevel
+                                : shrinePos.getY() + 0.5 - Config.getConfig().shrineRangePerLevel * shrineLevel;
+                        double targetZ = rand.nextBoolean()
+                                ? shrinePos.getZ() + 0.5 + Config.getConfig().shrineRangePerLevel * shrineLevel
+                                : shrinePos.getZ() + 0.5 - Config.getConfig().shrineRangePerLevel * shrineLevel;
+
+                        double startX = shrinePos.getX() + 0.5;
+                        double startY = shrinePos.getY() + 0.5;
+                        double startZ = shrinePos.getZ() + 0.5;
+                        int lifetime = SimpleEffectParticle.MAXAGE;
+                        double vx = (targetX - startX) / lifetime;
+                        double vy = (targetY - startY) / lifetime;
+                        double vz = (targetZ - startZ) / lifetime;
+
+                        client.world.addParticle(SkullMagic.SIMPLE_EFFECT_PARTICLE, true, startX, startY, startZ,
+                                vx, vy, vz);
+                    }
+                }
+            }
+            // TODO: rotating helix effect when holding any pedestal
         }
 
     }

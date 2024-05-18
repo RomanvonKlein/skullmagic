@@ -18,7 +18,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 
 public class Config {
-    private static String configPath = "./Config/skullmagic.json";
+    private static String configPath = "./config/skullmagic.json";
     private static Gson gson;
     public static ConfigData data;
 
@@ -90,7 +90,7 @@ public class Config {
     }
 
     private static ConfigData getDefaultConfigData() {
-        //TODO: load this from data configs?
+        // TODO: load this from data configs?
         ConfigData defaultData = new ConfigData();
 
         // mobdrops
@@ -144,7 +144,8 @@ public class Config {
         defaultData.spawnerSpawns.put("easy", new ArrayList<>());
         defaultData.spawnerSpawns.put("medium", new ArrayList<>());
         defaultData.spawnerSpawns.put("hard", new ArrayList<>());
-        SpawnerEntry shulkerBullet = new SpawnerEntry("/execute in %s run summon shulker_bullet  %d %d %d {Motion:[0d,0d,0d]}", 1, 500, 4,
+        SpawnerEntry shulkerBullet = new SpawnerEntry(
+                "/execute in %s run summon shulker_bullet  %d %d %d {Motion:[0d,0d,0d]}", 1, 500, 4,
                 4);
         SpawnerEntry zombie = new SpawnerEntry("/execute in %s run summon minecraft:zombie %d %d %d", 1, 500, 4, 4);
         SpawnerEntry babyZombieHorde = new SpawnerEntry(

@@ -6,8 +6,10 @@ import com.romanvonklein.skullmagic.SkullMagic;
 import com.romanvonklein.skullmagic.spells.Spell;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.World;
 
 public class SpellData extends PersistentState {
     SpellShrineData spellShrine;
@@ -134,16 +136,19 @@ public class SpellData extends PersistentState {
         SkullMagic.updatePlayer(playerToUpdate);
     }
 
-    public void removeSpellShrine(UUID playerToUpdate) {
+    public void removeSpellShrine() {
         this.spellShrine = new SpellShrineData();
         this.powerLevel = 1.0;
         this.efficiencyLevel = 1.0;
         this.cooldownLevel = 1.0;
-        SkullMagic.updatePlayer(playerToUpdate);
     }
 
     public BlockPos getShrinePos() {
         return this.spellShrine.shrinePos;
+    }
+
+    public RegistryKey<World> getWorldKey() {
+        return this.spellShrine.worldKey;
     }
 
     public boolean containsPedestal(WorldBlockPos worldBlockPos) {

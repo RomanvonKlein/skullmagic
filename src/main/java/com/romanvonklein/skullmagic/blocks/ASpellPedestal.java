@@ -3,6 +3,7 @@ package com.romanvonklein.skullmagic.blocks;
 import java.util.Optional;
 
 import com.romanvonklein.skullmagic.SkullMagic;
+import com.romanvonklein.skullmagic.blockEntities.ASpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.CooldownSpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.EfficiencySpellPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.PowerSpellPedestalBlockEntity;
@@ -66,7 +67,15 @@ public abstract class ASpellPedestal extends BlockWithEntity {
         if (!world.isClient) {
             SkullMagic.getServerData().tryRemoveSpellPedestal((ServerWorld) world, pos, this.type);
         }
+        dropScroll(world, pos);
         super.onBreak(world, pos, state, player);
+    }
+
+    private void dropScroll(World world, BlockPos pos) {
+        BlockEntity ent = world.getBlockEntity(pos);
+        if (ent instanceof ASpellPedestalBlockEntity) {
+            ((ASpellPedestalBlockEntity) ent).dropScroll();
+        }
     }
 
     @Override
@@ -74,6 +83,7 @@ public abstract class ASpellPedestal extends BlockWithEntity {
         if (!world.isClient) {
             SkullMagic.getServerData().tryRemoveSpellPedestal((ServerWorld) world, pos, this.type);
         }
+        dropScroll(world, pos);
         super.onDestroyedByExplosion(world, pos, explosion);
     }
 

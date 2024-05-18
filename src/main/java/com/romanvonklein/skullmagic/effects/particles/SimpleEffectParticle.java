@@ -13,6 +13,7 @@ import net.minecraft.particle.DefaultParticleType;
 
 @Environment(value = EnvType.CLIENT)
 public class SimpleEffectParticle extends SpriteBillboardParticle {
+    public static final int MAXAGE = 60;
 
     protected SimpleEffectParticle(ClientWorld clientWorld, double spawnPosX, double spawnPosY, double spawnPosZ,
             double speedX, double speedY, double speedZ) {
@@ -21,7 +22,7 @@ public class SimpleEffectParticle extends SpriteBillboardParticle {
         this.velocityY = speedY;
         this.velocityZ = speedZ;
         this.collidesWithWorld = true;
-        this.maxAge = 60;
+        this.maxAge = MAXAGE;
     }
 
     @Override

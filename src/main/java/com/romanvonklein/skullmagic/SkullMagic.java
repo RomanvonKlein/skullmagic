@@ -432,6 +432,8 @@ public class SkullMagic implements ModInitializer {
 		return serverData;
 	}
 
+	// TODO: instead of this, mark as dirty and update all dirty playerdata at the
+	// end of each tick
 	public static void updatePlayer(UUID playerToUpdate) {
 		if (playerToUpdate != null) {
 			SkullMagic.getServerData().updatePlayer(playerToUpdate);

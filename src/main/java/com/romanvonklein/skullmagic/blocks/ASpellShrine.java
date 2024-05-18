@@ -32,6 +32,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
         if (!world.isClient) {
             SkullMagic.getServerData().removeSpellShrine(new WorldBlockPos(pos, world.getRegistryKey()));
         }
+        dropScroll(world, pos);
         super.onBreak(world, pos, state, player);
     }
 
@@ -40,6 +41,7 @@ public abstract class ASpellShrine extends BlockWithEntity {
         if (!world.isClient) {
             SkullMagic.getServerData().removeSpellShrine(new WorldBlockPos(pos, world.getRegistryKey()));
         }
+        dropScroll(world, pos);
         super.onDestroyedByExplosion(world, pos, explosion);
     }
 
@@ -48,6 +50,13 @@ public abstract class ASpellShrine extends BlockWithEntity {
         // With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need
         // to change that!
         return BlockRenderType.MODEL;
+    }
+
+    private void dropScroll(World world, BlockPos pos) {
+        BlockEntity ent = world.getBlockEntity(pos);
+        if (ent instanceof SpellShrineBlockEntity) {
+            ((SpellShrineBlockEntity) ent).dropScroll();
+        }
     }
 
     @Override

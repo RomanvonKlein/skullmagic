@@ -224,4 +224,16 @@ public class ClientData extends PlayerData {
     public boolean shouldAutocastSpell(String spellname) {
         return this.spells.get(spellname).autoCast();
     }
+
+    public SpellShrineData getSpellShrineAt(WorldBlockPos shrinePos) {
+        SpellShrineData result = null;
+        for (SpellData spellData : this.spells.values()) {
+            if (shrinePos.isEqualTo(spellData.getShrinePos()) && shrinePos.worldKey.equals(spellData.getWorldKey())) {
+                result = spellData.spellShrine;
+                break;
+            }
+        }
+        return result;
+
+    }
 }

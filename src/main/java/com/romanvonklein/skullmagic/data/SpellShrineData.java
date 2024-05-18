@@ -1,6 +1,7 @@
 package com.romanvonklein.skullmagic.data;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import com.romanvonklein.skullmagic.util.Parsing;
 
@@ -12,12 +13,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 
-class SpellShrineData extends PersistentState {
+public class SpellShrineData extends PersistentState {
     BlockPos shrinePos;
     RegistryKey<World> worldKey;
     HashMap<BlockPos, Integer> powerPedestals;
     HashMap<BlockPos, Integer> efficiencyPedestals;
     HashMap<BlockPos, Integer> cooldownPedestals;
+    int shrineLevel;
 
     public SpellShrineData() {
         this.powerPedestals = new HashMap<>();
@@ -26,12 +28,14 @@ class SpellShrineData extends PersistentState {
     }
 
     SpellShrineData(RegistryKey<World> worldKey, BlockPos shrinePos, HashMap<BlockPos, Integer> powerPedestals,
-            HashMap<BlockPos, Integer> efficiencyPedestals, HashMap<BlockPos, Integer> cooldownPedestals) {
+            HashMap<BlockPos, Integer> efficiencyPedestals, HashMap<BlockPos, Integer> cooldownPedestals,
+            int shrineLevel) {
         this.worldKey = worldKey;
         this.shrinePos = shrinePos;
         this.powerPedestals = powerPedestals;
         this.efficiencyPedestals = efficiencyPedestals;
         this.cooldownPedestals = cooldownPedestals;
+        this.shrineLevel = shrineLevel;
     }
 
     @Override
@@ -41,6 +45,9 @@ class SpellShrineData extends PersistentState {
             tag.putIntArray("shrinePos", new int[] { shrinePos.getX(), shrinePos.getY(), shrinePos.getZ() });
         }
 
+        // shrineLevel
+        tag.putInt("shrineLevel", this.shrineLevel);
+
         // worldkey
         if (this.worldKey != null) {
             tag.putString("worldKey", worldKey.getValue().toString());
@@ -48,22 +55,22 @@ class SpellShrineData extends PersistentState {
 
         // powerPedestals
         NbtCompound powerPedestalsCompound = new NbtCompound();
-        for (BlockPos pedestalPos : powerPedestals.keySet()) {
-            powerPedestalsCompound.putInt(pedestalPos.toShortString(), powerPedestals.get(pedestalPos));
+        for (Entry<BlockPos, Integer> entry : powerPedestals.entrySet()) {
+            powerPedestalsCompound.putInt(entry.getKey().toShortString(), entry.getValue());
         }
         tag.put("powerPedestals", powerPedestalsCompound);
 
         // efficiencyPedestals
         NbtCompound efficiencyPedestalsCompound = new NbtCompound();
-        for (BlockPos pedestalPos : efficiencyPedestals.keySet()) {
-            efficiencyPedestalsCompound.putInt(pedestalPos.toShortString(), efficiencyPedestals.get(pedestalPos));
+        for (Entry<BlockPos, Integer> entry : efficiencyPedestals.entrySet()) {
+            efficiencyPedestalsCompound.putInt(entry.getKey().toShortString(), entry.getValue());
         }
         tag.put("efficiencyPedestals", efficiencyPedestalsCompound);
 
         // powerPedestals
         NbtCompound cooldownPedestalsCompound = new NbtCompound();
-        for (BlockPos pedestalPos : cooldownPedestals.keySet()) {
-            cooldownPedestalsCompound.putInt(pedestalPos.toShortString(), cooldownPedestals.get(pedestalPos));
+        for (Entry<BlockPos, Integer> entry : cooldownPedestals.entrySet()) {
+            cooldownPedestalsCompound.putInt(entry.getKey().toShortString(), entry.getValue());
         }
         tag.put("cooldownPedestals", cooldownPedestalsCompound);
 
@@ -77,7 +84,11 @@ class SpellShrineData extends PersistentState {
             int[] shrineCoords = tag.getIntArray("shrinePos");
             shrinePos = new BlockPos(shrineCoords[0], shrineCoords[1], shrineCoords[2]);
         }
-        
+        // shrineLevel
+        int shrineLevel = 1;
+        if (tag.contains("shrineLevel")) {
+            shrineLevel = tag.getInt("shrineLevel");
+        }
         // worldkey
         RegistryKey<World> worldKey = null;
         if (tag.contains("worldKey")) {
@@ -110,7 +121,8 @@ class SpellShrineData extends PersistentState {
                     cooldownPedestalsCompound.getInt(pedestalPosString));
         }
 
-        return new SpellShrineData(worldKey, shrinePos, powerPedestals, efficiencyPedestals, cooldownPedestals);
+        return new SpellShrineData(worldKey, shrinePos, powerPedestals, efficiencyPedestals, cooldownPedestals,
+                shrineLevel);
     }
 
     public double getPowerLevel() {
@@ -147,6 +159,10 @@ class SpellShrineData extends PersistentState {
 
     public void addCooldownPedestal(WorldBlockPos worldBlockPos, int level) {
         this.cooldownPedestals.put(worldBlockPos, level);
+    }
+
+    public int getShrineLevel() {
+        return this.shrineLevel;
     }
 
 }

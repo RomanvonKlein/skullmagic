@@ -10,6 +10,7 @@ import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -68,6 +69,18 @@ public class SpellShrineBlockEntity extends BlockEntity {
             } else {
                 SkullMagic.LOGGER.error("block for spellshrineblockentity does not seem to be valid spell shrine.");
             }
+        }
+    }
+
+    public void dropScroll() {
+        this.dropScroll(this.pos.getX() + 0.5, this.pos.getY() + 1.0, this.pos.getZ() + 0.5);
+    }
+
+    public void dropScroll(double x, double y, double z) {
+        if (this.getScroll() != null) {
+            ItemEntity itemEnt = new ItemEntity(world, x, y, z, this.getScroll());
+            itemEnt.setPickupDelay(0);
+            world.spawnEntity(itemEnt);
         }
     }
 
