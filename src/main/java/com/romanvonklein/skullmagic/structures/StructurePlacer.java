@@ -10,7 +10,7 @@ import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class StructurePlacer {
 
@@ -29,8 +29,8 @@ public class StructurePlacer {
             StructurePlacementData structurePlacementData = new StructurePlacementData();
             // .setMirror(this.mirror).setRotation(this.rotation).setIgnoreEntities(this.ignoreEntities);
 
-            structure.place(world, blockPos, blockPos, structurePlacementData,
-                    Random.createLocal(), Block.NOTIFY_LISTENERS);
+            // structure.place(world, blockPos, blockPos, structurePlacementData,
+            //         Random.createLocal(), Block.NOTIFY_LISTENERS);
             return null;
         }
         return structure;

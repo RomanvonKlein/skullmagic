@@ -52,6 +52,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+
+import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.world.World;
 
 public class SpellInitializer {
@@ -113,7 +115,7 @@ public class SpellInitializer {
                                                     UUID playerID) {
                                                 ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
                                                         .getPlayer(playerID);
-                                                Random newRand = Random.createLocal();
+                                                ThreadLocalRandom newRand = ThreadLocalRandom.current();
                                                 FireballEntity ent = new FireballEntity(world, taskPlayerEnt, angle.x(),
                                                         angle.y(), angle.z(),
                                                         (int) Math.round(
@@ -194,7 +196,7 @@ public class SpellInitializer {
                                             int burnDuration = ((int[]) data[0])[2];
                                             int taskTickNo = ((int[]) data[0])[3];
                                             int lasttaskTickNo = ((int[]) data[0])[4];
-                                            Random rand = Random.createLocal();
+                                            ThreadLocalRandom rand = ThreadLocalRandom.current();
 
                                             ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
                                                     .getPlayer(playerID);
@@ -251,7 +253,7 @@ public class SpellInitializer {
                                                 int breathLife = ((int[]) data[0])[1];
                                                 int witherDuration = ((int[]) data[0])[2];
                                                 int damage = ((int[]) data[0])[3];
-                                                Random rand = Random.createLocal();
+                                                ThreadLocalRandom rand = ThreadLocalRandom.current();
                                                 Vec3d dir = taskPlayerEnt.getRotationVector().normalize();
 
                                                 World world = taskPlayerEnt.getWorld();
@@ -511,7 +513,7 @@ public class SpellInitializer {
                         if (entityHitResult != null
                                 && entityHitResult.getEntity() instanceof ZombieVillagerEntity zombie) {
                             ((ZombieVillagerEntityMixin) zombie).invokeSetConverting(player.getUuid(),
-                                    Random.createLocal().nextInt(2401) + 3600);
+                                    ThreadLocalRandom.current().nextInt(2401) + 3600);
                             success = true;
                         }
                         return success;
@@ -742,7 +744,7 @@ public class SpellInitializer {
                         HitResult result = player.raycast(100, 1, false);
                         if (result != null) {
                             Vec3d center = result.getPos();
-                            Random rand = Random.createLocal();
+                            ThreadLocalRandom rand = ThreadLocalRandom.current();
                             for (int i = 0; i < lightningCount; i++) {
                                 DelayedTask tsk = new DelayedTask("meteoritestorm_spell_spawn_meteorites",
                                         rand.nextInt(maxDelay),
@@ -752,7 +754,7 @@ public class SpellInitializer {
                                                     UUID playerID) {
                                                 ServerPlayerEntity taskPlayerEnt = server.getPlayerManager()
                                                         .getPlayer(playerID);
-                                                Random newRand = Random.createLocal();
+                                                ThreadLocalRandom newRand = ThreadLocalRandom.current();
 
                                                 World world = taskPlayerEnt.getWorld();
                                                 LightningEntity bolt = new LightningEntity(EntityType.LIGHTNING_BOLT,

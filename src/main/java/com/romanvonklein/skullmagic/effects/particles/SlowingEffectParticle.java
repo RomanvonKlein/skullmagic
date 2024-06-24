@@ -9,7 +9,7 @@ import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
-import net.minecraft.util.math.random.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Environment(value = EnvType.CLIENT)
 public class SlowingEffectParticle extends AbstractSlowingParticle {
@@ -18,9 +18,9 @@ public class SlowingEffectParticle extends AbstractSlowingParticle {
             double speedX, double speedY, double speedZ) {
         super(clientWorld, spawnPosX, spawnPosY, spawnPosZ, speedX, speedY, speedZ);
         this.collidesWithWorld = true;
-        Random rand = Random.createLocal();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
 
-        this.maxAge = rand.nextBetween(30, 70);
+        this.maxAge = rand.nextInt(30, 70);
     }
 
     @Override

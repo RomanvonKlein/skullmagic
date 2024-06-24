@@ -8,6 +8,7 @@ import com.romanvonklein.skullmagic.networking.ServerPackageSender;
 import com.romanvonklein.skullmagic.util.SpawnerEntry;
 import com.romanvonklein.skullmagic.util.Util;
 
+import io.netty.util.internal.ThreadLocalRandom;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.MobEntity;
@@ -24,7 +25,6 @@ import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class SkullMagicSpawnerBlockEntity extends BlockEntity {
@@ -75,20 +75,20 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
                                 (MobEntity test) -> true)
                         .size() < maxCrowd
                         && !world.getEntitiesByType(TypeFilter.instanceOf(PlayerEntity.class),
-                                        new Box(pos.getX() - CheckPlayerRangeHorizontal,
-                                                pos.getY() - CheckPlayerRangeVertical,
-                                                pos.getZ() - CheckPlayerRangeHorizontal,
-                                                pos.getX() + CheckPlayerRangeHorizontal,
-                                                pos.getY() + CheckPlayerRangeVertical,
-                                                pos.getZ() + CheckPlayerRangeHorizontal),
-                                        (PlayerEntity test) -> true)
+                                new Box(pos.getX() - CheckPlayerRangeHorizontal,
+                                        pos.getY() - CheckPlayerRangeVertical,
+                                        pos.getZ() - CheckPlayerRangeHorizontal,
+                                        pos.getX() + CheckPlayerRangeHorizontal,
+                                        pos.getY() + CheckPlayerRangeVertical,
+                                        pos.getZ() + CheckPlayerRangeHorizontal),
+                                (PlayerEntity test) -> true)
                                 .isEmpty()) {
                     castedEnt.startSpawnProcess(world, pos);
                 } else {
                     int remainingTicks = castedEnt.maxDelay - castedEnt.delayed;
                     int siceLastTick = castedEnt.delayed - castedEnt.lastParticled;
                     if (siceLastTick >= remainingTicks / 10) {
-                        Random rand = Random.createLocal();
+                        ThreadLocalRandom rand = ThreadLocalRandom.current();
                         castedEnt.lastParticled = castedEnt.delayed;
                         ServerPackageSender.sendParticleEffectPackageToPlayers(((ServerWorld) world).getPlayers(),
                                 "minecraft:flame",
@@ -102,15 +102,16 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
 
     private void startSpawnProcess(World world, BlockPos pos) {
         SkullMagic.LOGGER.info("Attempting Spawn");
-        Random rand = Random.createLocal();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
         boolean success = false;
         for (int i = 0; i < this.maxSpawns; i++) {
             ServerCommandSource src = world.getServer().getCommandSource();
             String command = "FORMATTING FAILED";
             for (int tryNo = 0; tryNo < maxTries; tryNo++) {
-                int posX = pos.getX() + rand.nextBetween(-this.range, +this.range);
-                int posY = pos.getY() + rand.nextBetween(-this.range, +this.range);
-                int posZ = pos.getZ() + rand.nextBetween(-this.range, +this.range);
+                //TODO: does rand.nextInt (min, max) do what i think it does?
+                int posX = pos.getX() + rand.nextInt(-this.range, +this.range);
+                int posY = pos.getY() + rand.nextInt(-this.range, +this.range);
+                int posZ = pos.getZ() + rand.nextInt(-this.range, +this.range);
                 if (world.isSpaceEmpty(new Box(posX, posY, posZ, posX + 1, posY + 2, posZ + 1))) {
                     try {
                         SkullMagic.LOGGER.info("preparing spawning command from spawning command: {}",

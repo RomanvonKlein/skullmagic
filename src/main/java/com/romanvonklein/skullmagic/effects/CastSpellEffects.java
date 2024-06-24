@@ -1,10 +1,10 @@
 package com.romanvonklein.skullmagic.effects;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 
@@ -12,7 +12,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 
 public class CastSpellEffects {
     private CastSpellEffects() {
@@ -27,19 +26,20 @@ public class CastSpellEffects {
             int numPathParticles = (int) Math.round(spellPower * 10.0);
             // casting position effect
             Vec3d castPos = positions.get(0);
+            ThreadLocalRandom rand = ThreadLocalRandom.current();
             for (int i = 0; i < numParticles; i++) {
-                Random rand = Random.createLocal();
+
                 double vx = (rand.nextDouble() - 0.5) * spellPower;
                 double vy = (rand.nextDouble() - 0.5) * spellPower;
                 double vz = (rand.nextDouble() - 0.5) * spellPower;
                 client.world.addParticle(SkullMagic.SLOWING_EFFECT_PARTICLE, true, castPos.x, castPos.y, castPos.z, vx,
                         vy, vz);
+
             }
             if (positions.size() > 1) {
                 // effect on target
                 Vec3d targetPos = positions.get(1);
                 for (int i = 0; i < numParticles; i++) {
-                    Random rand = Random.createLocal();
                     double vx = (rand.nextDouble() - 0.5) * spellPower;
                     double vy = (rand.nextDouble() - 0.5) * spellPower;
                     double vz = (rand.nextDouble() - 0.5) * spellPower;
@@ -50,7 +50,6 @@ public class CastSpellEffects {
                 }
                 // effect on link
                 for (int i = 0; i < numPathParticles; i++) {
-                    Random rand = Random.createLocal();
                     double startX = (rand.nextDouble() * 2 - 0.5) + castPos.x;
                     double startY = (rand.nextDouble() * 2 - 0.5) + castPos.y;
                     double startZ = (rand.nextDouble() * 2 - 0.5) + castPos.z;
@@ -64,9 +63,10 @@ public class CastSpellEffects {
                 }
 
             }
-            client.world.playSound(castPos.x, castPos.y, castPos.z, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,
-                    SoundCategory.PLAYERS, 1.0f, 1.0f,
-                    true);
+            //TODO: this is causing crashes with random access - propably cant call things on the world instance from this thread (rendering thread?)
+            // client.world.playSound(castPos.x, castPos.y, castPos.z, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,
+            //         SoundCategory.PLAYERS, 1.0f, 1.0f,
+            //         true);
         }
 
         @Override
@@ -81,7 +81,9 @@ public class CastSpellEffects {
             if (SpellEffects.containsKey(spellname)) {
                 SpellEffects.get(spellname).spawn(client, worldkey, Arrays.asList(pos), spellPower);
             } else {
-                SIMPLE_PARTICLE_EFFECT.spawn(client, worldkey, Arrays.asList(pos), spellPower);
+                SIMPLE_PARTICLE_EFFECT.spawn(client, worldkey, Arrays.asList(pos), spellPower);// TODO: this is causing
+                                                                                               // crashes with random
+                                                                                               // access, before line 67
             }
         }
     }

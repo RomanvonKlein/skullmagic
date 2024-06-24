@@ -14,7 +14,7 @@ import net.minecraft.structure.pool.StructurePoolElement;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -88,7 +88,7 @@ public class SkullMagicStructurePoolBasedGenerator extends StructurePoolBasedGen
 
     public static void generate_1(DynamicRegistryManager registryManager, PoolStructurePiece piece, int maxDepth,
             PieceFactory pieceFactory, ChunkGenerator chunkGenerator, StructureTemplateManager structureManager,
-            List<? super PoolStructurePiece> results, Random random, HeightLimitView world) {
+            List<? super PoolStructurePiece> results, /*Random random,*/ HeightLimitView world) {
 /*
         SkullMagic.LOGGER.info("Generating skullMagicStructure.");
 

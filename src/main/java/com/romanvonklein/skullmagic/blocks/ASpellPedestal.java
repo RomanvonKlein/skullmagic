@@ -129,22 +129,16 @@ public abstract class ASpellPedestal extends BlockWithEntity {
             return checkType(type, SkullMagic.POWER_SPELL_PEDESTAL_BLOCK_ENTITY,
                     (world1, pos, state1, be) -> {
                     });
-            // (world1, pos, state1, be) -> PowerSpellPedestalBlockEntity.tick(world1, pos,
-            // state1, be));
 
         } else if (this.type.equals("efficiency")) {
             return checkType(type, SkullMagic.EFFICIENCY_SPELL_PEDESTAL_BLOCK_ENTITY,
                     (world1, pos, state1, be) -> {
                     });
-            // (world1, pos, state1, be) -> EfficiencySpellPedestalBlockEntity.tick(world1,
-            // pos, state1, be));
 
         } else {
             return checkType(type, SkullMagic.COOLDOWN_SPELL_PEDESTAL_BLOCK_ENTITY,
                     (world1, pos, state1, be) -> {
                     });
-            // (world1, pos, state1, be) -> CooldownSpellPedestalBlockEntity.tick(world1,
-            // pos, state1, be));
         }
     }
 }

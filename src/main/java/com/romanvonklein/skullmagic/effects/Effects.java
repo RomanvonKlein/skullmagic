@@ -1,13 +1,13 @@
 package com.romanvonklein.skullmagic.effects;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.romanvonklein.skullmagic.SkullMagic;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 
 public class Effects {
     public static final Effect POSITION_HEIGHLIGH_EFFECT = new Effect() {
@@ -16,7 +16,7 @@ public class Effects {
         @Override
         public void spawn(MinecraftClient client, String worldkey, List<Vec3d> positions, double spellPower) {
             Vec3d pos = positions.get(0);
-            Random rand = Random.createLocal();
+            ThreadLocalRandom rand = ThreadLocalRandom.current();
             for (int i = 0; i < particlesPerTick; i++) {
                 client.world.addParticle(ParticleTypes.PORTAL, true, pos.x, pos.y, pos.z, rand.nextDouble() - 0.5,
                         rand.nextDouble() - 0.5, rand.nextDouble() - 0.5);
@@ -32,7 +32,7 @@ public class Effects {
         @Override
         public void spawn(MinecraftClient client, String worldkey, List<Vec3d> positions, double spellPower) {
             Vec3d pos = positions.get(0);
-            Random rand = Random.createLocal();
+            ThreadLocalRandom rand = ThreadLocalRandom.current();
             client.world.addParticle(ParticleTypes.FLAME, true, pos.x, pos.y, pos.z, (rand.nextDouble() - 0.5) * 0.05,
                     (rand.nextDouble()) * 0.05, (rand.nextDouble() - 0.5) * 0.05);
         }
@@ -50,19 +50,19 @@ public class Effects {
             int num_particles = 5;
             Vec3d moveVec = centerPos.subtract(altarPos).multiply(0.025);
             for (int i = 0; i < num_particles; i++) {
-                Random rand = Random.createLocal();
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
                 Vec3d moddedMoveVec = moveVec.multiply(rand.nextDouble() + 0.5);
                 client.world.addParticle(SkullMagic.CONNECTING_EFFECT_PARTICLE, true, altarPos.x, altarPos.y,
                         altarPos.z, moddedMoveVec.x, moddedMoveVec.y, moddedMoveVec.z);
             }
             for (int i = 0; i < num_particles; i++) {
-                Random rand = Random.createLocal();
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
                 Vec3d moddedMoveVec = moveVec.multiply(rand.nextDouble() + 0.5);
                 client.world.addParticle(SkullMagic.CONNECTING_EFFECT_PARTICLE, true, targetPos.x, targetPos.y,
                         targetPos.z, -moddedMoveVec.x, -moddedMoveVec.y, -moddedMoveVec.z);
             }
             for (int i = 0; i < num_particles; i++) {
-                Random rand = Random.createLocal();
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
                 Vec3d moddedMoveVec = new Vec3d((rand.nextDouble() - 0.5), (rand.nextDouble() - 0.5),
                         (rand.nextDouble() - 0.5)).multiply(0.01);
                 client.world.addParticle(SkullMagic.CONNECTING_EFFECT_PARTICLE, true, centerPos.x, centerPos.y,
@@ -83,19 +83,19 @@ public class Effects {
             int num_particles = 5;
             Vec3d moveVec = centerPos.subtract(altarPos).multiply(0.025);
             for (int i = 0; i < num_particles; i++) {
-                Random rand = Random.createLocal();
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
                 Vec3d moddedMoveVec = moveVec.multiply(rand.nextDouble() + 0.5);
                 client.world.addParticle(SkullMagic.CONNECTING_EFFECT_PARTICLE, true, centerPos.x, centerPos.y,
                         centerPos.z, moddedMoveVec.x, moddedMoveVec.y, moddedMoveVec.z);
             }
             for (int i = 0; i < num_particles; i++) {
-                Random rand = Random.createLocal();
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
                 Vec3d moddedMoveVec = moveVec.multiply(rand.nextDouble() + 0.5);
                 client.world.addParticle(SkullMagic.CONNECTING_EFFECT_PARTICLE, true, centerPos.x, centerPos.y,
                         centerPos.z, -moddedMoveVec.x, -moddedMoveVec.y, -moddedMoveVec.z);
             }
             for (int i = 0; i < num_particles; i++) {
-                Random rand = Random.createLocal();
+                ThreadLocalRandom rand = ThreadLocalRandom.current();
                 Vec3d moddedMoveVec = new Vec3d((rand.nextDouble() - 0.5), (rand.nextDouble() - 0.5),
                         (rand.nextDouble() - 0.5)).multiply(0.01);
                 client.world.addParticle(SkullMagic.DISCONNECTING_EFFECT_PARTICLE, true, centerPos.x, centerPos.y,

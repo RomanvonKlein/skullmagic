@@ -8,7 +8,7 @@ import com.romanvonklein.skullmagic.data.WorldBlockPos;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.util.thread.TaskQueue.Simple;
 
 public class EffectController {
@@ -67,7 +67,7 @@ public class EffectController {
                     if (shrineData != null) {
 
                         int shrineLevel = shrineData.getShrineLevel();
-                        Random rand = Random.createLocal();
+                        ThreadLocalRandom rand = ThreadLocalRandom.current();
                         double targetX = rand.nextBoolean()
                                 ? shrinePos.getX() + 0.5 + Config.getConfig().shrineRangePerLevel * shrineLevel
                                 : shrinePos.getX() + 0.5 - Config.getConfig().shrineRangePerLevel * shrineLevel;
