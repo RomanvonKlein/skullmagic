@@ -21,24 +21,15 @@ public class LinkingParticle extends AbstractSlowingParticle {
         this.targetBlockPos = new Vec3d(targetPosX, targetPosY, targetPosZ);
         this.collidesWithWorld = false;
     }
-    // @Override
-    // public void move(double x, double y, double z) {
-    // // adjust velocity
-    // Vec3d prevPos = new Vec3d(this.prevPosX, this.prevPosY, this.prevPosZ);
-    // double diff = targetBlockPos.distanceTo(prevPos);
-    // if (diff > 1.5) {
-
-    // } else {
-    // // close enought to ascend
-    // this.velocityY = 0.1;
-
-    // }
-    // super.move(x, y, z);
-    // }
 
     @Override
     public ParticleTextureSheet getType() {
         return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
+    }
+
+    @Override
+    public float getSize(float tickDelta) {
+        return 0.5f * ((this.maxAge - this.age) / 70.0f);
     }
 
     @Override

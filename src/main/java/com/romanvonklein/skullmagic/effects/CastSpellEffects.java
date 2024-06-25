@@ -63,10 +63,9 @@ public class CastSpellEffects {
                 }
 
             }
-            //TODO: this is causing crashes with random access - propably cant call things on the world instance from this thread (rendering thread?)
-            // client.world.playSound(castPos.x, castPos.y, castPos.z, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,
-            //         SoundCategory.PLAYERS, 1.0f, 1.0f,
-            //         true);
+            client.world.playSound(castPos.x, castPos.y, castPos.z, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,
+                    SoundCategory.PLAYERS, 1.0f, 1.0f,
+                    true);
         }
 
         @Override
@@ -81,9 +80,7 @@ public class CastSpellEffects {
             if (SpellEffects.containsKey(spellname)) {
                 SpellEffects.get(spellname).spawn(client, worldkey, Arrays.asList(pos), spellPower);
             } else {
-                SIMPLE_PARTICLE_EFFECT.spawn(client, worldkey, Arrays.asList(pos), spellPower);// TODO: this is causing
-                                                                                               // crashes with random
-                                                                                               // access, before line 67
+                SIMPLE_PARTICLE_EFFECT.spawn(client, worldkey, Arrays.asList(pos), spellPower);
             }
         }
     }

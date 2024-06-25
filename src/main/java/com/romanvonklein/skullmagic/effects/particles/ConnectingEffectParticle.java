@@ -30,7 +30,7 @@ public class ConnectingEffectParticle extends SpriteBillboardParticle {
 
     @Override
     public float getSize(float tickDelta) {
-        return 0.1f;
+        return 0.5f * ((this.maxAge - this.age) / 70.0f);
     }
 
     @Override

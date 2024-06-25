@@ -36,6 +36,11 @@ public class SimpleEffectParticle extends SpriteBillboardParticle {
     }
 
     @Override
+    public float getSize(float tickDelta) {
+        return 0.5f * ((this.maxAge - this.age) / 70.0f);
+    }
+
+    @Override
     public void tick() {
         this.prevPosX = this.x;
         this.prevPosY = this.y;
