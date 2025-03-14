@@ -321,7 +321,9 @@ class PlayerData extends PersistentState {
     }
 
     public void toggleSpellAutoCast(String spellname) {
-        this.spells.get(spellname).toggleAutoCast();
+        if (this.spells.containsKey(spellname)) {
+            this.spells.get(spellname).toggleAutoCast();
+        }
     }
 
 }
