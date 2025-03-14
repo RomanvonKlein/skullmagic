@@ -63,9 +63,11 @@ public class CastSpellEffects {
                 }
 
             }
-            client.world.playSound(castPos.x, castPos.y, castPos.z, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,
-                    SoundCategory.PLAYERS, 1.0f, 1.0f,
-                    true);
+            client.execute(() -> 
+                client.world.playSound(castPos.x, castPos.y, castPos.z, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,
+                SoundCategory.PLAYERS, 1.0f, 1.0f,
+                true)
+            );
         }
 
         @Override
@@ -74,13 +76,13 @@ public class CastSpellEffects {
 
     };
 
-    public static void castSpellEffect(MinecraftClient client, String spellname, String worldkey, Vec3d pos,
+    public static void castSpellEffect(MinecraftClient client, String spellname, String worldkey, Vec3d castPos,
             double spellPower) {
         if (worldkey.equals(client.world.getRegistryKey().toString())) {
             if (SpellEffects.containsKey(spellname)) {
-                SpellEffects.get(spellname).spawn(client, worldkey, Arrays.asList(pos), spellPower);
+                SpellEffects.get(spellname).spawn(client, worldkey, Arrays.asList(castPos), spellPower);
             } else {
-                SIMPLE_PARTICLE_EFFECT.spawn(client, worldkey, Arrays.asList(pos), spellPower);
+                SIMPLE_PARTICLE_EFFECT.spawn(client, worldkey, Arrays.asList(castPos), spellPower);
             }
         }
     }
