@@ -12,10 +12,37 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "skullmagic:overworld/dark_tower/dark_tower_side_02",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_side_03",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_side_04",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_side_05",
         "projection": "rigid",
         "processors": "skullmagic:stone_degradation"
       }
