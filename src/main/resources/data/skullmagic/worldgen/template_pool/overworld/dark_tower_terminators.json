@@ -10,6 +10,24 @@
         "projection": "rigid",
         "processors": "skullmagic:stone_degradation"
       }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_top_02",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "skullmagic:overworld/dark_tower/dark_tower_top_03",
+        "projection": "rigid",
+        "processors": "skullmagic:stone_degradation"
+      }
     }
   ]
 }
