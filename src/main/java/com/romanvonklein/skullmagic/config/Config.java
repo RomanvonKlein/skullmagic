@@ -136,8 +136,8 @@ public class Config {
         defaultData.defaultSpells = new String[] {};
 
         // other values
-        defaultData.capacityCrystalStrength = 500;
-        defaultData.altarCapacity = 1000;
+        defaultData.capacityCrystalStrength = 750;
+        defaultData.altarCapacity = 10000;
         defaultData.shrineRangePerLevel = 5;
 
         // spawner lists

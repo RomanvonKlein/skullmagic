@@ -69,7 +69,8 @@ public class ClientData extends PlayerData {
     public void setEssenceChargeRate(int amount) {
         this.getEssencePool().setEssenceChargeRate(amount, null);
     }
-
+    
+    @Override
     public boolean knowsSpell(String spellname) {
         return this.spells.containsKey(spellname) && this.spells.get(spellname) != null;
     }

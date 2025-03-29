@@ -36,7 +36,6 @@ public class SpellData extends PersistentState {
     }
 
     public void toggleAutoCast() {
-        // TODO: notify Player
         this.autoCast = !this.autoCast;
     }
 
