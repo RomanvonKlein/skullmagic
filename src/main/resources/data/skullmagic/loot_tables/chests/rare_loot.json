@@ -9,6 +9,14 @@
                 },
                 {
                     "type": "minecraft:item",
+                    "name": "skullmagic:strengthbuff_orb"
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "skullmagic:lunge_orb"
+                },
+                {
+                    "type": "minecraft:item",
                     "name": "skullmagic:teleport_orb"
                 },
                 {
