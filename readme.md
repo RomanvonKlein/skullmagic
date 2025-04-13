@@ -5,3 +5,5 @@ It allows you to harness the power of your enemies by constructing an altar to c
 ## Development
 This project is based on the fabric modloader. You can compile and run this project by first making sure to have javasdk >=17 installed.
 After cloning this repository, you should be abled to build it by first running ```gradlew genSources```, then ```gradlew build```.
+## License
+This software is licensed under the [BSD License](./license.txt)
