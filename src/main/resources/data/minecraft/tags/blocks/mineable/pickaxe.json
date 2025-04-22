@@ -2,7 +2,7 @@
     "replace": false,
     "values": [
         "skullmagic:skull_pedestal",
-        "skullmagic:skull_altar",
+        "skullmagic:simple_skull_altar",
         "skullmagic:simple_spell_shrine",
         "skullmagic:intermediate_spell_shrine",
         "skullmagic:advanced_spell_shrine",

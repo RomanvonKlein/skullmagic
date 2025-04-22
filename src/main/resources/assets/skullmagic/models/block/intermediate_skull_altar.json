@@ -2,8 +2,8 @@
 	"parent": "block/block",
 	"texture_size": [64, 64],
 	"textures": {
-		"1": "skullmagic:block/skull_altar",
-		"particle":"skullmagic:block/skull_altar"
+		"1": "skullmagic:block/intermediate_skull_altar",
+		"particle":"skullmagic:block/intermediate_skull_altar"
 	},
 	"elements": [
 		{

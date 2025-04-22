@@ -17,6 +17,7 @@ import com.romanvonklein.skullmagic.blockEntities.SkullAltarBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import com.romanvonklein.skullmagic.blocks.ASpellPedestal;
 import com.romanvonklein.skullmagic.blocks.ASpellShrine;
+import com.romanvonklein.skullmagic.config.AltarStats;
 import com.romanvonklein.skullmagic.config.Config;
 import com.romanvonklein.skullmagic.items.KnowledgeOrb;
 import com.romanvonklein.skullmagic.networking.ServerPackageSender;
@@ -51,12 +52,12 @@ public class ServerData extends PersistentState {
 
     private ArrayList<UUID> playersToUpdate = new ArrayList<>();
     HashMap<UUID, PlayerData> players;
-    static private Map<String, ? extends Spell> spells;
+    private static Map<String, ? extends Spell> spells;
 
     // From 1.20.2
     // public static PersistentState.Type<ServerData> getPersistentStateType() {
-    //     return new PersistentState.Type<>(ServerData::new, ServerData::fromNbt,
-    //             DataFixTypes.SAVED_DATA_MAP_INDEX);
+    // return new PersistentState.Type<>(ServerData::new, ServerData::fromNbt,
+    // DataFixTypes.SAVED_DATA_MAP_INDEX);
     // }
 
     public ServerData() {
@@ -66,7 +67,7 @@ public class ServerData extends PersistentState {
     public ServerData(HashMap<UUID, PlayerData> players) {
         this.players = players;
         this.generateDataShortcuts();
-        this.GenerateBufferedData();
+        this.generateBufferedData();
     }
 
     public void setChangedForPlayer(UUID playerID) {
@@ -78,9 +79,8 @@ public class ServerData extends PersistentState {
      * the ServerData instance.
      * That data includes spell details( cost, efficiency, power... )
      */
-    private void GenerateBufferedData() {
+    private void generateBufferedData() {
         SkullMagic.LOGGER.warn("Buffer gerneration not implemented yet.");
-        // throw new NotImplementedException();
     }
 
     /**
@@ -103,9 +103,9 @@ public class ServerData extends PersistentState {
     }
 
     public void tick(MinecraftServer server) {
-        for (UUID playerID : this.players.keySet()) {
-            PlayerData data = this.players.get(playerID);
-            data.tick(server, playerID);
+        for (Map.Entry<UUID, PlayerData> entry : this.players.entrySet()) {
+            PlayerData data = entry.getValue();
+            data.tick(server, entry.getKey());
         }
         for (UUID playerID : this.playersToUpdate) {
             ServerPackageSender.sendUpdatePlayerDataPackageForPlayer(server.getPlayerManager().getPlayer(playerID));
@@ -247,7 +247,7 @@ public class ServerData extends PersistentState {
      * @param player
      * @param pos
      */
-    public void trySetLinkedPlayer(ServerPlayerEntity player, WorldBlockPos pos) {
+    public void trySetLinkedPlayer(ServerPlayerEntity player, WorldBlockPos pos, String altarId) {
         if (!playerHasAltar(player)) {
             // player has no altar
             if (altarIsBound(pos)) {
@@ -256,7 +256,7 @@ public class ServerData extends PersistentState {
 
             } else {
                 // altar is unlinked => bind the altar
-                linkAltar(player, pos);
+                linkAltar(player, pos, altarId);
                 player.sendMessage(Text.translatable("skullmagic.message.linked_altar_to_player"), true);
             }
         } else {
@@ -278,17 +278,18 @@ public class ServerData extends PersistentState {
         }
     }
 
-    public void linkAltar(ServerPlayerEntity player, WorldBlockPos pos) {
+    public void linkAltar(ServerPlayerEntity player, WorldBlockPos pos, String altarId) {
         ServerWorld world = player.getServer().getWorld(pos.worldKey);
-        Vec3i distVec = new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                Config.getConfig().scanWidth);
+        Vec3i distVec = new Vec3i(Config.getConfig().getAltarStats(altarId).scanWidth,
+                Config.getConfig().getAltarStats(altarId).scanHeight,
+                Config.getConfig().getAltarStats(altarId).scanWidth);
         Box searchbox = new Box(pos.subtract(distVec), pos.add(distVec));
         HashMap<BlockPos, String> pedestals = getUnlinkedSkullPedestalsInBox(world,
                 searchbox);
         ArrayList<BlockPos> consumers = getUnlinkedConsumersInBox(world, searchbox);
         ArrayList<BlockPos> capacityCrystals = getUnlinkedCapacityCrystalsInBox(world, searchbox);
         this.players.get(player.getUuid())
-                .setEssencePool(new EssencePool(pos, pos.worldKey, pedestals, consumers, capacityCrystals, 0),
+                .setEssencePool(new EssencePool(pos, altarId, pos.worldKey, pedestals, consumers, capacityCrystals, 0),
                         player.getUuid());
         world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE,
                 SoundCategory.BLOCKS,
@@ -444,8 +445,8 @@ public class ServerData extends PersistentState {
         if (playerHasAltar(player)) {
             UUID playerID = player.getGameProfile().getId();
             PlayerData data = this.players.get(playerID);
-            if (Util.inRange(data.getAltarPos(), pos, Config.getConfig().scanWidth,
-                    Config.getConfig().scanHeight)) {
+            if (Util.inRange(data.getAltarPos(), pos, Config.getConfig().getAltarStats(data.getAltarId()).scanWidth,
+                    Config.getConfig().getAltarStats(data.getAltarId()).scanHeight)) {
                 data.getEssencePool().addCapacityCrystal(pos, playerID);
                 world.playSound(null, pos, SoundEvents.BLOCK_BEACON_ACTIVATE,
                         SoundCategory.BLOCKS,
@@ -483,13 +484,22 @@ public class ServerData extends PersistentState {
         String skullIdentifier = Util.getPedestalSkullIdentifier(world, pedPos);
         if (skullIdentifier != null
                 && !pedestalIsLinked(new WorldBlockPos(pedPos, world.getRegistryKey()))) {
+            int scanWidth = Config.getConfig().getMaxAltarScanWidth();
+            int scanHeight = Config.getConfig().getMaxAltarScanHeight();
             HashMap<WorldBlockPos, UUID> activeAltars = getActiveAltarsInBox(world,
-                    new Box(pedPos.subtract((new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                            Config.getConfig().scanWidth))),
-                            pedPos.add(new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                                    Config.getConfig().scanWidth))));
-            if (activeAltars.size() > 0) {
-                linkSkullPedestalToPlayerAltar(world, activeAltars.values().iterator().next(), pedPos, skullIdentifier);
+                    new Box(pedPos.subtract((new Vec3i(scanWidth,
+                            scanHeight,
+                            scanWidth))),
+                            pedPos.add(new Vec3i(scanWidth,
+                                    scanHeight,
+                                    scanWidth))));
+            for (Map.Entry<WorldBlockPos, UUID> altarEntry : activeAltars.entrySet()) {
+                String altarId = players.get(altarEntry.getValue()).essencePool.getAltarId();
+                AltarStats stats = Config.getConfig().getAltarStats(altarId);
+                if (Util.inRange(altarEntry.getKey(), pedPos, stats.scanWidth, stats.scanHeight)) {
+                    linkSkullPedestalToPlayerAltar(world, altarEntry.getValue(), pedPos, skullIdentifier);
+                    break;
+                }
             }
         }
     }
@@ -755,8 +765,9 @@ public class ServerData extends PersistentState {
             int shrineLevel) {
         if (playerKnowsSpell(playerid, spellname) && !playerHasSpellShrine(playerid, spellname)) {
             PlayerData data = this.players.get(playerid);
-            Vec3i rangevec = new Vec3i(Config.getConfig().scanWidth, Config.getConfig().scanHeight,
-                    Config.getConfig().scanWidth);
+            Vec3i rangevec = new Vec3i(Config.getConfig().shrineRangePerLevel * shrineLevel,
+                    Config.getConfig().shrineRangePerLevel * shrineLevel,
+                    Config.getConfig().shrineRangePerLevel * shrineLevel);
             Box box = new Box(pos.subtract(rangevec), pos.add(rangevec));
             ArrayList<Tuple<BlockPos, String>> powerPedestalsList = getUnlinkedPowerSpellPedestals(world, box,
                     spellname);
@@ -911,8 +922,8 @@ public class ServerData extends PersistentState {
         if (ent.getScroll() == null || ent.getScroll().isOf(Items.AIR)) {
             // if empty, check wether the player holds a valid scroll.
             ItemStack scrollItemStack = player.getMainHandStack();
-            if (scrollItemStack.getItem() instanceof KnowledgeOrb) {
-                String spellname = ((KnowledgeOrb) scrollItemStack.getItem()).spellName;
+            if (scrollItemStack.getItem() instanceof KnowledgeOrb knowledgeOrb) {
+                String spellname = knowledgeOrb.spellName;
                 if (this.tryAddSpellPedestal((ServerWorld) world, pos,
                         player.getGameProfile().getId(), spellname, pedestal)) {
                     ent.setScroll(scrollItemStack.copy(), player);
@@ -945,8 +956,8 @@ public class ServerData extends PersistentState {
         if (blockEnt.getScroll() == null || blockEnt.getScroll().isOf(Items.AIR)) {
             // if empty, check wether the player holds a valid scroll.
             ItemStack itemStack = player.getMainHandStack();
-            if (itemStack.getItem() instanceof KnowledgeOrb) {
-                String spellname = ((KnowledgeOrb) itemStack.getItem()).spellName;
+            if (itemStack.getItem() instanceof KnowledgeOrb knowledgeOrb) {
+                String spellname = knowledgeOrb.spellName;
                 // only continue if the player knowns the spell
                 if (playerKnowsSpell(playerid, spellname)) {
                     // dont do anything if the player already has a shrine for that spell assigned

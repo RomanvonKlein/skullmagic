@@ -1,9 +1,6 @@
 package com.romanvonklein.skullmagic;
 
-import static net.minecraft.world.gen.feature.Feature.ORE;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,17 +20,19 @@ import com.romanvonklein.skullmagic.blockEntities.SkullMagicSpawnerBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SkullPedestalBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.SpellShrineBlockEntity;
 import com.romanvonklein.skullmagic.blockEntities.WitherEnergyChannelerBlockEntity;
+import com.romanvonklein.skullmagic.blocks.AdvancedSkullAltar;
 import com.romanvonklein.skullmagic.blocks.AdvancedSpellShrine;
 import com.romanvonklein.skullmagic.blocks.BlockPlacer;
 import com.romanvonklein.skullmagic.blocks.BlockUser;
 import com.romanvonklein.skullmagic.blocks.CapacityCrystal;
 import com.romanvonklein.skullmagic.blocks.FireCannon;
+import com.romanvonklein.skullmagic.blocks.IntermediateSkullAltar;
 import com.romanvonklein.skullmagic.blocks.IntermediateSpellShrine;
 import com.romanvonklein.skullmagic.blocks.SimpleCooldownSpellPedestal;
 import com.romanvonklein.skullmagic.blocks.SimpleEfficiencySpellPedestal;
 import com.romanvonklein.skullmagic.blocks.SimplePowerSpellPedestal;
 import com.romanvonklein.skullmagic.blocks.SimpleSpellShrine;
-import com.romanvonklein.skullmagic.blocks.SkullAltar;
+import com.romanvonklein.skullmagic.blocks.SimpleSkullAltar;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSkullBlock;
 import com.romanvonklein.skullmagic.blocks.SkullMagicSpawner;
 import com.romanvonklein.skullmagic.blocks.SkullPedestal;
@@ -53,6 +52,8 @@ import com.romanvonklein.skullmagic.tasks.TaskManager;
 import com.romanvonklein.skullmagic.util.CreativeTabLists;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -62,9 +63,9 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -77,21 +78,15 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.featuretoggle.FeatureFlag;
 import net.minecraft.resource.featuretoggle.FeatureManager;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.structure.rule.BlockMatchRuleTest;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.YOffset;
+import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
 import net.minecraft.world.gen.feature.PlacedFeature;
-import net.minecraft.world.gen.placementmodifier.CountPlacementModifier;
-import net.minecraft.world.gen.placementmodifier.HeightRangePlacementModifier;
-import net.minecraft.world.gen.placementmodifier.SquarePlacementModifier;
 
 public class SkullMagic implements ModInitializer {
 	public static String MODID = "skullmagic";
@@ -99,76 +94,68 @@ public class SkullMagic implements ModInitializer {
 
 	// blocks
 	public static final Block BLOCK_USER_BLOCK = new BlockUser(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block CapacityCrystal = new CapacityCrystal(
-			// FabricBlockSettings.create(Material.AMETHYST).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block SkullPedestal = new SkullPedestal(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block SIMPLE_SPELL_SHRINE = new SimpleSpellShrine(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block INTERMEDIATE_SPELL_SHRINE = new IntermediateSpellShrine(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block ADVANCED_SPELL_SHRINE = new AdvancedSpellShrine(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block SPELL_POWER_PEDESTAL = new SimplePowerSpellPedestal(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block SPELL_EFFICIENCY_PEDESTAL = new SimpleEfficiencySpellPedestal(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block SPELL_COOLDOWN_PEDESTAL = new SimpleCooldownSpellPedestal(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
-	public static final Block SkullAltar = new SkullAltar(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
+
+	public static final Block SIMPLE_SKULL_ALTAR = new SimpleSkullAltar(
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+	public static final Block INTERMEDIATE_SKULL_ALTAR = new IntermediateSkullAltar(
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+	public static final Block ADVANCED_SKULL_ALTAR = new AdvancedSkullAltar(
+			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block FireCannon = new FireCannon(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block BlockPlacer = new BlockPlacer(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block WitherEnergyChanneler = new WitherEnergyChanneler(
-			// FabricBlockSettings.create(Material.METAL).strength(4.0f).nonOpaque());
 			FabricBlockSettings.create().strength(4.0f).nonOpaque());
+
 	public static final Block ENDERMAN_HEAD_BLOCK = new SkullMagicSkullBlock(
 			SkullMagicSkullBlock.SkullMagicType.ENDERMAN,
-			// AbstractBlock.Settings.create(Material.DECORATION).strength(1.0f));
 			AbstractBlock.Settings.create().strength(1.0f));
 
 	public static final Block SPIDER_HEAD_BLOCK = new SkullMagicSkullBlock(
 			SkullMagicSkullBlock.SkullMagicType.SPIDER,
-			// AbstractBlock.Settings.create(Material.DECORATION).strength(1.0f));
 			AbstractBlock.Settings.create().strength(1.0f));
 	public static final Block BLAZE_HEAD_BLOCK = new SkullMagicSkullBlock(
 			SkullMagicSkullBlock.SkullMagicType.BLAZE,
-			// AbstractBlock.Settings.create(Material.DECORATION).strength(1.0f));
 			AbstractBlock.Settings.create().strength(1.0f));
-	// public static final Block SKULLIUM_ORE = new
-	// Block(FabricBlockSettings.create(Material.STONE).strength(2.0f));
+
 	public static final Block SKULLIUM_ORE = new Block(FabricBlockSettings.create().strength(2.0f));
-	// public static final Block SKULLIUM_BLOCK = new
-	// Block(FabricBlockSettings.create(Material.AMETHYST).strength(4.0f));
 	public static final Block SKULLIUM_BLOCK = new Block(FabricBlockSettings.create().strength(4.0f));
 
 	// Spawner Blocks
 	public static final Block SKULLMAGIC_EASY_SPAWNER_BLOCK = new SkullMagicSpawner(
-			// FabricBlockSettings.create(Material.STONE).strength(2.0f).nonOpaque(),
-			// "easy");
 			FabricBlockSettings.create().strength(2.0f).nonOpaque(), "easy");
 	public static final Block SKULLMAGIC_MEDIUM_SPAWNER_BLOCK = new SkullMagicSpawner(
-			// FabricBlockSettings.create(Material.STONE).strength(2.0f).nonOpaque(),
-			// "medium");
 			FabricBlockSettings.create().strength(2.0f).nonOpaque(), "medium");
 	public static final Block SKULLMAGIC_HARD_SPAWNER_BLOCK = new SkullMagicSpawner(
-			// FabricBlockSettings.create(Material.STONE).strength(2.0f).nonOpaque(),
-			// "hard");
 			FabricBlockSettings.create().strength(2.0f).nonOpaque(), "hard");
 
 	// items
@@ -178,8 +165,7 @@ public class SkullMagic implements ModInitializer {
 	public static final Item SKULL_WAND = generateItem(new FabricItemSettings(), CreativeTabLists.functionalTabList);
 
 	// generation
-	public static final RegistryKey<PlacedFeature> SKULLIUM_ORE_PLACED_FEATURE = RegistryKey
-			.of(RegistryKeys.PLACED_FEATURE, new Identifier(MODID, "ore_skullium"));
+	public static final RegistryKey<PlacedFeature> SKULLIUM_ORE_PLACED_FEATURE_KEY = RegistryKey.of(RegistryKeys.PLACED_FEATURE, Identifier.of(MODID,"skullium_ore"));
 
 	public static Item generateItem(FabricItemSettings settings, List<ItemGroup> tablList) {
 		Item result = new Item(settings);
@@ -217,20 +203,6 @@ public class SkullMagic implements ModInitializer {
 	// screen handlers
 	public static ScreenHandlerType<BlockPlacerScreenHandler> BLOCK_PLACER_SCREEN_HANDLER;
 
-	// ore features
-	private static final ConfiguredFeature<?, ?> END_SKULLIUM_ORE_CONFIGURED_FEATURE = new ConfiguredFeature<>(
-			ORE,
-			new OreFeatureConfig(
-					new BlockMatchRuleTest(Blocks.END_STONE),
-					SKULLIUM_ORE.getDefaultState(),
-					9));
-
-	public static PlacedFeature END_SKULLIUM_ORE_PLACED_FEATURE = new PlacedFeature(
-			RegistryEntry.of(END_SKULLIUM_ORE_CONFIGURED_FEATURE),
-			Arrays.asList(
-					CountPlacementModifier.of(20),
-					SquarePlacementModifier.of(),
-					HeightRangePlacementModifier.uniform(YOffset.getBottom(), YOffset.fixed(256))));
 
 	// particles
 	public static final DefaultParticleType LINK_PARTICLE = FabricParticleTypes
@@ -286,7 +258,8 @@ public class SkullMagic implements ModInitializer {
 				MODID + ":block_placer_block_entity",
 				FabricBlockEntityTypeBuilder.create(BlockPlacerBlockEntity::new, BlockPlacer).build(null));
 		SKULL_ALTAR_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, MODID + ":skull_altar_block_entity",
-				FabricBlockEntityTypeBuilder.create(SkullAltarBlockEntity::new, SkullAltar).build(null));
+				FabricBlockEntityTypeBuilder.create(SkullAltarBlockEntity::new, SIMPLE_SKULL_ALTAR,
+						INTERMEDIATE_SKULL_ALTAR, ADVANCED_SKULL_ALTAR).build(null));
 		SKULL_PEDESTAL_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE,
 				MODID + ":skull_pedestal_block_entity",
 				FabricBlockEntityTypeBuilder.create(SkullPedestalBlockEntity::new, SkullPedestal).build(null));
@@ -308,7 +281,9 @@ public class SkullMagic implements ModInitializer {
 		registerBlockWithItem(CapacityCrystal, "capacity_crystal", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(FireCannon, "fire_cannon", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(SkullPedestal, "skull_pedestal", CreativeTabLists.functionalTabList);
-		registerBlockWithItem(SkullAltar, "skull_altar", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(SIMPLE_SKULL_ALTAR, "simple_skull_altar", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(INTERMEDIATE_SKULL_ALTAR, "intermediate_skull_altar", CreativeTabLists.functionalTabList);
+		registerBlockWithItem(ADVANCED_SKULL_ALTAR, "advanced_skull_altar", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(BlockPlacer, "block_placer", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(SPELL_POWER_PEDESTAL, "spell_power_pedestal", CreativeTabLists.functionalTabList);
 		registerBlockWithItem(SPELL_EFFICIENCY_PEDESTAL, "spell_efficiency_pedestal",
@@ -406,17 +381,8 @@ public class SkullMagic implements ModInitializer {
 				});
 
 		// feature initialization
-		// Registry.register(Registries.FEATURE, new Identifier(MODID,
-		// "end_skullium_ore"),
-		// END_SKULLIUM_ORE_CONFIGURED_FEATURE);
-		// Registry.register(Registries.FEATURE, new Identifier(MODID,
-		// "end_skullium_ore"),
-		// END_SKULLIUM_ORE_PLACED_FEATURE);
-		// BiomeModifications.addFeature(BiomeSelectors.foundInTheEnd(),
-		// GenerationStep.Feature.UNDERGROUND_ORES,
-		// RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(MODID,
-		// "end_skullium_ore")));
-
+		BiomeModifications.addFeature(BiomeSelectors.tag(ConventionalBiomeTags.IN_THE_END), GenerationStep.Feature.UNDERGROUND_ORES, SKULLIUM_ORE_PLACED_FEATURE_KEY);
+		// BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, SKULLIUM_ORE_PLACED_FEATURE_KEY);
 		// initialize loot tables
 		LootTableModifier.initializeLootTableModifications();
 	}

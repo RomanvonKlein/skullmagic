@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XGX",
+    "XWX",
+    "XXX"
+  ],
+  "key": {
+    "W": {
+      "item": "skullmagic:skullium_block"
+    },
+    "G": {
+      "item": "minecraft:light_weighted_pressure_plate"
+    },
+    "X": {
+      "item": "minecraft:end_stone_bricks"
+    }
+  },
+  "result": {
+    "item": "skullmagic:advanced_skull_altar",
+    "count": 1
+  }
+}

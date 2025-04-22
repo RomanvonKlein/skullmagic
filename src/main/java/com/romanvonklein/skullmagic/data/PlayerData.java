@@ -134,8 +134,10 @@ class PlayerData extends PersistentState {
 
     public boolean tryAddConsumer(RegistryKey<World> registryKey, BlockPos pos, UUID playerID) {
         boolean result = false;
+
         if (this.essencePool.getWorldKey().toString().equals(registryKey.toString())
-                && Util.inRange(pos, this.getAltarPos(), Config.getConfig().scanWidth, Config.getConfig().scanHeight)) {
+                && Util.inRange(pos, this.getAltarPos(), Config.getConfig().getAltarStats(this.getAltarId()).scanWidth,
+                        Config.getConfig().getAltarStats(this.getAltarId()).scanHeight)) {
             this.essencePool.addConsumer(pos, playerID);
             result = true;
         }
@@ -324,6 +326,10 @@ class PlayerData extends PersistentState {
         if (this.spells.containsKey(spellname)) {
             this.spells.get(spellname).toggleAutoCast();
         }
+    }
+
+    public String getAltarId() {
+        return this.essencePool.getAltarId();
     }
 
 }

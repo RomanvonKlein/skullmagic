@@ -10,7 +10,6 @@ import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class StructurePlacer {
 

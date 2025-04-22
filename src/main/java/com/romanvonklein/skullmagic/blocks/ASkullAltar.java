@@ -13,6 +13,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -24,10 +25,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 
-//TODO: does this even need to still be a blockentity
-public class SkullAltar extends BlockWithEntity {
+public abstract class ASkullAltar extends BlockWithEntity {
 
-    public SkullAltar(Settings settings) {
+    protected ASkullAltar(Settings settings) {
         super(settings);
     }
 
@@ -59,7 +59,7 @@ public class SkullAltar extends BlockWithEntity {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
             BlockEntityType<T> type) {
         return checkType(type, SkullMagic.SKULL_ALTAR_BLOCK_ENTITY,
-                (world1, pos, state1, be) -> SkullAltarBlockEntity.tick(world1, pos, state1, be));
+                SkullAltarBlockEntity::tick);
     }
 
     @Override
@@ -67,7 +67,8 @@ public class SkullAltar extends BlockWithEntity {
             BlockHitResult hit) {
         if (!world.isClient) {
             SkullMagic.getServerData().trySetLinkedPlayer((ServerPlayerEntity) player,
-                    new WorldBlockPos(pos, world.getRegistryKey()));
+                    new WorldBlockPos(pos, world.getRegistryKey()), Registries.BLOCK
+                            .getId(state.getBlock()).toString());
         }
         return ActionResult.SUCCESS;
     }

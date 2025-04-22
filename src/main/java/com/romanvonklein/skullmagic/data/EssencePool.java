@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 
 class EssencePool extends PersistentState {
     private BlockPos altarPos;
+    private String altarId;
     private RegistryKey<World> worldKey;
     private HashMap<BlockPos, String> pedestals;
     private ArrayList<BlockPos> consumers;
@@ -28,11 +29,12 @@ class EssencePool extends PersistentState {
 
     public EssencePool() {
         altarPos = null;
+        altarId = null;
         worldKey = null;
         pedestals = new HashMap<>();
         consumers = new ArrayList<>();
         essence = 0;
-        this.maxEssence = Config.getConfig().altarCapacity;
+        this.maxEssence = 0;
         this.essenceChargeRate = 0;
         this.capacityCrystals = new ArrayList<>();
     }
@@ -67,14 +69,15 @@ class EssencePool extends PersistentState {
         SkullMagic.updatePlayer(playerToUpdate);
     }
 
-    EssencePool(BlockPos altarPos, RegistryKey<World> worldKey, HashMap<BlockPos, String> pedestals,
+    EssencePool(BlockPos altarPos, String altarId, RegistryKey<World> worldKey, HashMap<BlockPos, String> pedestals,
             ArrayList<BlockPos> consumers, ArrayList<BlockPos> capacityCrystals, int essence) {
         this.altarPos = altarPos;
+        this.altarId = altarId;
         this.worldKey = worldKey;
         this.pedestals = pedestals;
         this.consumers = consumers;
         this.capacityCrystals = capacityCrystals;
-        this.maxEssence = Config.getConfig().altarCapacity;
+        this.maxEssence = Config.getConfig().getAltarStats(altarId).maxCapacity;
         this.essence = essence;
 
         this.recalculateEssenceChargeRate();
@@ -109,6 +112,10 @@ class EssencePool extends PersistentState {
         // altarPos
         if (altarPos != null) {
             tag.putIntArray("altarPos", new int[] { altarPos.getX(), altarPos.getY(), altarPos.getZ() });
+        }
+        // altarId
+        if (altarId != null) {
+            tag.putString("altarId", altarId);
         }
 
         // worldkey
@@ -153,6 +160,12 @@ class EssencePool extends PersistentState {
             altarPos = new BlockPos(altarCoords[0], altarCoords[1], altarCoords[2]);
         }
 
+        // altarId
+        String altarId = null;
+        if (tag.contains("altarId")) {
+            altarId = tag.getString("altarId");
+        }
+
         // worldkey
         RegistryKey<World> worldKey = null;
         if (tag.contains("worldKey")) {
@@ -187,8 +200,7 @@ class EssencePool extends PersistentState {
         // essence
         int essence = tag.getInt("essence");
 
-        EssencePool pool = new EssencePool(altarPos, worldKey, pedestals, consumers, capacityCrystals, essence);
-        return pool;
+        return new EssencePool(altarPos, altarId, worldKey, pedestals, consumers, capacityCrystals, essence);
     }
 
     boolean dischargeEssence(int reducedEssenceCost, UUID playerToUpdate) {
@@ -228,6 +240,10 @@ class EssencePool extends PersistentState {
         return this.altarPos;
     }
 
+    public String getAltarId() {
+        return this.altarId;
+    }
+
     public RegistryKey<World> getWorldKey() {
         return this.worldKey;
     }
@@ -242,6 +258,7 @@ class EssencePool extends PersistentState {
 
     public void clear() {
         this.altarPos = null;
+        this.altarId = null;
         this.consumers.clear();
         this.essence = 0;
         this.essenceChargeRate = 0;

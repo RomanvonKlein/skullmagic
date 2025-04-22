@@ -31,15 +31,13 @@ public class Config {
 
         public Map<String, Integer> skulls;
         public Map<String, Integer> shrines;
-        public int scanWidth;
-        public int scanHeight;
+        private Map<String, AltarStats> altars;
         public int supplyWidth;
         public int supplyHeight;
 
         public String[] defaultSpells;
 
         public int capacityCrystalStrength;
-        public int altarCapacity;
 
         public int shrineRangePerLevel;
 
@@ -47,7 +45,37 @@ public class Config {
             this.drops = new HashMap<>();
             this.skulls = new HashMap<>();
             this.shrines = new HashMap<>();
+            this.altars = new HashMap<>();
             this.spawnerSpawns = new HashMap<>();
+        }
+
+        public int getMaxAltarScanWidth() {
+            int maxScanWidth = 0;
+            for (AltarStats stats : this.altars.values()) {
+                if (stats.scanWidth > maxScanWidth) {
+                    maxScanWidth = stats.scanWidth;
+                }
+            }
+            return maxScanWidth;
+        }
+
+        public int getMaxAltarScanHeight() {
+            int maxScanHeight = 0;
+            for (AltarStats stats : this.altars.values()) {
+                if (stats.scanHeight > maxScanHeight) {
+                    maxScanHeight = stats.scanHeight;
+                }
+            }
+            return maxScanHeight;
+        }
+
+        public AltarStats getAltarStats(String id) {
+
+            if (id != null && this.altars.containsKey(id)) {
+                return this.altars.get(id);
+            } else {
+                return new AltarStats(0, 0, 0);
+            }
         }
     }
 
@@ -129,15 +157,24 @@ public class Config {
         // shrine values
         defaultData.shrines.put(Registries.ITEM.getId(SkullMagic.SIMPLE_SPELL_SHRINE.asItem()).toString(), 3);
 
-        defaultData.scanHeight = 2;
-        defaultData.scanWidth = 5;
-        defaultData.supplyWidth = 32;
-        defaultData.supplyHeight = 16;
+        // altar values
+        defaultData.altars.put(Registries.ITEM.getId(SkullMagic.SIMPLE_SKULL_ALTAR.asItem()).toString(),
+                new AltarStats(2, 1, 5000));
+        defaultData.altars.put(
+                Registries.ITEM.getId(SkullMagic.INTERMEDIATE_SKULL_ALTAR.asItem()).toString(),
+                new AltarStats(4, 1, 10000));
+        defaultData.altars
+                .put(Registries.ITEM.getId(SkullMagic.ADVANCED_SKULL_ALTAR.asItem()).toString(),
+                        new AltarStats(6, 1, 15000));
+
+        // defaultData.scanHeight = 2;
+        // defaultData.scanWidth = 5;
+        // defaultData.supplyWidth = 32;
+        // defaultData.supplyHeight = 16;
         defaultData.defaultSpells = new String[] {};
 
         // other values
         defaultData.capacityCrystalStrength = 750;
-        defaultData.altarCapacity = 10000;
         defaultData.shrineRangePerLevel = 5;
 
         // spawner lists

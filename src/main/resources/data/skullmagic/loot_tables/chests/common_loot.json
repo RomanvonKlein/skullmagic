@@ -17,10 +17,6 @@
         },
         {
           "type": "minecraft:item",
-          "name": "skullmagic:fireresistance_orb"
-        },
-        {
-          "type": "minecraft:item",
           "name": "skullmagic:infect_orb"
         },
         {
