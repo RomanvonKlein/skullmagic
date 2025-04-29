@@ -23,26 +23,20 @@ import net.minecraft.world.gen.structure.StructureType;
 public class BigJigsawStructure extends Structure {
 
     public static final int MAX_SIZE = 128;
-    public static final Codec<BigJigsawStructure> CODEC = RecordCodecBuilder.mapCodec((RecordCodecBuilder.Instance<BigJigsawStructure> instance) -> {
-        return instance.group(configCodecBuilder(instance),
-                StructurePool.REGISTRY_CODEC.fieldOf("start_pool").forGetter((BigJigsawStructure structure) -> {
-                    return structure.startPool;
-                }), Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter((structure) -> {
-                    return structure.startJigsawName;
-                }), Codec.intRange(0, 20).fieldOf("size").forGetter((structure) -> {
-                    return structure.size;
-                }), HeightProvider.CODEC.fieldOf("start_height").forGetter((structure) -> {
-                    return structure.startHeight;
-                }), Codec.BOOL.fieldOf("use_expansion_hack").forGetter((structure) -> {
-                    return structure.useExpansionHack;
-                }), Type.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter((structure) -> {
-                    return structure.projectStartToHeightmap;
-                }), Codec.intRange(1, 256).fieldOf("max_distance_from_center").forGetter((structure) -> {
-                    return structure.maxDistanceFromCenter;
-                })).apply(instance, BigJigsawStructure::new);
-    }).flatXmap(createValidator(), createValidator()).codec();
-
-
+    public static final Codec<BigJigsawStructure> CODEC = RecordCodecBuilder
+            .mapCodec((RecordCodecBuilder.Instance<BigJigsawStructure> instance) -> {
+                return instance.group(configCodecBuilder(instance),
+                        StructurePool.REGISTRY_CODEC.fieldOf("start_pool")
+                                .forGetter((BigJigsawStructure structure) -> structure.startPool),
+                        Identifier.CODEC.optionalFieldOf("start_jigsaw_name")
+                                .forGetter(structure -> structure.startJigsawName),
+                        Codec.intRange(0, 20).fieldOf("size").forGetter(structure -> structure.size),
+                        HeightProvider.CODEC.fieldOf("start_height").forGetter(structure -> structure.startHeight
+                        ), Codec.BOOL.fieldOf("use_expansion_hack").forGetter(structure -> structure.useExpansionHack
+                        ), Type.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(structure -> structure.projectStartToHeightmap
+                        ), Codec.intRange(1, 256).fieldOf("max_distance_from_center").forGetter(structure -> structure.maxDistanceFromCenter
+                        )).apply(instance, BigJigsawStructure::new);
+            }).flatXmap(createValidator(), createValidator()).codec();
 
     private final RegistryEntry<StructurePool> startPool;
     private final Optional<Identifier> startJigsawName;
@@ -53,15 +47,13 @@ public class BigJigsawStructure extends Structure {
     private final int maxDistanceFromCenter;
 
     private static Function<BigJigsawStructure, DataResult<BigJigsawStructure>> createValidator() {
-        return (feature) -> {
+        return feature -> {
             byte heightOnTerrain;
             switch (feature.getTerrainAdaptation()) {
                 case NONE:
                     heightOnTerrain = 0;
                     break;
-                case BURY:
-                case BEARD_THIN:
-                case BEARD_BOX:
+                case BURY, BEARD_THIN, BEARD_BOX:
                     heightOnTerrain = 12;
                     break;
                 default:

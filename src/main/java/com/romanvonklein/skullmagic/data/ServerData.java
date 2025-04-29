@@ -80,7 +80,7 @@ public class ServerData extends PersistentState {
      * That data includes spell details( cost, efficiency, power... )
      */
     private void generateBufferedData() {
-        SkullMagic.LOGGER.warn("Buffer gerneration not implemented yet.");
+        // SkullMagic.LOGGER.warn("Buffer generation not implemented yet.");
     }
 
     /**
@@ -89,7 +89,7 @@ public class ServerData extends PersistentState {
      * instance.
      */
     private void generateDataShortcuts() {
-        SkullMagic.LOGGER.warn("Data shortcuts not yet implemented!");
+        // SkullMagic.LOGGER.warn("Data shortcuts not yet implemented!");
         // throw new NotImplementedException();
     }
 
@@ -714,7 +714,7 @@ public class ServerData extends PersistentState {
         UUID playerID = player.getUuid();
         double powerLevel = getSpellPowerLevel(playerID, spellname);
         Spell spell = spells.get(spellname);
-        if (spell.action.apply(player, powerLevel)) {
+        if (spell.cast(player, powerLevel)) {
             setSpellOnCooldown(playerID, spellname);
             dischargeSpellcost(playerID, spellname);
             if (spell.isTargeted) {
@@ -728,7 +728,6 @@ public class ServerData extends PersistentState {
                             player.getEyePos(), center);
                 }
             } else {
-
                 ServerPackageSender.sendEffectPackageToPlayers(
                         (List<ServerPlayerEntity>) player.getWorld().getPlayers(),
                         spellname, powerLevel,

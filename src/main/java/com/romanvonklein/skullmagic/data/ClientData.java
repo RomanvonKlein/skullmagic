@@ -69,7 +69,7 @@ public class ClientData extends PlayerData {
     public void setEssenceChargeRate(int amount) {
         this.getEssencePool().setEssenceChargeRate(amount, null);
     }
-    
+
     @Override
     public boolean knowsSpell(String spellname) {
         return this.spells.containsKey(spellname) && this.spells.get(spellname) != null;
@@ -206,8 +206,8 @@ public class ClientData extends PlayerData {
         // tick the active spell if applicable
         if (this.selectedSpell != null && !this.selectedSpell.equals("")) {
             Spell selectedSpell = ServerData.getSpells().get(this.selectedSpell);
-            if (selectedSpell instanceof SpellWithHoldAction) {
-                ((SpellWithHoldAction) selectedSpell).clientAction.apply(client.player,
+            if (selectedSpell instanceof SpellWithHoldAction spell) {
+                spell.clientAction(client.player,
                         this.getSpellPower(this.selectedSpell));
             }
         }

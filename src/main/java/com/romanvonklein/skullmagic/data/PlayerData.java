@@ -310,10 +310,10 @@ class PlayerData extends PersistentState {
         }
         // tick active spell serverFunction if exists
         if (this.selectedSpell != null && !this.selectedSpell.equals("")) {
-            Spell selectedSpell = ServerData.getSpells().get(this.selectedSpell);
-            if (selectedSpell instanceof SpellWithHoldAction) {
-                ((SpellWithHoldAction) selectedSpell).serverAction
-                        .apply(server.getPlayerManager().getPlayer(playerToUpdate), getSpellPower(this.selectedSpell));
+            Spell activeSpell = ServerData.getSpells().get(this.selectedSpell);
+            if (activeSpell instanceof SpellWithHoldAction spell) {
+                spell.serverAction(server.getPlayerManager().getPlayer(playerToUpdate),
+                        getSpellPower(this.selectedSpell));
             }
         }
     }

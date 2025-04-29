@@ -13,8 +13,6 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 
 public class SkullPedestalBlockEntity extends BlockEntity {
-    public static final int scanRange = 5;
-    public static final int scanHeight = 1;
     private int[] linkedAltarCoords;
 
     public SkullPedestalBlockEntity(BlockPos pos, BlockState state) {

@@ -101,27 +101,22 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
     }
 
     private void startSpawnProcess(World world, BlockPos pos) {
-        SkullMagic.LOGGER.info("Attempting Spawn");
         ThreadLocalRandom rand = ThreadLocalRandom.current();
         boolean success = false;
         for (int i = 0; i < this.maxSpawns; i++) {
             ServerCommandSource src = world.getServer().getCommandSource();
             String command = "FORMATTING FAILED";
             for (int tryNo = 0; tryNo < maxTries; tryNo++) {
-                //TODO: does rand.nextInt (min, max) do what i think it does?
                 int posX = pos.getX() + rand.nextInt(-this.range, +this.range);
                 int posY = pos.getY() + rand.nextInt(-this.range, +this.range);
                 int posZ = pos.getZ() + rand.nextInt(-this.range, +this.range);
                 if (world.isSpaceEmpty(new Box(posX, posY, posZ, posX + 1, posY + 2, posZ + 1))) {
                     try {
-                        SkullMagic.LOGGER.info("preparing spawning command from spawning command: {}",
-                                this.spawnCommand);
+
                         command = String.format(this.spawnCommand,
                                 world.getRegistryKey().getValue().toString(),
                                 posX, posY,
                                 posZ);
-                        String.format("%d %s", 5, "test");
-                        SkullMagic.LOGGER.info("Using spawning command: {}", command);
                         success = true;
                         world.getServer().getCommandManager().executeWithPrefix(src.withSilent(), command);
                     } catch (Exception e) {
@@ -132,8 +127,6 @@ public class SkullMagicSpawnerBlockEntity extends BlockEntity {
                     }
                     break;
                 } else {
-                    SkullMagic.LOGGER.info("Could not find any free space at {} {} {}", posX, posY,
-                            posZ);
                     ServerPackageSender.sendParticleEffectPackageToPlayers(
                             ((ServerWorld) world).getPlayers(),
                             "minecraft:flame",
